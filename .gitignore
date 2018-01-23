@@ -1,0 +1,12 @@
+.project
+.pydevproject
+
+*.7z
+*.bak
+*.dat
+*.ebml
+*.lnk
+*.old
+*.pyc
+*.zip
+*~
