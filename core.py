@@ -13,6 +13,8 @@ Created on Apr 27, 2017
     Requires validation.
 @todo: Document-wide caching, for future handling of streamed data.
 @todo: Clean up and standardize usage of the term 'size' versus 'length.'
+@todo: Change name of `level` attribute in schemata. In the new schema format,
+    only one value (-1) does anything, which is sort of confusing.
 @todo: (longer term) Consider making schema loading automatic based on the EBML
     DocType, DocTypeVersion, and DocTypeReadVersion. Would mean a refactoring
     of how schemata are loaded.
@@ -379,8 +381,9 @@ class BinaryElement(Element):
 #===============================================================================
 
 class VoidElement(BinaryElement):
-    """ Special case ``Void`` element. Its contents are ignored; they are never
-        even read. 
+    """ Special case ``Void`` element. Its contents are ignored and not read;
+        its `value` is always returned as ``0xFF`` times its length. To get the
+        actual contents, use `getRawValue()`.
     """
    
     def parse(self, stream, size):
@@ -702,15 +705,6 @@ class Document(MasterElement):
 
 
     @property
-    def roots(self):
-        """ The document's root elements. For python-ebml compatibility.
-            Using this with large files is not recommended; consider iterating
-            instead.
-        """
-        return list(self)
-
-
-    @property
     def value(self):
         """ An iterator for iterating the document's root elements. Same as
             `Document.__iter__()`.
@@ -847,7 +841,7 @@ class Schema(object):
     }
 
     # Mapping of schema type names to the corresponding Element subclasses.
-    # For python-ebml compatibility.
+    # For python-ebml schema compatibility.
     ELEMENT_TYPES = {
         'integer': IntegerElement,
         'uinteger': UIntegerElement,
@@ -911,7 +905,7 @@ class Schema(object):
         
         # Create the schema's Document subclass.
         self.document = type('%sDocument' % self.name.title(), (Document,),
-                             {'schema': self})
+                             {'schema': self, 'children':self.children})
 
     
     def _parseLegacySchema(self, schema):
@@ -1084,7 +1078,7 @@ class Schema(object):
             if level == -1:
                 self.globals[eid] = eclass
                 
-        parent = parent or self.document
+        parent = parent or self
         if parent.children is None:
             parent.children = {}
         parent.children[eid] = eclass
