@@ -25,6 +25,8 @@ schema = loadSchema('mide.xml')
 doc = schema.load('test_file.ebml')
 ```
 
+_ebmlite_ (currently) uses its own Schema definition syntax. It does not use the [official schema format](https://github.com/Matroska-Org/ebml-specification/blob/master/specification.markdown#ebml-schema).
+
 Here is an example, showing a simplified version of the schema definition of the standard EBML header elements:
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -53,6 +55,7 @@ Here is an example, showing a simplified version of the schema definition of the
     <!-- More definitions would follow... -->
 </Schema>
 ```
+
 
 Each element defined in the schema is a subclass of one of 8 Element base classes:
 * **MasterElement:** An element containing other elements.
@@ -102,3 +105,7 @@ An Element type can appear multiple times in a schema; i.e. if its type can appe
     </MasterElement>
 </Schema>
 ```
+
+To Do
+=====
+* See `@todo` items in the Python files.

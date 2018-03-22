@@ -7,19 +7,34 @@ Created on Apr 27, 2017
 @todo: Unit tests.
 @todo: Complete EBML encoding. Specifically, make 'master' elements write 
     directly to the stream, rather than build bytearrays, so huge 'master' 
-    elements can be handled.
+    elements can be handled. It appears that the official spec may prohibit
+    (or at least counter-indicate) multiple root elements. Possible
+    compromise until proper fix: handle root 'master' elements differently
+    than deeper ones, more like the current `Document`.
 @todo: Validation. Enforce hierarchy defined in new schema format.
 @todo: Proper support for 'infinite' master elements (i.e `size` is `None`).
-    Requires validation.
-@todo: Document-wide caching, for future handling of streamed data.
+    Requires validation; an invalid child element indicates the end of
+    the 'infinite' master.
+@todo: Document-wide caching, for future handling of streamed data. Affects
+    the longer-term streaming TODO, listed below.
 @todo: Clean up and standardize usage of the term 'size' versus 'length.'
 @todo: Change name of `level` attribute in schemata. In the new schema format,
     only one value (-1) does anything, which is sort of confusing.
+@todo: General documentation (more detailed than the README) and examples.
+@todo: Document the best way to load schemata in a PyInstaller executable.
+
 @todo: (longer term) Consider making schema loading automatic based on the EBML
     DocType, DocTypeVersion, and DocTypeReadVersion. Would mean a refactoring
     of how schemata are loaded.
 @todo: (longer term) Refactor to support streaming data. This will require
-    modifying the indexing and iterating methods of `Document`.
+    modifying the indexing and iterating methods of `Document`. Also affects
+    the document-wide caching TODO item, listed above.
+@todo: (longer term) Support the official Schema definition format. Start by
+    adopting some of the attributes, specifically ``minOccurs`` and 
+    ``maxOccurs`` (they serve the function provided by the current 
+    ``mandatory`` and ``multiple`` attributes). Add ``range`` later. 
+    Eventually, recognize official schemata when loading, like the system 
+    currently handles legacy ``python-ebml`` schemata.
 '''
 
 __author__ = "dstokes"
@@ -78,7 +93,8 @@ class Element(object):
         @cvar dtype: The element's native Python data type.
         @cvar precache: If `True`, the Element's value is read when the Element
             is parsed. if `False`, the value is lazy-loaded when needed.
-            Numeric element types default to `True`.
+            Numeric element types default to `True`. Can be used to reduce
+            the number of file seeks, potentially speeding things up.
         @cvar length: An explicit length (in bytes) of the element when
             encoding. `None` will use standard EBML variable-length encoding.
     """
