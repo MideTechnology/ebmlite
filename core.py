@@ -623,13 +623,13 @@ class Document(MasterElement):
         Loading a `Schema` generates a subclass.
     """
 
-    def __init__(self, stream, name=None, size=None, headers=False):
+    def __init__(self, stream, name=None, size=None, headers=True):
         """ Constructor. Instantiate a `Document` from a file-like stream.
             In most cases, `Schema.load()` should be used instead of
             explicitly instantiating a `Document`.
 
             @param stream: A stream object (e.g. a file) from which to read
-                the EBML content, or a filename.
+                the EBML content.
             @keyword name: The name of the document. Defaults to the filename
                 (if applicable).
             @keyword size: The size of the document, in bytes. Use if the
