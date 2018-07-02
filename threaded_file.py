@@ -1,10 +1,17 @@
 '''
-Created on Nov 8, 2013
+A special-case, drop-in 'replacement' for a standard read-only file stream
+that supports simultaneous access by multiple threads without (explicit)
+blocking. Each thread actually gets its own stream, so it can perform its
+own seeks without affecting other threads that may be reading the file. This
+functionality is transparent.
 
 @author: dstokes
 '''
 
-import threading
+import platform
+from threading import currentThread, Event
+
+__all__ = ['ThreadAwareFile']
 
 class ThreadAwareFile(file):
     """ A 'replacement' for a standard read-only file stream that supports
@@ -13,7 +20,15 @@ class ThreadAwareFile(file):
         seeks without affecting other threads that may be reading the file.
         This functionality is transparent.
 
-        ThreadAwareFile is read-only.
+        ThreadAwareFile implements the standard `file` methods and has 
+        the standard attributes and properties. Most of these affect only
+        the current thread.
+        
+        @var timeout: A value (in seconds) for blocking operations to wait.
+            Very few operations block; specifically, only those that do
+            (or depend upon) internal housekeeping. Timeout should only occur
+            in certain extreme conditions (e.g. filesystem-related file
+            access issues).
     """
 
     def __init__(self, *args, **kwargs):
@@ -21,26 +36,50 @@ class ThreadAwareFile(file):
 
             Open a read-only file that may already be open in other threads.
             Takes the standard `file` arguments, except `mode` can only be
-            read (``r``).
+            one of the "read" modes (``r``, ``rb``, ``rU``, etc.).
         """
-        if len(args) > 1:
-            if isinstance(args[1], basestring) and 'w' in args[1]:
-                raise IOError("ThreadAwareFile is read-only")
+        # Ensure the file mode, if specified, is "read."
+        mode = args[1] if len(args) > 1 else 'r'
+        if isinstance(mode, basestring):
+            if 'a' in mode or 'w' in mode or '+' in mode:
+                raise IOError("%s is read-only" % self.__class__.__name__)
 
-        openNew = kwargs.pop('_new', True)
+        # Undocumented keyword argument `_new` is used by `makeThreadAware()`
+        # to prevent a new file for the current thread from being created.
+        newFile = kwargs.pop('_new', True)
+        
+        # Blocking timeout. Not a `file` keyword argument; remove.
+        self.timeout = kwargs.pop('timeout', 60.0)
+        
+        self.initArgs = args
+        self.initKwargs = kwargs
+        
+        self._ready = Event() # NOT a lock; some things block, others wait
+        self._ready.set()
 
-        self.initArgs = args[:]
-        self.initKwargs = kwargs.copy()
         self.threads = {}
-        self._busy = threading.Event() # NOT a lock; only some things block
-        self.timeout = 60.0
+        
+        if newFile is True:
+            # Getting the stream for the thread will open the file.
+            self.getThreadStream()
 
-        if openNew:
-            ident = threading.currentThread().ident
-            self.threads[ident] = file(*args, **kwargs)
+        # For repr() on files closed by a thread.
+        self._mode = mode
 
-        self.forceIdent = None
 
+    def __repr__(self):
+        # Format the object's ID appropriately for the architecture (32b/64b)
+        if '32' in platform.architecture()[0]:
+            fmt = "<%s %s %r, mode %r at 0x%08X>"
+        else:
+            fmt = "<%s %s %r, mode %r at 0x%016X>"
+            
+        return fmt % ("closed" if self.closed else "open",
+                      self.__class__.__name__, 
+                      self.initArgs[0],
+                      self._mode, 
+                      id(self))
+        
 
     @classmethod
     def makeThreadAware(cls, fileStream):
@@ -52,29 +91,19 @@ class ThreadAwareFile(file):
         elif not isinstance(fileStream, file):
             raise TypeError("Not a file: %r" % fileStream)
 
-        newfile = cls(fileStream.name, fileStream.mode, _new=False)
-        newfile.threads[newfile.getIdent()] = fileStream
-        return newfile
-
-
-    def getIdent(self):
-        """ Get the identity of the current thread. If the attribute
-            `forceIdent` is not `None`, `forceIdent` will be returned
-            instead.
-        """
-        if self.forceIdent is not None:
-            return self.forceIdent
-        return threading.currentThread().ident
+        f = cls(fileStream.name, fileStream.mode, _new=False)
+        f.threads[currentThread().ident] = fileStream
+        return f
 
 
     def getThreadStream(self):
         """ Get (or create) the file stream for the current thread.
         """
-        ident = self.getIdent()
+        self._ready.wait(self.timeout)
 
-        self._busy.wait(self.timeout)
-
+        ident = currentThread().ident
         if ident not in self.threads:
+            # First access from this thread. Open the file.
             fp = file(*self.initArgs, **self.initKwargs)
             self.threads[ident] = fp
             return fp
@@ -87,49 +116,26 @@ class ThreadAwareFile(file):
             Warning: May not be thread-safe in some situations!
         """
         try:
-            self._busy.set()
+            self._ready.wait(self.timeout)
+            self._ready.clear()
             for v in self.threads.values():
                 v.close()
         finally:
-            self._busy.clear()
-
-
-    def changeFile(self, *args, **kwargs):
-        """ Change the path of the file being accessed. Intended for
-            maintaining access to a file after a 'Save As' without
-            having to reload all the data. The arguments are the
-            same as `file()`.
-
-            Warning: May not be thread-safe in some situations!
-        """
-        if len(args) > 1:
-            if isinstance(args[1], basestring):
-                if 'w' in args[1] or 'a' in args[1]:
-                    raise IOError("ThreadAwareFile is read-only")
-        self.initArgs = args[:]
-        self.initKwargs = kwargs.copy()
-
-        try:
-            self._busy.wait(self.timeout)
-            for i in self.threads.keys():
-                try:
-                    self.threads.pop(i).close()
-                except (KeyError, AttributeError):
-                    pass
-        finally:
-            self._busy.clear()
+            self._ready.set()
 
 
     def cleanup(self):
         """ Delete all closed streams.
         """
         try:
-            self._busy.wait(self.timeout)
+            self._ready.wait(self.timeout)
+            self._ready.clear()
+            
             for i in self.threads.keys():
                 if self.threads[i].closed:
                     del self.threads[i]
         finally:
-            self._busy.clear()
+            self._ready.set()
 
 
     @property
@@ -137,15 +143,19 @@ class ThreadAwareFile(file):
         """ Is the file not open? Note: A thread that never accessed the file
             will get `True`.
         """
-        ident = self.getIdent()
+        ident = currentThread().ident
         if ident in self.threads:
             return self.threads[ident].closed
         return True
 
 
     def close(self, *args, **kwargs):
-        return self.getThreadStream().close(*args, **kwargs)
-
+        """ Close the file for the current thread. The file will remain
+            open for other threads.
+        """
+        result = self.getThreadStream().close(*args, **kwargs)
+        self.cleanup()
+        return result
 
 
     # Standard file methods, overridden
@@ -164,9 +174,6 @@ class ThreadAwareFile(file):
 
     def __reduce_ex__(self, *args, **kwargs):
         return self.getThreadStream().__reduce_ex__(*args, **kwargs)
-
-    def __repr__(self, *args, **kwargs):
-        return self.getThreadStream().__repr__(*args, **kwargs)
 
     def __sizeof__(self, *args, **kwargs):
         return self.getThreadStream().__sizeof__(*args, **kwargs)
@@ -205,13 +212,16 @@ class ThreadAwareFile(file):
         return self.getThreadStream().tell(*args, **kwargs)
 
     def truncate(self, *args, **kwargs):
-        raise IOError("Can't truncate(); ThreadAwareFile is read-only")
+        raise IOError("Can't truncate(); %s is read-only" % 
+                      self.__class__.__name__)
 
     def write(self, *args, **kwargs):
-        raise IOError("Can't write(); ThreadAwareFile is read-only")
+        raise IOError("Can't write(); %s is read-only" % 
+                      self.__class__.__name__)
 
     def writelines(self, *args, **kwargs):
-        raise IOError("Can't writelines(); ThreadAwareFile is read-only")
+        raise IOError("Can't writelines(); %s is read-only" % 
+                      self.__class__.__name__)
 
     def xreadlines(self, *args, **kwargs):
         return self.getThreadStream().xreadlines(*args, **kwargs)
