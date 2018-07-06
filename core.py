@@ -852,7 +852,7 @@ class Schema(object):
         @ivar elementsByName: A dictionary mapping element names to the schema's
             corresponding `Element` subclasses.
         @ivar elementInfo: A dictionary mapping IDs to the raw schema attribute
-            data. Is likely to have additional items not present in the created
+            data. It may have additional items not present in the created
             element class' attributes.
 
         @ivar source: The source from which the Schema was loaded; either a
@@ -1307,4 +1307,6 @@ def loadSchema(filename, reload=False, **kwargs):
     if not os.path.exists(filename):
         raise IOError(errno.ENOENT, 'Could not find schema XML', origName)
 
-    return SCHEMATA.setdefault(filename, Schema(filename, **kwargs))
+    schema = Schema(filename, **kwargs)
+    SCHEMATA[filename] = schema
+    return schema
