@@ -3,7 +3,7 @@ _ebmlite_ README
 
 _ebmlite_ is a lightweight, "pure Python" library for parsing EBML (Extensible Binary Markup Language) data. It is designed to crawl through EBML files quickly and efficiently, and that's about it. _ebmlite_ can also do basic EBML encoding, but more advanced EBML manipulation (e.g. with a proper [DOM](https://en.wikipedia.org/wiki/Document_Object_Model)) are beyond its scope, and are better left to other libraries.
 
-_ebmlite_ is currently a work-in-progress. It is usable, but does not (yet) implement the full EBML specification. It is not an easy_install package; to use it, it must be explicitly placed where it can be imported (e.g. in the `PYTHONPATH`).
+_ebmlite_ is currently a work-in-progress. It is usable (we use it extensively), but does not (yet) implement the full EBML specification. It is not currently an `setuptools` package; to use it, it must be explicitly placed where it can be imported (e.g. in the `PYTHONPATH`).
 
 Parts of _ebmlite_ were modeled after [python-ebml](https://github.com/jspiros/python-ebml), which we had previously been using, but is not a directly derivative work. _ebmlite_ can import _python-ebml_ schemata XML, but that is the extent of its cross-compatibility.
 
@@ -65,7 +65,7 @@ Each element defined in the schema is a subclass of one of 8 Element base classe
 * **IntegerElement:** Contains a signed integer value of variable length.
 * **UIntegerElement:** Contains an unsigned integer value of variable length.
 * **FloatElement:** Contains a 32 or 64 bit floating point value.
-* **StringElement:** Contains printable ASCII characters.
+* **StringElement:** Contains printable US-ASCII characters (0x20 to 0x7E).
 * **UnicodeElement:** Contains UTF-8 string data.
 * **DateElement:** Contains a timestamp, stored as nanoseconds since 2001-01-01T00:00:00 UTC as a 64 bit integer. _ebmlite_ automatically translates this into a Python `datetime.datetime` object.
 * **BinaryElement:** Contains binary data.
@@ -75,13 +75,13 @@ Element definitions have several attributes:
 * `id` (integer): The Element subclass' EBML ID.
 * `length` (integer, optional): A fixed size to use when encoding the element, overriding the EBML variable length encoding. Use to create byte-aligned structures.
 * `level` (integer, optional): The allowed 'depth' of the element. This is primarily an artifact of _python-ebml_ schema compatibility. Only the value `-1` has an effect in an _ebmlite_ schema; it indicates that the element can appear anywhere in an EBML file.
-* `multiple` (bool, optional, default=1): Indicates that the element can appear more than once within the same parent.
+* `multiple` (bool, optional, default=1): Indicates that the element can appear more than once within the same parent. *Currently partially enforced for encoding.*
 * `mandatory` (bool, optional, default=0): Indicates that the element *must* be present. *Not currently enforced.*
 * `precache` (bool, optional, default varies by type): Indicates that the element's value should be read and cached when the element is parsed, rather than 'lazy-loaded' when explicitly accessed. Can be used to reduce the number of seeks when working with an EBML file after it has been imported. Simple numeric element types have this enabled by default; master, binary, and string/Unicode elements do not.
 
 There are two additional, special-case Element subclasses which are not subclassed:
-* **UnknownElement:** Instantiated for elements with IDs that do not appear in the schema. Its payload is treated as binary data. The UnknownElement itself does not appear in the Schema.
-* **VoidElement:** "Void" (ID `0xEC`) is a standard EBML element used for padding. If the Schema defines the Void element, it is replaced by this special-case element. The contents of its payload are ignored.
+* **UnknownElement:** Instantiated for elements with IDs that do not appear in the schema. Its payload is treated as binary data. The UnknownElement itself does not appear in the Schema. Unlike other Element subclasses, its ID can vary from instance to instance.
+* **VoidElement:** "Void" (ID `0xEC`) is a standard EBML element, typically used for padding. If the Schema defines the Void element, it is replaced by this special-case element. The contents of its payload are ignored.
 
 The structure of the schema's XML defines the structure of the EBML document; children of a MasterElement in the schema are valid child element types in the EBML. An Element type can appear multiple times in a schema; i.e. if its type can appear as a child of different parent types. Only the first definition requires both `name` and `id` attributes. Successive definitions can be abbreviated to just the `name` and/or `id`; they will inherit all the other attributes of the first definition. Successive definitions must *not* have contradictory attributes, however.
 ```XML
@@ -109,7 +109,9 @@ The structure of the schema's XML defines the structure of the EBML document; ch
 </Schema>
 ```
 
+**Note:** As seen in the example above, _ebmlite_ allows an EBML document to have multiple elements at its root level. Several other EBML libraries do this as well, but this is apparently counter to the official spec. Officially, an EBML document should have only a single root element, similar to an XML file.
+
 To Do
 =====
 * Complete documentation and example code.
-* See `@todo` items in the Python files.
+* See `@todo` items in the Python files (i.e. `core.py`).

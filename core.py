@@ -2,8 +2,6 @@
 EBMLite: A lightweight EBML parsing library. It is designed to crawl through
 EBML files quickly and efficiently, and that's about it.
 
-Created on Apr 27, 2017
-
 @todo: Unit tests.
 @todo: Complete EBML encoding. Specifically, make 'master' elements write
     directly to the stream, rather than build bytearrays, so huge 'master'
@@ -11,7 +9,7 @@ Created on Apr 27, 2017
     (or at least counter-indicate) multiple root elements. Possible
     compromise until proper fix: handle root 'master' elements differently
     than deeper ones, more like the current `Document`.
-@todo: Validation. Enforce hierarchy defined in new schema format.
+@todo: Validation. Enforce the hierarchy defined in each schema.
 @todo: Proper support for 'infinite' master elements (i.e `size` is `None`).
     Requires validation; an invalid child element indicates the end of
     the 'infinite' master.
@@ -37,7 +35,7 @@ Created on Apr 27, 2017
     currently handles legacy ``python-ebml`` schemata.
 '''
 
-__author__ = "dstokes"
+__author__ = "David Randall Stokes"
 __copyright__ = "Copyright 2018 Mide Technology Corporation"
 
 __all__ = ['BinaryElement', 'DateElement', 'Document', 'Element',
@@ -398,8 +396,8 @@ class DateElement(IntegerElement):
 #===============================================================================
 
 class BinaryElement(Element):
-    """ Base class for an EBML 'binary' element. Schema-specific subclasses are
-        generated when a `Schema` is loaded.
+    """ Base class for an EBML 'binary' element. Schema-specific subclasses
+        are generated when a `Schema` is loaded.
     """
 
     def __len__(self):
@@ -410,8 +408,8 @@ class BinaryElement(Element):
 
 class VoidElement(BinaryElement):
     """ Special case ``Void`` element. Its contents are ignored and not read;
-        its `value` is always returned as ``0xFF`` times its length. To get the
-        actual contents, use `getRawValue()`.
+        its `value` is always returned as ``0xFF`` times its length. To get
+        the actual contents, use `getRawValue()`.
     """
 
     def parse(self, stream, size):
@@ -428,8 +426,9 @@ class VoidElement(BinaryElement):
 #===============================================================================
 
 class UnknownElement(BinaryElement):
-    """ Special case ``Unknown`` element, used for elements with IDs not present
-        in a schema. Unlike other elements, each instance has its own ID.
+    """ Special case ``Unknown`` element, used for elements with IDs not
+        present in a schema. Unlike other elements, each instance has its own
+        ID.
     """
     name = "UnknownElement"
     precache = False
@@ -458,7 +457,8 @@ class MasterElement(Element):
     dtype = list
 
     def parse(self):
-        """ Type-specific helper function for parsing the element's payload. """
+        """ Type-specific helper function for parsing the element's payload.
+        """
         # Special case; unlike other elements, value() property doesn't call
         # parse(). Used only when pre-caching.
         return self.value
@@ -580,8 +580,8 @@ class MasterElement(Element):
 
             @param data: The data to encode, provided as a dictionary keyed by
                 element name, a list of two-item name/value tuples, or a list
-                of either. Note: individual items in a list of name/value pairs
-                *must* be tuples!
+                of either. Note: individual items in a list of name/value
+                pairs *must* be tuples!
             @return: A bytearray containing the encoded EBML binary.
         """
         if isinstance(data, list) and len(data)>0 and isinstance(data[0],list):
@@ -699,8 +699,8 @@ class Document(MasterElement):
 
 
     def close(self):
-        """ Close the EBML file. Should generally be used only if the object was
-            created using a filename, rather than a stream.
+        """ Close the EBML file. Should generally be used only if the object
+            was created using a filename, rather than a stream.
         """
         self.stream.close()
 
@@ -817,9 +817,10 @@ class Document(MasterElement):
     def encode(cls, stream, data, headers=False, **kwargs):
         """ Encode an EBML document.
 
-            @param value: The data to encode, provided as a dictionary keyed by
-                element name, or a list of two-item name/value tuples. Note:
-                individual items in a list of name/value pairs *must* be tuples!
+            @param value: The data to encode, provided as a dictionary keyed
+                by element name, or a list of two-item name/value tuples.
+                Note: individual items in a list of name/value pairs *must*
+                be tuples!
             @return: A bytearray containing the encoded EBML binary.
         """
         if headers is True:
@@ -842,18 +843,18 @@ class Document(MasterElement):
 #===============================================================================
 
 class Schema(object):
-    """ An EBML schema, mapping element IDs to names and data types. Unlike the
-        document and element types, this is not a base class; all schemata are
-        actual instances of this class.
+    """ An EBML schema, mapping element IDs to names and data types. Unlike
+        the document and element types, this is not a base class; all schemata
+        are actual instances of this class.
 
         @ivar document: The schema's Document subclass.
         @ivar elements: A dictionary mapping element IDs to the schema's
             corresponding `Element` subclasses.
-        @ivar elementsByName: A dictionary mapping element names to the schema's
-            corresponding `Element` subclasses.
-        @ivar elementInfo: A dictionary mapping IDs to the raw schema attribute
-            data. It may have additional items not present in the created
-            element class' attributes.
+        @ivar elementsByName: A dictionary mapping element names to the
+            schema's corresponding `Element` subclasses.
+        @ivar elementInfo: A dictionary mapping IDs to the raw schema
+            attribute data. It may have additional items not present in the
+            created element class' attributes.
 
         @ivar source: The source from which the Schema was loaded; either a
             filename or a file-like stream.
@@ -950,8 +951,9 @@ class Schema(object):
             ename = attribs['name'].strip() if 'name' in attribs else None
             etype = attribs['type'].strip() if 'type' in attribs else None
 
-            # Use text in the element as its docstring. Note: embedded HTML tags
-            # (as in the Matroska schema) will cause the text to be truncated.
+            # Use text in the element as its docstring. Note: embedded HTML
+            # tags (as in the Matroska schema) will cause the text to be
+            # truncated.
             docs = el.text.strip() if isinstance(el.text, basestring) else None
 
 
@@ -980,8 +982,8 @@ class Schema(object):
                 raise ValueError('Unknown element type: %s' % el.tag)
 
             # FUTURE: Add schema-describing metadata (author, origin,
-            # description, etc.) to XML as non-Element elements. Parse them out
-            # here.
+            # description, etc.) to XML as non-Element elements. Parse them
+            # out here.
             return
 
         attribs = el.attrib.copy()
@@ -1049,17 +1051,18 @@ class Schema(object):
             return default
 
         if eid in self.elements or ename in self.elementsByName:
-            # Already appeared in schema. Duplicates are permitted for defining
-            # an element that can appear as a child to multiple Master elements,
-            # so long as they have the same attributes. Additional definitions
-            # only need to specify the element ID and/or element name.
+            # Already appeared in schema. Duplicates are permitted for
+            # defining an element that can appear as a child to multiple
+            # Master elements, so long as they have the same attributes.
+            # Additional definitions only need to specify the element ID
+            # and/or element name.
             oldEl = self[ename or eid]
             ename = oldEl.name
             eid = oldEl.id
 
             if not issubclass(self.elements[eid], baseClass):
                 raise TypeError('%s %r (ID 0x%02X) redefined as %s' %
-                                (oldEl.__name__, ename, eid, baseClass.__name__))
+                            (oldEl.__name__, ename, eid, baseClass.__name__))
 
             newatts = self.elementInfo[eid].copy()
             newatts.update(attribs)
@@ -1104,9 +1107,10 @@ class Schema(object):
             self.elementInfo[eid] = attribs
             self.elementsByName[ename] = eclass
 
-            # Element 'level'. EBMLite schemata explicitly define the hierarchy
-            # (i.e. what elements are valid children), so only the value -1 has
-            # any meaning: level -1 elements can appear anywhere in the file.
+            # Element 'level'. EBMLite schemata explicitly define the
+            # hierarchy (i.e. what elements are valid children), so only the
+            # value -1 has any meaning: level -1 elements can appear anywhere
+            # in the file.
             if level == -1:
                 self.globals[eid] = eclass
 
@@ -1143,7 +1147,6 @@ class Schema(object):
 
     def __getitem__(self, key):
         """ Get an Element class from the schema, by name or by ID. """
-
         try:
             self.elements[key]
         except KeyError:
@@ -1163,8 +1166,9 @@ class Schema(object):
                 name of an EBML file.
             @keyword name: The name of the document. Defaults to filename.
             @keyword headers: If `False`, the file's ``EBML`` header element
-                (if present) will not appear as a root element in the document.
-                The contents of the ``EBML`` element will always be read.
+                (if present) will not appear as a root element in the
+                document. The contents of the ``EBML`` element will always be
+                read.
         """
         if isinstance(fp, basestring):
             fp = open(fp, 'rb')
