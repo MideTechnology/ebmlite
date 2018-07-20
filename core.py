@@ -13,6 +13,10 @@ EBML files quickly and efficiently, and that's about it.
 @todo: Proper support for 'infinite' master elements (i.e `size` is `None`).
     Requires validation; an invalid child element indicates the end of
     the 'infinite' master.
+@todo: Improved `MasterElement.__eq__()` method, possibly doing a recursive
+    crawl of both elements and comparing the actual contents, or iterating
+    over chunks of the raw binary data. Current implementation doesn't check
+    element contents, just ID and payload size (for speed).
 @todo: Document-wide caching, for future handling of streamed data. Affects
     the longer-term streaming TODO, listed below.
 @todo: Clean up and standardize usage of the term 'size' versus 'length.'
@@ -262,6 +266,13 @@ class IntegerElement(Element):
     dtype = int
     precache = True
 
+
+    def __eq__(self, other):
+        if not super(IntegerElement, self).__eq__(other):
+            return False
+        return self.value == other.value
+
+
     def parse(self, stream, size):
         """ Type-specific helper function for parsing the element's payload.
             It is assumed the file pointer is at the start of the payload.
@@ -306,6 +317,12 @@ class FloatElement(Element):
     dtype = float
     precache = True
 
+    def __eq__(self, other):
+        if not super(FloatElement, self).__eq__(other):
+            return False
+        return self.value == other.value
+
+
     def parse(self, stream, size):
         """ Type-specific helper function for parsing the element's payload.
             It is assumed the file pointer is at the start of the payload.
@@ -326,6 +343,12 @@ class StringElement(Element):
         subclasses are generated when a `Schema` is loaded.
     """
     dtype = str
+
+    def __eq__(self, other):
+        if not super(StringElement, self).__eq__(other):
+            return False
+        return self.value == other.value
+
 
     def __len__(self):
         return self.size
