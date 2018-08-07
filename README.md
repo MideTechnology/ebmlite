@@ -42,9 +42,9 @@ Here is an example of an _ebmlite_ schema, showing a simplified version of the d
         <UIntegerElement name="EBMLMaxSizeLength" id="0x42F3" multiple="0" mandatory="1"/>
         <StringElement name="DocType" id="0x4282" multiple="0" mandatory="1"/>
         <UIntegerElement name="DocTypeVersion" id="0x4287" multiple="0" mandatory="1"/>
-        <BinaryElement name="Void" level="-1" id="0xEC" multiple="1"/>
-        <BinaryElement name="CRC-32" level="-1" id="0xBF" multiple="0"/>
-        <MasterElement name="SignatureSlot" level="-1" id="0x1B538667" multiple="1">
+        <BinaryElement name="Void" global="1" id="0xEC" multiple="1"/>
+        <BinaryElement name="CRC-32" global="1" id="0xBF" multiple="0"/>
+        <MasterElement name="SignatureSlot" global="1" id="0x1B538667" multiple="1">
             <UIntegerElement name="SignatureAlgo" id="0x7E8A" multiple="0"/>
             <UIntegerElement name="SignatureHash" id="0x7E9A" multiple="0"/>
             <BinaryElement name="SignaturePublicKey" id="0x7EA5" multiple="0"/>
@@ -73,8 +73,10 @@ Each element defined in the schema is a subclass of one of 8 Element base classe
 Element definitions have several attributes:
 * `name` (string): The Element subclass' name.
 * `id` (integer): The Element subclass' EBML ID.
+* `global` (bool, optional): If "true" (e.g. `1` or `True`), the element may
+appear in any location in an EBML file, not just where it appears in the
+schema. This is equivalent to a `depth` of `-1` in a _python-ebml_ schema
 * `length` (integer, optional): A fixed size to use when encoding the element, overriding the EBML variable length encoding. Use to create byte-aligned structures.
-* `level` (integer, optional): The allowed 'depth' of the element. This is primarily an artifact of _python-ebml_ schema compatibility. Only the value `-1` has an effect in an _ebmlite_ schema; it indicates that the element can appear anywhere in an EBML file.
 * `multiple` (bool, optional, default=1): Indicates that the element can appear more than once within the same parent. *Currently partially enforced for encoding.*
 * `mandatory` (bool, optional, default=0): Indicates that the element *must* be present. *Not currently enforced.*
 * `precache` (bool, optional, default varies by type): Indicates that the element's value should be read and cached when the element is parsed, rather than 'lazy-loaded' when explicitly accessed. Can be used to reduce the number of seeks when working with an EBML file after it has been imported. Simple numeric element types have this enabled by default; master, binary, and string/Unicode elements do not.
