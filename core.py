@@ -20,8 +20,6 @@ EBML files quickly and efficiently, and that's about it.
 @todo: Document-wide caching, for future handling of streamed data. Affects
     the longer-term streaming TODO, listed below.
 @todo: Clean up and standardize usage of the term 'size' versus 'length.'
-@todo: Change name of `level` attribute in schemata. In the new schema format,
-    only one value (-1) does anything, which is sort of confusing.
 @todo: General documentation (more detailed than the README) and examples.
 @todo: Document the best way to load schemata in a PyInstaller executable.
 
@@ -979,7 +977,6 @@ class Schema(object):
             # truncated.
             docs = el.text.strip() if isinstance(el.text, basestring) else None
 
-
             if etype is None:
                 raise ValueError('Element "%s" (ID 0x%02X) missing required '
                                  '"type" attribute' % (ename, eid))
@@ -1117,7 +1114,17 @@ class Schema(object):
             multiple = _getBool(attribs, 'multiple', False)
             precache = _getBool(attribs, 'precache', baseClass.precache)
             length = _getInt(attribs, 'length', None)
-            level = _getInt(attribs, 'level', None)
+            isGlobal = _getInt(attribs, 'global', None)
+
+            if isGlobal is None:
+                # Element 'level'. The old schema format used level to define
+                # the structure (the file itself was flat); the new format's
+                # schema structure defined the EBML structure. The exception
+                # are 'global' elements, which may appear anywhere. The old
+                # format defined these as having a level of -1. The new format
+                # uses a Boolean attribute, `global`, but fall back to
+                # reading `level` if `global` isn't defined.
+                isGlobal = _getInt(attribs, 'level', None) == -1
 
             # Create a new Element subclass
             eclass = type('%sElement' % ename, (baseClass,),
@@ -1130,11 +1137,7 @@ class Schema(object):
             self.elementInfo[eid] = attribs
             self.elementsByName[ename] = eclass
 
-            # Element 'level'. EBMLite schemata explicitly define the
-            # hierarchy (i.e. what elements are valid children), so only the
-            # value -1 has any meaning: level -1 elements can appear anywhere
-            # in the file.
-            if level == -1:
+            if isGlobal:
                 self.globals[eid] = eclass
 
         parent = parent or self

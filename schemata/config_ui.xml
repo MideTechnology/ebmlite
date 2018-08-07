@@ -14,9 +14,9 @@
         <StringElement name="DocType" id="0x4282" multiple="0" mandatory="1" default="mide.ss.config" minver="1">A string that describes the type of document that follows this EBML header. 'mide' for Mide Instrumentation Data Exchange files.</StringElement>
         <UIntegerElement name="DocTypeVersion" id="0x4287" multiple="0" mandatory="1" default="1" minver="1">The version of DocType interpreter used to create the file.</UIntegerElement>
         <UIntegerElement name="DocTypeReadVersion" id="0x4285" multiple="0" mandatory="1" default="1" minver="1">The minimum DocType version an interpreter has to support to read this file.</UIntegerElement>
-        <BinaryElement name="Void" level="-1" id="0xEC" multiple="1" minver="1">Used to void damaged data, to avoid unexpected behaviors when using damaged data. The content is discarded. Also used to reserve space in a sub-element for later use.</BinaryElement>
-        <BinaryElement name="CRC-32" level="-1" id="0xBF" multiple="0" minver="1" webm="0">The CRC is computed on all the data of the Master element it's in. The CRC element should be the first in it's parent master for easier reading. All level 1 elements should include a CRC-32. The CRC in use is the IEEE CRC32 Little Endian</BinaryElement>
-        <MasterElement name="SignatureSlot" level="-1" id="0x1B538667" multiple="1" webm="0">Contain signature of some (coming) elements in the stream.
+        <BinaryElement name="Void" global="1" id="0xEC" multiple="1" minver="1">Used to void damaged data, to avoid unexpected behaviors when using damaged data. The content is discarded. Also used to reserve space in a sub-element for later use.</BinaryElement>
+        <BinaryElement name="CRC-32" global="1" id="0xBF" multiple="0" minver="1" webm="0">The CRC is computed on all the data of the Master element it's in. The CRC element should be the first in it's parent master for easier reading. All level 1 elements should include a CRC-32. The CRC in use is the IEEE CRC32 Little Endian</BinaryElement>
+        <MasterElement name="SignatureSlot" global="1" id="0x1B538667" multiple="1" webm="0">Contain signature of some (coming) elements in the stream.
             <UIntegerElement name="SignatureAlgo" id="0x7E8A" multiple="0" webm="0">Signature algorithm used (1=RSA, 2=elliptic).</UIntegerElement>
             <UIntegerElement name="SignatureHash" id="0x7E9A" multiple="0" webm="0">Hash algorithm used (1=SHA1-160, 2=MD5).</UIntegerElement>
             <BinaryElement name="SignaturePublicKey" id="0x7EA5" multiple="0" webm="0">The public key to use with the algorithm (in the case of a PKI-based signature).</BinaryElement>
@@ -29,12 +29,12 @@
         </MasterElement>
     </MasterElement>
 
-<MasterElement name="ConfigUI" level="0" id="0x7777" mandatory="1" multiple="0">
+<MasterElement name="ConfigUI" id="0x7777" mandatory="1" multiple="0">
     <MasterElement name="Tab" id="0x4028" multiple="1" mandatory="1">
         <UnicodeElement name="Label" id="0x5005" multiple="0"></UnicodeElement>
         <UnicodeElement name="ToolTip" id="0x5015" multiple="0"></UnicodeElement>
 
-        <MasterElement name="Group" level="-1" id="0x4008" multiple="1">
+        <MasterElement name="Group" global="1" id="0x4008" multiple="1">
             <UnicodeElement name="Label" id="0x5005" multiple="0"></UnicodeElement>
             <UnicodeElement name="ToolTip" id="0x5015" multiple="0"></UnicodeElement>
             <UIntegerElement name="ConfigID" id="0x5001" multiple="0"></UIntegerElement>
@@ -44,7 +44,7 @@
             NOTE: Any *Field can have any *Value type! The examples below show *Fields with matching
             *Values, but that is just shorthand to make things less cumbersome for now.
             -->
-            <MasterElement name="BooleanField" level="-1" id="0x4000" multiple="1">
+            <MasterElement name="BooleanField" global="1" id="0x4000" multiple="1">
                 <UIntegerElement name="ConfigID" id="0x5001" multiple="0"></UIntegerElement>
                 <UnicodeElement name="Label" id="0x5005" multiple="0"></UnicodeElement>
                 <UnicodeElement name="ToolTip" id="0x5015" multiple="0"></UnicodeElement>
@@ -54,7 +54,7 @@
                 <StringElement name="DisplayFormat" id="0x5034" multiple="0"></StringElement>
             </MasterElement>
 
-            <MasterElement name="UIntField" level="-1" id="0x4001" multiple="1">
+            <MasterElement name="UIntField" global="1" id="0x4001" multiple="1">
                 <IntegerField name="ConfigID" id="0x5001" multiple="0"></IntegerField>
                 <UnicodeElement name="Label" id="0x5005" multiple="0"></UnicodeElement>
                 <UnicodeElement name="ToolTip" id="0x5015" multiple="0"></UnicodeElement>
@@ -71,7 +71,7 @@
                 <FloatElement name="FloatOffset" id="0x5213" multiple="0"></FloatElement>
             </MasterElement>
 
-            <MasterElement name="IntField" level="-1" id="0x4002" multiple="1">
+            <MasterElement name="IntField" global="1" id="0x4002" multiple="1">
                 <UIntegerElement name="ConfigID" id="0x5001" multiple="0"></UIntegerElement>
                 <UnicodeElement name="Label" id="0x5005" multiple="0"></UnicodeElement>
                 <UnicodeElement name="ToolTip" id="0x5015" multiple="0"></UnicodeElement>
@@ -89,7 +89,7 @@
                 <FloatElement name="FloatOffset" />
             </MasterElement>
 
-            <MasterElement name="FloatField" level="-1" id="0x4003" multiple="1">
+            <MasterElement name="FloatField" global="1" id="0x4003" multiple="1">
                 <UIntegerElement name="ConfigID" id="0x5001" multiple="0"></UIntegerElement>
                 <UnicodeElement name="Label" id="0x5005" multiple="0"></UnicodeElement>
                 <UnicodeElement name="ToolTip" id="0x5015" multiple="0"></UnicodeElement>
@@ -108,7 +108,7 @@
                 <FloatElement name="FloatOffset" />
             </MasterElement>
 
-            <MasterElement name="ASCIIField" level="-1" id="0x4004" multiple="1">
+            <MasterElement name="ASCIIField" global="1" id="0x4004" multiple="1">
                 <UIntegerElement name="ConfigID" id="0x5001" multiple="0"></UIntegerElement>
                 <UnicodeElement name="Label" id="0x5005" multiple="0"></UnicodeElement>
                 <UnicodeElement name="ToolTip" id="0x5015" multiple="0"></UnicodeElement>
@@ -123,7 +123,7 @@
                 <FloatElement name="FloatValue" />
             </MasterElement>
 
-            <MasterElement name="TextField" level="-1" id="0x4005" multiple="1">
+            <MasterElement name="TextField" global="1" id="0x4005" multiple="1">
                 <UIntegerElement name="ConfigID" id="0x5001" multiple="0"></UIntegerElement>
                 <UnicodeElement name="Label" id="0x5005" multiple="0"></UnicodeElement>
                 <UnicodeElement name="ToolTip" id="0x5015" multiple="0"></UnicodeElement>
@@ -139,7 +139,7 @@
                 <FloatElement name="FloatValue" />
             </MasterElement>
 
-            <MasterElement name="EnumField" level="-1" id="0x4007" multiple="1">
+            <MasterElement name="EnumField" global="1" id="0x4007" multiple="1">
                 <UIntegerElement name="ConfigID" id="0x5001" multiple="0"></UIntegerElement>
                 <UnicodeElement name="Label" id="0x5005" multiple="0"></UnicodeElement>
                 <UnicodeElement name="ToolTip" id="0x5015" multiple="0"></UnicodeElement>
@@ -154,7 +154,7 @@
                 <FloatElement name="FloatValue" />
                 <FloatElement name="FloatGain" />
                 <FloatElement name="FloatOffset" />
-                <MasterElement name="EnumOption" level="-1" id="0x4107" multiple="1">
+                <MasterElement name="EnumOption" global="1" id="0x4107" multiple="1">
                     <UnicodeElement name="Label" id="0x5005" multiple="0"></UnicodeElement>
                     <UnicodeElement name="ToolTip" id="0x5015" multiple="0"></UnicodeElement>
                     <StringElement name="DisableIf" id="0x5014" multiple="0"></StringElement>
@@ -168,7 +168,7 @@
                 </MasterElement>
             </MasterElement>
 
-            <MasterElement name="BitField" level="-1" id="0x4027" multiple="1">
+            <MasterElement name="BitField" global="1" id="0x4027" multiple="1">
                 <UIntegerElement name="ConfigID" id="0x5001" multiple="0"></UIntegerElement>
                 <UnicodeElement name="Label" id="0x5005" multiple="0"></UnicodeElement>
                 <UnicodeElement name="ToolTip" id="0x5015" multiple="0"></UnicodeElement>
@@ -180,7 +180,7 @@
                 <MasterElement name="EnumOption" />
             </MasterElement>
 
-            <MasterElement name="DateTimeField" level="-1" id="0x4022" multiple="1">
+            <MasterElement name="DateTimeField" global="1" id="0x4022" multiple="1">
                 <UIntegerElement name="ConfigID" id="0x5001" multiple="0"></UIntegerElement>
                 <UnicodeElement name="Label" id="0x5005" multiple="0"></UnicodeElement>
                 <UnicodeElement name="ToolTip" id="0x5015" multiple="0"></UnicodeElement>
@@ -196,7 +196,7 @@
                 <FloatElement name="FloatOffset" />
             </MasterElement>
 
-            <MasterElement name="UTCOffsetField" level="-1" id="0x4023" multiple="1">
+            <MasterElement name="UTCOffsetField" global="1" id="0x4023" multiple="1">
                 <UIntegerElement name="ConfigID" id="0x5001" multiple="0"></UIntegerElement>
                 <UnicodeElement name="Label" id="0x5005" multiple="0"></UnicodeElement>
                 <UnicodeElement name="ToolTip" id="0x5015" multiple="0"></UnicodeElement>
@@ -216,7 +216,7 @@
             Note: The Check*Field elements should match the *Field elements. Any differences are probably
             accidental.
             -->
-            <MasterElement name="CheckBooleanField" level="-1" id="0x4010" multiple="1">
+            <MasterElement name="CheckBooleanField" global="1" id="0x4010" multiple="1">
                 <UIntegerElement name="ConfigID" id="0x5001" multiple="0"></UIntegerElement>
                 <UnicodeElement name="Label" id="0x5005" multiple="0"></UnicodeElement>
                 <UnicodeElement name="ToolTip" id="0x5015" multiple="0"></UnicodeElement>
@@ -226,7 +226,7 @@
                 <StringElement name="DisplayFormat" id="0x5034" multiple="0"></StringElement>
             </MasterElement>
 
-            <MasterElement name="CheckUIntField" level="-1" id="0x4011" multiple="1">
+            <MasterElement name="CheckUIntField" global="1" id="0x4011" multiple="1">
                 <UIntegerElement name="ConfigID" id="0x5001" multiple="0"></UIntegerElement>
                 <UnicodeElement name="Label" id="0x5005" multiple="0"></UnicodeElement>
                 <UnicodeElement name="ToolTip" id="0x5015" multiple="0"></UnicodeElement>
@@ -243,7 +243,7 @@
                 <FloatElement name="FloatOffset" />
             </MasterElement>
 
-            <MasterElement name="CheckIntField" level="-1" id="0x4012" multiple="1">
+            <MasterElement name="CheckIntField" global="1" id="0x4012" multiple="1">
                 <UIntegerElement name="ConfigID" id="0x5001" multiple="0"></UIntegerElement>
                 <UnicodeElement name="Label" id="0x5005" multiple="0"></UnicodeElement>
                 <UnicodeElement name="ToolTip" id="0x5015" multiple="0"></UnicodeElement>
@@ -263,7 +263,7 @@
                 <FloatElement name="FloatOffset" />
             </MasterElement>
 
-            <MasterElement name="CheckFloatField" level="-1" id="0x4013" multiple="1">
+            <MasterElement name="CheckFloatField" global="1" id="0x4013" multiple="1">
                 <UIntegerElement name="ConfigID" id="0x5001" multiple="0"></UIntegerElement>
                 <UnicodeElement name="Label" id="0x5005" multiple="0"></UnicodeElement>
                 <UnicodeElement name="ToolTip" id="0x5015" multiple="0"></UnicodeElement>
@@ -284,7 +284,7 @@
                 <FloatElement name="FloatOffset" />
             </MasterElement>
 
-            <MasterElement name="CheckASCIIField" level="-1" id="0x4014" multiple="1">
+            <MasterElement name="CheckASCIIField" global="1" id="0x4014" multiple="1">
                 <UIntegerElement name="ConfigID" id="0x5001" multiple="0"></UIntegerElement>
                 <UnicodeElement name="Label" id="0x5005" multiple="0"></UnicodeElement>
                 <UnicodeElement name="ToolTip" id="0x5015" multiple="0"></UnicodeElement>
@@ -300,7 +300,7 @@
                 <FloatElement name="FloatValue" />
             </MasterElement>
 
-            <MasterElement name="CheckTextField" level="-1" id="0x4015" multiple="1">
+            <MasterElement name="CheckTextField" global="1" id="0x4015" multiple="1">
                 <UIntegerElement name="ConfigID" id="0x5001" multiple="0"></UIntegerElement>
                 <UnicodeElement name="Label" id="0x5005" multiple="0"></UnicodeElement>
                 <UnicodeElement name="ToolTip" id="0x5015" multiple="0"></UnicodeElement>
@@ -317,7 +317,7 @@
                 <FloatElement name="FloatValue" />
             </MasterElement>
 
-            <MasterElement name="CheckEnumField" level="-1" id="0x4017" multiple="1">
+            <MasterElement name="CheckEnumField" global="1" id="0x4017" multiple="1">
                 <UIntegerElement name="ConfigID" id="0x5001" multiple="0"></UIntegerElement>
                 <UnicodeElement name="Label" id="0x5005" multiple="0"></UnicodeElement>
                 <UnicodeElement name="ToolTip" id="0x5015" multiple="0"></UnicodeElement>
@@ -330,7 +330,7 @@
                 <FloatElement name="FloatValue" />
                 <StringElement name="ValueFormat" id="0x5024" multiple="0"></StringElement>
                 <StringElement name="DisplayFormat" id="0x5034" multiple="0"></StringElement>
-                <MasterElement name="EnumOption" level="-1" id="0x4107" multiple="1">
+                <MasterElement name="EnumOption" global="1" id="0x4107" multiple="1">
                     <UnicodeElement name="Label" id="0x5005" multiple="0"></UnicodeElement>
                     <UnicodeElement name="ToolTip" id="0x5015" multiple="0"></UnicodeElement>
                     <UnicodeElement name="TextValue" />
@@ -342,7 +342,7 @@
                 </MasterElement>
             </MasterElement>
 
-            <MasterElement name="CheckBitField" level="-1" id="0x4037" multiple="1">
+            <MasterElement name="CheckBitField" global="1" id="0x4037" multiple="1">
                 <UIntegerElement name="ConfigID" id="0x5001" multiple="0"></UIntegerElement>
                 <UnicodeElement name="Label" id="0x5005" multiple="0"></UnicodeElement>
                 <UnicodeElement name="ToolTip" id="0x5015" multiple="0"></UnicodeElement>
@@ -354,7 +354,7 @@
                 <MasterElement name="EnumOption" />
             </MasterElement>
 
-            <MasterElement name="CheckDateTimeField" level="-1" id="0x4032" multiple="1">
+            <MasterElement name="CheckDateTimeField" global="1" id="0x4032" multiple="1">
                 <UIntegerElement name="ConfigID" id="0x5001" multiple="0"></UIntegerElement>
                 <UnicodeElement name="Label" id="0x5005" multiple="0"></UnicodeElement>
                 <UnicodeElement name="ToolTip" id="0x5015" multiple="0"></UnicodeElement>
@@ -370,7 +370,7 @@
                 <FloatElement name="FloatOffset" />
             </MasterElement>
 
-            <MasterElement name="CheckUTCOffsetField" level="-1" id="0x4033" multiple="1">
+            <MasterElement name="CheckUTCOffsetField" global="1" id="0x4033" multiple="1">
                 <UIntegerElement name="ConfigID" id="0x5001" multiple="0"></UIntegerElement>
                 <UnicodeElement name="Label" id="0x5005" multiple="0"></UnicodeElement>
                 <UnicodeElement name="ToolTip" id="0x5015" multiple="0"></UnicodeElement>
@@ -386,7 +386,7 @@
                 <FloatElement name="FloatOffset" />
             </MasterElement>
 
-            <MasterElement name="IntAccelerationField" level="-1" id="0x4042" multiple="1">
+            <MasterElement name="IntAccelerationField" global="1" id="0x4042" multiple="1">
                 <UIntegerElement name="ConfigID" id="0x5001" multiple="0"></UIntegerElement>
                 <UnicodeElement name="Label" id="0x5005" multiple="0"></UnicodeElement>
                 <UnicodeElement name="ToolTip" id="0x5015" multiple="0"></UnicodeElement>
@@ -402,7 +402,7 @@
                 <FloatElement name="FloatOffset" />
             </MasterElement>
 
-            <MasterElement name="CheckIntAccelerationField" level="-1" id="0x4052" multiple="1">
+            <MasterElement name="CheckIntAccelerationField" global="1" id="0x4052" multiple="1">
                 <UIntegerElement name="ConfigID" id="0x5001" multiple="0"></UIntegerElement>
                 <UnicodeElement name="Label" id="0x5005" multiple="0"></UnicodeElement>
                 <UnicodeElement name="ToolTip" id="0x5015" multiple="0"></UnicodeElement>
@@ -418,7 +418,7 @@
                 <FloatElement name="FloatOffset" />
             </MasterElement>
 
-            <MasterElement name="FloatAccelerationField" level="-1" id="0x4043" multiple="1">
+            <MasterElement name="FloatAccelerationField" global="1" id="0x4043" multiple="1">
                 <UIntegerElement name="ConfigID" id="0x5001" multiple="0"></UIntegerElement>
                 <UnicodeElement name="Label" id="0x5005" multiple="0"></UnicodeElement>
                 <UnicodeElement name="ToolTip" id="0x5015" multiple="0"></UnicodeElement>
@@ -436,7 +436,7 @@
                 <FloatElement name="FloatOffset" />
             </MasterElement>
 
-            <MasterElement name="CheckFloatAccelerationField" level="-1" id="0x4053" multiple="1">
+            <MasterElement name="CheckFloatAccelerationField" global="1" id="0x4053" multiple="1">
                 <UIntegerElement name="ConfigID" id="0x5001" multiple="0"></UIntegerElement>
                 <UnicodeElement name="Label" id="0x5005" multiple="0"></UnicodeElement>
                 <UnicodeElement name="ToolTip" id="0x5015" multiple="0"></UnicodeElement>
@@ -454,7 +454,7 @@
                 <FloatElement name="FloatOffset" />
             </MasterElement>
 
-            <MasterElement name="IntTemperatureField" level="-1" id="0x4062" multiple="1">
+            <MasterElement name="IntTemperatureField" global="1" id="0x4062" multiple="1">
                 <UIntegerElement name="ConfigID" id="0x5001" multiple="0"></UIntegerElement>
                 <UnicodeElement name="Label" id="0x5005" multiple="0"></UnicodeElement>
                 <UnicodeElement name="ToolTip" id="0x5015" multiple="0"></UnicodeElement>
@@ -470,7 +470,7 @@
                 <FloatElement name="FloatOffset" />
             </MasterElement>
 
-            <MasterElement name="CheckIntTemperatureField" level="-1" id="0x4072" multiple="1">
+            <MasterElement name="CheckIntTemperatureField" global="1" id="0x4072" multiple="1">
                 <UIntegerElement name="ConfigID" id="0x5001" multiple="0"></UIntegerElement>
                 <UnicodeElement name="Label" id="0x5005" multiple="0"></UnicodeElement>
                 <UnicodeElement name="ToolTip" id="0x5015" multiple="0"></UnicodeElement>
@@ -486,7 +486,7 @@
                 <FloatElement name="FloatOffset" />
             </MasterElement>
 
-            <MasterElement name="FloatTemperatureField" level="-1" id="0x4063" multiple="1">
+            <MasterElement name="FloatTemperatureField" global="1" id="0x4063" multiple="1">
                 <UIntegerElement name="ConfigID" id="0x5001" multiple="0"></UIntegerElement>
                 <UnicodeElement name="Label" id="0x5005" multiple="0"></UnicodeElement>
                 <UnicodeElement name="ToolTip" id="0x5015" multiple="0"></UnicodeElement>
@@ -504,7 +504,7 @@
                 <FloatElement name="FloatOffset" />
             </MasterElement>
 
-            <MasterElement name="CheckFloatTemperatureField" level="-1" id="0x4073" multiple="1">
+            <MasterElement name="CheckFloatTemperatureField" global="1" id="0x4073" multiple="1">
                 <UIntegerElement name="ConfigID" id="0x5001" multiple="0"></UIntegerElement>
                 <UnicodeElement name="Label" id="0x5005" multiple="0"></UnicodeElement>
                 <UnicodeElement name="ToolTip" id="0x5015" multiple="0"></UnicodeElement>
@@ -521,7 +521,7 @@
             </MasterElement>
 
 
-            <MasterElement name="IntPressureField" level="-1" id="0x4082" multiple="1">
+            <MasterElement name="IntPressureField" global="1" id="0x4082" multiple="1">
                 <UIntegerElement name="ConfigID" id="0x5001" multiple="0"></UIntegerElement>
                 <UnicodeElement name="Label" id="0x5005" multiple="0"></UnicodeElement>
                 <UnicodeElement name="ToolTip" id="0x5015" multiple="0"></UnicodeElement>
@@ -537,7 +537,7 @@
                 <FloatElement name="FloatOffset" />
             </MasterElement>
 
-            <MasterElement name="CheckIntPressureField" level="-1" id="0x4092" multiple="1">
+            <MasterElement name="CheckIntPressureField" global="1" id="0x4092" multiple="1">
                 <UIntegerElement name="ConfigID" id="0x5001" multiple="0"></UIntegerElement>
                 <UnicodeElement name="Label" id="0x5005" multiple="0"></UnicodeElement>
                 <UnicodeElement name="ToolTip" id="0x5015" multiple="0"></UnicodeElement>
@@ -553,25 +553,7 @@
                 <FloatElement name="FloatOffset" />
             </MasterElement>
 
-            <MasterElement name="FloatPressureField" level="-1" id="0x4083" multiple="1">
-                <UIntegerElement name="ConfigID" id="0x5001" multiple="0"></UIntegerElement>
-                <UnicodeElement name="Label" id="0x5005" multiple="0"></UnicodeElement>
-                <UnicodeElement name="ToolTip" id="0x5015" multiple="0"></UnicodeElement>
-                <StringElement name="DisableIf" id="0x5014" multiple="0"></StringElement>
-                <StringElement name="ValueFormat" id="0x5024" multiple="0"></StringElement>
-                <StringElement name="DisplayFormat" id="0x5034" multiple="0"></StringElement>
-                <FloatElement name="FloatIncrement" id="0x5133" multiple="0"></FloatElement>
-                <UIntegerElement name="FloatDigits" id="0x5141" multiple="0"></UIntegerElement>
-                <UnicodeElement name="TextValue" />
-                <StringElement name="ASCIIValue" />
-                <IntegerElement name="IntValue" />
-                <UIntegerElement name="UIntValue" />
-                <FloatElement name="FloatValue" />
-                <FloatElement name="FloatGain" />
-                <FloatElement name="FloatOffset" />
-            </MasterElement>
-
-            <MasterElement name="CheckFloatPressureField" level="-1" id="0x4093" multiple="1">
+            <MasterElement name="FloatPressureField" global="1" id="0x4083" multiple="1">
                 <UIntegerElement name="ConfigID" id="0x5001" multiple="0"></UIntegerElement>
                 <UnicodeElement name="Label" id="0x5005" multiple="0"></UnicodeElement>
                 <UnicodeElement name="ToolTip" id="0x5015" multiple="0"></UnicodeElement>
@@ -589,7 +571,25 @@
                 <FloatElement name="FloatOffset" />
             </MasterElement>
 
-            <MasterElement name="HiddenField" level="-1" id="0x040FF" multiple="1">
+            <MasterElement name="CheckFloatPressureField" global="1" id="0x4093" multiple="1">
+                <UIntegerElement name="ConfigID" id="0x5001" multiple="0"></UIntegerElement>
+                <UnicodeElement name="Label" id="0x5005" multiple="0"></UnicodeElement>
+                <UnicodeElement name="ToolTip" id="0x5015" multiple="0"></UnicodeElement>
+                <StringElement name="DisableIf" id="0x5014" multiple="0"></StringElement>
+                <StringElement name="ValueFormat" id="0x5024" multiple="0"></StringElement>
+                <StringElement name="DisplayFormat" id="0x5034" multiple="0"></StringElement>
+                <FloatElement name="FloatIncrement" id="0x5133" multiple="0"></FloatElement>
+                <UIntegerElement name="FloatDigits" id="0x5141" multiple="0"></UIntegerElement>
+                <UnicodeElement name="TextValue" />
+                <StringElement name="ASCIIValue" />
+                <IntegerElement name="IntValue" />
+                <UIntegerElement name="UIntValue" />
+                <FloatElement name="FloatValue" />
+                <FloatElement name="FloatGain" />
+                <FloatElement name="FloatOffset" />
+            </MasterElement>
+
+            <MasterElement name="HiddenField" global="1" id="0x040FF" multiple="1">
                 A 'field' for config items without individual UI widgets (e.g. created from multiple other fields)
                 <UIntegerElement name="ConfigID" id="0x5001" multiple="0"></UIntegerElement>
                 <StringElement name="DisableIf" id="0x5014" multiple="0">For hidden fields, this determines if the config item will be written.</StringElement>
@@ -603,21 +603,21 @@
                 <FloatElement name="FloatOffset" />
             </MasterElement>
 
-            <MasterElement name="VerticalPadding" level="-1" id="0x400F" multiple="1">
+            <MasterElement name="VerticalPadding" global="1" id="0x400F" multiple="1">
                 Special-case widget that creates a resizable vertical spacer, placing the fields following it on the bottom of the dialog.
             </MasterElement>
 
-            <MasterElement name="CheckDriftButton" level="-1" id="0x402F" multiple="0">
+            <MasterElement name="CheckDriftButton" global="1" id="0x402F" multiple="0">
                 Special-case control that compares device time to system time.
             </MasterElement>
 
-            <MasterElement name="ResetButton" level="-1" id="404F" multiple="1">
+            <MasterElement name="ResetButton" global="1" id="404F" multiple="1">
                 Special-case control that resets all the siblings in its group or tab to their factory default values.
             </MasterElement>
 
         </MasterElement> <!-- Group -->
 
-        <MasterElement name="CheckGroup" level="-1" id="0x4018" multiple="1">
+        <MasterElement name="CheckGroup" global="1" id="0x4018" multiple="1">
             <!-- All these children have already been defined, so they can be abbreviated -->
             <UnicodeElement name="Label" />
             <UnicodeElement name="ToolTip" />
@@ -693,13 +693,13 @@
     </MasterElement> <!-- Tab -->
 
     <!-- Special-case Tabs. These do no require child elements. -->
-    <MasterElement name="FactoryCalibrationTab" level="-1" id="0x4A08" multiple="1"></MasterElement>
-    <MasterElement name="UserCalibrationTab" level="-1" id="0x4A28" multiple="1"></MasterElement>
-    <MasterElement name="DeviceInfoTab" level="-1" id="0x4A48" multiple="1"></MasterElement>
+    <MasterElement name="FactoryCalibrationTab" global="1" id="0x4A08" multiple="1"></MasterElement>
+    <MasterElement name="UserCalibrationTab" global="1" id="0x4A28" multiple="1"></MasterElement>
+    <MasterElement name="DeviceInfoTab" global="1" id="0x4A48" multiple="1"></MasterElement>
 
 </MasterElement> <!-- ConfigUI -->
 
-<MasterElement name="RecorderConfigurationList" id="0x18436668" level="-1" multiple="0" mandatory="0">
+<MasterElement name="RecorderConfigurationList" id="0x18436668" global="1" multiple="0" mandatory="0">
     <MasterElement name="RecorderConfigurationItem" id="0x5008" multiple="1">
         <UIntegerElement name="ConfigID" id="0x5001" multiple="0" />
         <UIntegerElement name="BooleanValue" id="0x5100" multiple="0" />
@@ -715,7 +715,7 @@
 Attributes: a way to insert an arbitrary key/value into a structure, without revising (and potentially bloating) the schema itself. This data is typically non-critical.
 Strictly speaking, this may be considered an abuse of EBML, but it is flexible and moderately clean.
 -->
-<MasterElement name="Attribute" level="-1" id="0x6110" multiple="1" minver="2"> Container For arbitrary name/value attributes, allowing additional data without revising (and bloating) the schema. All of these elements are level -1, allowing an AttributeList to occur at any level, but should always be used at the relative levels implied below.
+<MasterElement name="Attribute" global="1" id="0x6110" multiple="1" minver="2"> Container For arbitrary name/value attributes, allowing additional data without revising (and bloating) the schema. All of these elements are level -1, allowing an AttributeList to occur at any level, but should always be used at the relative levels implied below.
     <UnicodeElement name="AttributeName" id="0x612f" multiple="0" minver="2"> Attribute name. Should always be child of Atrribute. </UnicodeElement>
     <IntegerElement name="IntAttribute" id="0x6120" multiple="0" minver="2"> Integer Attribute. Should always be child of Atrribute. </IntegerElement>
     <UIntegerElement name="UIntAttribute" id="0x6121" multiple="0" minver="2"> Unsigned integer Attribute. Should always be child of Atrribute. </UIntegerElement>

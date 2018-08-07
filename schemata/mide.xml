@@ -9,9 +9,9 @@
         <StringElement name="DocType" id="0x4282" multiple="0" mandatory="1" default="mide" minver="1">A string that describes the type of document that follows this EBML header. 'mide' for Mide Instrumentation Data Exchange files.</StringElement>
         <UIntegerElement name="DocTypeVersion" id="0x4287" multiple="0" mandatory="1" default="2" minver="1">The version of DocType interpreter used to create the file.</UIntegerElement>
         <UIntegerElement name="DocTypeReadVersion" id="0x4285" multiple="0" mandatory="1" default="2" minver="1">The minimum DocType version an interpreter has to support to read this file.</UIntegerElement>
-        <BinaryElement name="Void" level="-1" id="0xEC" multiple="1" minver="1">Used to void damaged data, to avoid unexpected behaviors when using damaged data. The content is discarded. Also used to reserve space in a sub-element for later use.</BinaryElement>
-        <BinaryElement name="CRC-32" level="-1" id="0xBF" multiple="0" minver="1" webm="0">The CRC is computed on all the data of the Master element it's in. The CRC element should be the first in it's parent master for easier reading. All level 1 elements should include a CRC-32. The CRC in use is the IEEE CRC32 Little Endian</BinaryElement>
-        <MasterElement name="SignatureSlot" level="-1" id="0x1B538667" multiple="1" webm="0">Contain signature of some (coming) elements in the stream.
+        <BinaryElement name="Void" global="1" id="0xEC" multiple="1" minver="1">Used to void damaged data, to avoid unexpected behaviors when using damaged data. The content is discarded. Also used to reserve space in a sub-element for later use.</BinaryElement>
+        <BinaryElement name="CRC-32" global="1" id="0xBF" multiple="0" minver="1" webm="0">The CRC is computed on all the data of the Master element it's in. The CRC element should be the first in it's parent master for easier reading. All level 1 elements should include a CRC-32. The CRC in use is the IEEE CRC32 Little Endian</BinaryElement>
+        <MasterElement name="SignatureSlot" global="1" id="0x1B538667" multiple="1" webm="0">Contain signature of some (coming) elements in the stream.
             <UIntegerElement name="SignatureAlgo" id="0x7E8A" multiple="0" webm="0">Signature algorithm used (1=RSA, 2=elliptic).</UIntegerElement>
             <UIntegerElement name="SignatureHash" id="0x7E9A" multiple="0" webm="0">Hash algorithm used (1=SHA1-160, 2=MD5).</UIntegerElement>
             <BinaryElement name="SignaturePublicKey" id="0x7EA5" multiple="0" webm="0">The public key to use with the algorithm (in the case of a PKI-based signature).</BinaryElement>
@@ -26,10 +26,10 @@
 
   <!-- Mide format global tags. Support required for all .mide schemas. -->
   <!-- Since the generating device may be very memory-constrained, and these tags may be repeated periodically for streaming, we use a short (global) element ID and generally allow them at any level -->
-  <UIntegerElement name="SchemaID" level="-1" id="0xFE" minver="1">Device EBML schema (aka 'tagset') hint. Points to a numeric schema ID defined at the receiving side.</UIntegerElement>
-  <BinaryElement name="Sync" level="-1" id="0xFA" minver="1">Used to provide an arbitrary length sync word (for network / stream framing purposes) at any point in the stream.</BinaryElement>
-  <!--<BinaryElement name="Discontinuity" level="-1" id="0xFD" minver="1">Probably replaced by a flag in individual datablocks at the Channel level.</BinaryElement>  -->
-  <IntegerElement name="ElementTag" level="-1" id="0xFC" minver="1">Arbitrary tag. Allow for separate opening and closing tags without knowing the length of the enclosed data in advance. I.e. instead of [tag len value=[subtag len... /]/], [tag len=0][subtags and contents][/tag]. Positive value corresponds to the corresponding ElementID as an opening tag; the corresponding negative value as the closing tag. Value -int_max for any int size is reserved.</IntegerElement>
+  <UIntegerElement name="SchemaID" global="1" id="0xFE" minver="1">Device EBML schema (aka 'tagset') hint. Points to a numeric schema ID defined at the receiving side.</UIntegerElement>
+  <BinaryElement name="Sync" global="1" id="0xFA" minver="1">Used to provide an arbitrary length sync word (for network / stream framing purposes) at any point in the stream.</BinaryElement>
+  <!--<BinaryElement name="Discontinuity" global="1" id="0xFD" minver="1">Probably replaced by a flag in individual datablocks at the Channel level.</BinaryElement>  -->
+  <IntegerElement name="ElementTag" global="1" id="0xFC" minver="1">Arbitrary tag. Allow for separate opening and closing tags without knowing the length of the enclosed data in advance. I.e. instead of [tag len value=[subtag len... /]/], [tag len=0][subtags and contents][/tag]. Positive value corresponds to the corresponding ElementID as an opening tag; the corresponding negative value as the closing tag. Value -int_max for any int size is reserved.</IntegerElement>
 
   <!--
 	VR gen3 (Slam Stick / WVR) tags
@@ -96,7 +96,7 @@
                 <StringElement name="SensorName" id="0x5243" multiple="0" minver="2">Text name assigned to a sensor; probably the sensor make/model if present.</StringElement>
                 <UIntegerElement name="SensorBwLimitIDRef" id="0x5244" multiple="0" minver="2">Reference to a BwLimitList entry. If present, this discloses the usable bandwidth range of the sensor itself.</UIntegerElement>
                 <MasterElement name="TraceabilityData" id="0x5250" multiple="0" minver="2">Master element for any traceability data tied to the Sensor.
-                    <StringElement name="SensorSerialNumber" level="4" id="0x5251" multiple="0" minver="2">Sensor manufacturer-supplied serial number, if any.</StringElement>
+                    <StringElement name="SensorSerialNumber" id="0x5251" multiple="0" minver="2">Sensor manufacturer-supplied serial number, if any.</StringElement>
                     <!-- Child elements TBD... -->
                 </MasterElement>
             </MasterElement>
@@ -114,39 +114,39 @@
                 <UIntegerElement name="TimeCodeModulus" id="0x5278" multiple="0" minver="2">The modulus at which modulo timestamps for this channel roll over.</UIntegerElement>
                 <StringElement name="SampleRate" id="0x5279" multiple="0" minver="2">The samplerate for this channel, if known and fixed. String represents a valid numeric expression, such as integer, decimal or ratio, e.g. '32768/16262'. Element required if both starting and ending timecodes will ever be omitted for blocks in this channel.</StringElement>
                 <MasterElement name="SubChannel" id="0x52A0" multiple="1" minver="2">Master element for SensorSubChannels.
-                    <IntegerElement name="SubChannelID" level="4" id="0x52A1" multiple="0" minver="2">ID of this SubChannel. Currently, SubChannelIDs must be sequential, starting from 0, for use with Slam Stick Lab.</IntegerElement>
-                    <StringElement name="SubChannelName" level="4" id="0x52A2" multiple="0" minver="2">Display name of the subchannel, typically the axis name for multiaxis measurements (e.g. "X", "Yaw", etc.). Typically omitted if no display name is needed beyond a measurement label and units.</StringElement>
-                    <UIntegerElement name="SubChannelCalibrationIDRef" level="4" id="0x52A3" multiple="0" minver="2">Reference to a Calibration in CalibrationList.</UIntegerElement>
-                    <UIntegerElement name="SubChannelBwLimitIDRef" level="4" id="0x52A4" multiple="0" minver="2">Reference to a BwLimitList entry. If present, this discloses any bandwidth limitations imposed for the acquisition channel, e.g. antialias or other filter settings. Note that the effective bandwidth is the lesser of the Sensor and SubChannel bandwidth!</UIntegerElement>
-                    <StringElement name="SubChannelLabel" level="4" id="0x52A5" multiple="0" minver="2">General measurement type label for this subchannel (e.g. "Acceleration", "Rotation", "Temperature", etc.).</StringElement>
-                    <UnicodeElement name="SubChannelUnits" level="4" id="0x52A6" multiple="0" minver="2">Text name of the engineering unit (e.g. "g") for this subchannel. Unicode characters such as degree or Greek symbols are allowed and encouraged.</UnicodeElement>
-                    <UIntegerElement name="SubChannelRangeMin" level="4" id="0x52A7" multiple="0" minver="2">Minimum valid sensor value; may be used for data validation or initial axis scaling during display.</UIntegerElement>
-                    <UIntegerElement name="SubChannelRangeMax" level="4" id="0x52A8" multiple="0" minver="2">Maximum valid sensor value; may be used for data validation or initial axis scaling during display.</UIntegerElement>
-                    <UIntegerElement name="SubChannelSensorRef" level="4" id="0x52A9" multiple="0" minver="2">Reference to a Sensor ID. Allows the association between SubChannels and a physical sensor to be expressed.</UIntegerElement>
-                    <UIntegerElement name="SubChannelWarningRef" level="4" id="0x52AA" multiple="1" minver="2">Reference to a warning range, i.e. another sensor measuring something that affects the results of this one.</UIntegerElement>
-                    <IntegerElement name="SubChannelVisibility" level="4" id="0x52AB" multiple="0" minver="2">Allow data channels to specify a visibility level; could have different visibility levels for e.g. 'advanced', 'on request' (channels which are not normally useful on their own, e.g. IRIG stream), 'hidden' (internal diagnostic or other dirty laundry).</IntegerElement>
+                    <IntegerElement name="SubChannelID" id="0x52A1" multiple="0" minver="2">ID of this SubChannel. Currently, SubChannelIDs must be sequential, starting from 0, for use with Slam Stick Lab.</IntegerElement>
+                    <StringElement name="SubChannelName" id="0x52A2" multiple="0" minver="2">Display name of the subchannel, typically the axis name for multiaxis measurements (e.g. "X", "Yaw", etc.). Typically omitted if no display name is needed beyond a measurement label and units.</StringElement>
+                    <UIntegerElement name="SubChannelCalibrationIDRef" id="0x52A3" multiple="0" minver="2">Reference to a Calibration in CalibrationList.</UIntegerElement>
+                    <UIntegerElement name="SubChannelBwLimitIDRef" id="0x52A4" multiple="0" minver="2">Reference to a BwLimitList entry. If present, this discloses any bandwidth limitations imposed for the acquisition channel, e.g. antialias or other filter settings. Note that the effective bandwidth is the lesser of the Sensor and SubChannel bandwidth!</UIntegerElement>
+                    <StringElement name="SubChannelLabel" id="0x52A5" multiple="0" minver="2">General measurement type label for this subchannel (e.g. "Acceleration", "Rotation", "Temperature", etc.).</StringElement>
+                    <UnicodeElement name="SubChannelUnits" id="0x52A6" multiple="0" minver="2">Text name of the engineering unit (e.g. "g") for this subchannel. Unicode characters such as degree or Greek symbols are allowed and encouraged.</UnicodeElement>
+                    <UIntegerElement name="SubChannelRangeMin" id="0x52A7" multiple="0" minver="2">Minimum valid sensor value; may be used for data validation or initial axis scaling during display.</UIntegerElement>
+                    <UIntegerElement name="SubChannelRangeMax" id="0x52A8" multiple="0" minver="2">Maximum valid sensor value; may be used for data validation or initial axis scaling during display.</UIntegerElement>
+                    <UIntegerElement name="SubChannelSensorRef" id="0x52A9" multiple="0" minver="2">Reference to a Sensor ID. Allows the association between SubChannels and a physical sensor to be expressed.</UIntegerElement>
+                    <UIntegerElement name="SubChannelWarningRef" id="0x52AA" multiple="1" minver="2">Reference to a warning range, i.e. another sensor measuring something that affects the results of this one.</UIntegerElement>
+                    <IntegerElement name="SubChannelVisibility" id="0x52AB" multiple="0" minver="2">Allow data channels to specify a visibility level; could have different visibility levels for e.g. 'advanced', 'on request' (channels which are not normally useful on their own, e.g. IRIG stream), 'hidden' (internal diagnostic or other dirty laundry).</IntegerElement>
                 </MasterElement>
             </MasterElement>
             <MasterElement name="PlotList" id="0x5300" multiple="0" minver="2">Master element for the PlotList items. It works like a virtual Channel, with Plots being its Subchannels.
                 <MasterElement name="Plot" id="0x5301" multiple="1" minver="2">Master element for a Plot entry
                     <!-- NOTE: ElementIDs/names are intentionally replicated between SubChannel and Plot children. -->
-                    <IntegerElement name="SubChannelID" level="4" id="0x52A1" multiple="0" minver="2">SubChannelID</IntegerElement>
-                    <StringElement name="SubChannelName" level="4" id="0x52A2" multiple="0" minver="2">Text name of the subchannel (e.g. axis?).</StringElement>
-                    <UIntegerElement name="SubChannelCalibrationIDRef" level="4" id="0x52A3" multiple="0" minver="2">Reference to a Calibration in CalibrationList.</UIntegerElement>
-                    <UIntegerElement name="SubChannelRangeMin" level="4" id="0x52A7" multiple="0" minver="2">Minimum valid sensor value.</UIntegerElement>
-                    <UIntegerElement name="SubChannelRangeMax" level="4" id="0x52A8" multiple="0" minver="2">Maximum valid sensor value.</UIntegerElement>
-                    <UIntegerElement name="SubChannelWarningRef" level="4" id="0x52AA" multiple="1" minver="2">Reference to a warning range, i.e. another sensor measuring something that affects the results of this one</UIntegerElement>
+                    <IntegerElement name="SubChannelID" id="0x52A1" multiple="0" minver="2">SubChannelID</IntegerElement>
+                    <StringElement name="SubChannelName" id="0x52A2" multiple="0" minver="2">Text name of the subchannel (e.g. axis?).</StringElement>
+                    <UIntegerElement name="SubChannelCalibrationIDRef" id="0x52A3" multiple="0" minver="2">Reference to a Calibration in CalibrationList.</UIntegerElement>
+                    <UIntegerElement name="SubChannelRangeMin" id="0x52A7" multiple="0" minver="2">Minimum valid sensor value.</UIntegerElement>
+                    <UIntegerElement name="SubChannelRangeMax" id="0x52A8" multiple="0" minver="2">Maximum valid sensor value.</UIntegerElement>
+                    <UIntegerElement name="SubChannelWarningRef" id="0x52AA" multiple="1" minver="2">Reference to a warning range, i.e. another sensor measuring something that affects the results of this one</UIntegerElement>
                     <!--SubChannelVisibility applicable here? -->
                     <!--SubChannelBwLimitIDRef applicable here? -->
                     <!-- Elements unique to Plot -->
-                    <StringElement name="SubChannelAxisName" level="4" id="0x5302" multiple="0" minver="2">Text name of the axis(?).</StringElement>
-                    <UIntegerElement name="SubChannelAxisXRef" level="4" id="0x5303" multiple="0" minver="2">Reference to an Axis.</UIntegerElement>
-                    <StringElement name="SubChannelUnitsName" level="4" id="0x5304" multiple="0" minver="2">Text name of the sensor output units.</StringElement>
-                    <UIntegerElement name="SubChannelUnitsXRef" level="4" id="0x5305" multiple="0" minver="2">Reference to a numbered, standardized SI unit.</UIntegerElement>
+                    <StringElement name="SubChannelAxisName" id="0x5302" multiple="0" minver="2">Text name of the axis(?).</StringElement>
+                    <UIntegerElement name="SubChannelAxisXRef" id="0x5303" multiple="0" minver="2">Reference to an Axis.</UIntegerElement>
+                    <StringElement name="SubChannelUnitsName" id="0x5304" multiple="0" minver="2">Text name of the sensor output units.</StringElement>
+                    <UIntegerElement name="SubChannelUnitsXRef" id="0x5305" multiple="0" minver="2">Reference to a numbered, standardized SI unit.</UIntegerElement>
 
-                    <MasterElement name="PlotSource" level="4" id="0x5320" multiple="1" minver="2">List of channels/subchannels used by this Plot
-                        <IntegerElement name="PlotChannelRef" level="5" id="0x5221" multiple="0" minver="2">SubChannelID</IntegerElement>
-                        <IntegerElement name="PlotSubChannelRef" level="5" id="0x5222" multiple="0" minver="2">SubChannelID</IntegerElement>
+                    <MasterElement name="PlotSource" id="0x5320" multiple="1" minver="2">List of channels/subchannels used by this Plot
+                        <IntegerElement name="PlotChannelRef" id="0x5221" multiple="0" minver="2">SubChannelID</IntegerElement>
+                        <IntegerElement name="PlotSubChannelRef" id="0x5222" multiple="0" minver="2">SubChannelID</IntegerElement>
                     </MasterElement>
                 </MasterElement>
             </MasterElement>
@@ -177,7 +177,7 @@
     Attributes: a way to insert an arbitrary key/value into a structure, without revising (and potentially bloating) the schema itself. This data is typically non-critical.
     Strictly speaking, this may be considered an abuse of EBML, but it is flexible and moderately clean.
     -->
-    <MasterElement name="Attribute" level="-1" id="0x6110" multiple="1" minver="2"> Container For arbitrary name/value attributes, allowing additional data without revising (and bloating) the schema. All of these elements are level -1, allowing an AttributeList to occur at any level, but should always be used at the relative levels implied below.
+    <MasterElement name="Attribute" global="1" id="0x6110" multiple="1" minver="2"> Container For arbitrary name/value attributes, allowing additional data without revising (and bloating) the schema. All of these elements are level -1, allowing an AttributeList to occur at any level, but should always be used at the relative levels implied below.
         <UnicodeElement name="AttributeName" id="0x612f" multiple="0" minver="2"> Attribute name. Should always be child of Atrribute. </UnicodeElement>
         <IntegerElement name="IntAttribute" id="0x6120" multiple="0" minver="2"> Integer Attribute. Should always be child of Atrribute. </IntegerElement>
         <UIntegerElement name="UIntAttribute" id="0x6121" multiple="0" minver="2"> Unsigned integer Attribute. Should always be child of Atrribute. </UIntegerElement>
@@ -274,7 +274,7 @@
 
     <!-- New configuration data: pairs of config IDs and values. Duplicated from the config_ui.xml schema,
     rather than attempting to parse one element with a different schema.. -->
-    <MasterElement name="RecorderConfigurationList" id="0x18436668" level="-1" multiple="0" mandatory="0">
+    <MasterElement name="RecorderConfigurationList" id="0x18436668" global="1" multiple="0" mandatory="0">
         <MasterElement name="RecorderConfigurationItem" id="0x5008" multiple="1">
             <UIntegerElement name="ConfigID" id="0x5001" multiple="0"></UIntegerElement>
             <UIntegerElement name="BooleanValue" id="0x5100" multiple="0"></UIntegerElement>
