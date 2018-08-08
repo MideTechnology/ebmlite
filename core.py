@@ -142,9 +142,6 @@ class Element(object):
         self.payloadOffset = payloadOffset
         self._value = None
 
-        # For python-ebml compatibility. Remove later.
-        self.bodySize = size + (payloadOffset - offset)
-
 
     def __repr__(self):
         return "<%s (ID:0x%02X), offset %s, size %s>" % \
@@ -365,7 +362,6 @@ class StringElement(Element):
         return encoding.encodeString(data, length)
 
 
-
 #===============================================================================
 
 class UnicodeElement(StringElement):
@@ -411,7 +407,6 @@ class DateElement(IntegerElement):
     def encodePayload(cls, data, length=None):
         """ Type-specific payload encoder for date elements. """
         return encoding.encodeDate(data, length)
-
 
 
 #===============================================================================
@@ -509,9 +504,45 @@ class MasterElement(Element):
 
         if el.precache:
             # Read the value now, avoiding a seek later.
-            el._value = el.parse(stream, esize)
+            el._value = el.parse(stream, el.size)
 
-        return el, payloadOffset + esize
+        return el, payloadOffset + el.size
+
+
+    @property
+    def size(self):
+        """ The element's size. Master elements can be instantiated with this
+            as `None`; this denotes an 'infinite' EBML element, and its size
+            will be determined by iterating over its contents until an invalid
+            child type is found.
+        """
+        try:
+            return self._size
+        except AttributeError:
+            # An "infinite" element (size specified in file is all 0xFF)
+            pos = end = self.payloadOffset
+            el = None
+            while el is None or el.__class__ in self.children:
+                self.stream.seek(pos)
+                end = pos
+                try:
+                    el, pos = self.parseElement(self.stream)
+                except TypeError:
+                    if "ord()" in str(err):
+                        # TypeError w/ failed ord() can occur at end-of-file
+                        break
+                    raise
+
+            self._size = end - self.payloadOffset
+            return self._size
+
+
+    @size.setter
+    def size(self, esize):
+        if esize is not None:
+            # Only create the `_size` attribute for a real value. Don't
+            # define it if it's `None`, so `size` will get calculated.
+            self._size = esize
 
 
     def __iter__(self):
@@ -704,11 +735,6 @@ class Document(MasterElement):
             # Failed to read the first element. Don't raise here; do that when
             # the Document is actually used.
             pass
-
-        if self.size is not None:
-            self.bodySize = self.size - self.payloadOffset
-        else:
-            self.bodySize = None
 
 
     def __repr__(self):
