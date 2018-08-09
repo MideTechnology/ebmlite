@@ -480,10 +480,15 @@ class MasterElement(Element):
         return self.value
 
 
-    def parseElement(self, stream):
+    def parseElement(self, stream, nocache=False):
         """ Read the next element from a stream, instantiate a `MasterElement`
             object, and then return it and the offset of the next element
             (this element's position + size).
+
+            @param stream: The source file-like stream.
+            @keyword nocache: If `True`, the parsed element's `precache`
+                attribute is ignored, and the element's value will not be
+                cached. For faster iteration.
         """
         offset = stream.tell()
         eid, idlen = readElementID(stream)
@@ -491,10 +496,6 @@ class MasterElement(Element):
         payloadOffset = offset + idlen + sizelen
 
         try:
-            # TODO: Enforce structure dictated by the schema by using only the
-            # elements that are children of this one, or are 'global.' Also,
-            # handle 'unknown' size elements, which end with the first invalid
-            # child element.
             etype = self.schema.elements[eid]
             el = etype(stream, offset, esize, payloadOffset)
         except KeyError:
@@ -502,7 +503,7 @@ class MasterElement(Element):
             el.id = eid
             el.schema = getattr(self, "schema", None)
 
-        if el.precache:
+        if el.precache and not nocache:
             # Read the value now, avoiding a seek later.
             el._value = el.parse(stream, el.size)
 
@@ -514,26 +515,31 @@ class MasterElement(Element):
         """ The element's size. Master elements can be instantiated with this
             as `None`; this denotes an 'infinite' EBML element, and its size
             will be determined by iterating over its contents until an invalid
-            child type is found.
+            child type is found, or the end-of-file is reached.
         """
         try:
             return self._size
         except AttributeError:
             # An "infinite" element (size specified in file is all 0xFF)
             pos = end = self.payloadOffset
+            elen = 0
             el = None
-            while el is None or el.__class__ in self.children:
+            while el is None or el.id in self.children:
                 self.stream.seek(pos)
                 end = pos
                 try:
-                    el, pos = self.parseElement(self.stream)
-                except TypeError:
+                    el, pos = self.parseElement(self.stream, noCache=True)
+                    elen += 1
+                    # TODO: Cache parsed elements?
+                except TypeError as err:
+                    # Will occur at end of file; message will contain "ord()".
                     if "ord()" in str(err):
-                        # TypeError w/ failed ord() can occur at end-of-file
                         break
+                    # Not the expected EOF TypeError!
                     raise
 
             self._size = end - self.payloadOffset
+            self._length = elen
             return self._size
 
 
@@ -546,14 +552,19 @@ class MasterElement(Element):
 
 
     def __iter__(self):
-        # TODO: Support elements with 'unknown' length (quit when an invalid
-        # child element is read).
+        # TODO: Better support for 'infinite' elements (getting the size of
+        # an infinite element iterates over it, so there's duplicated effort.)
         pos = self.payloadOffset
         payloadEnd = pos + self.size
         while pos < payloadEnd:
             self.stream.seek(pos)
-            el, pos = self.parseElement(self.stream)
-            yield el
+            try:
+                el, pos = self.parseElement(self.stream)
+                yield el
+            except TypeError as err:
+                if "ord()" in str(err):
+                    break
+                raise
 
 
     def __len__(self):
