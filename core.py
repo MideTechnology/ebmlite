@@ -10,9 +10,8 @@ EBML files quickly and efficiently, and that's about it.
     compromise until proper fix: handle root 'master' elements differently
     than deeper ones, more like the current `Document`.
 @todo: Validation. Enforce the hierarchy defined in each schema.
-@todo: Proper support for 'infinite' master elements (i.e `size` is `None`).
-    Requires validation; an invalid child element indicates the end of
-    the 'infinite' master.
+@todo: Optimize 'infinite' master elements (i.e `size` is `None`). See notes
+    in `MasterElement` class' method definitions.
 @todo: Improved `MasterElement.__eq__()` method, possibly doing a recursive
     crawl of both elements and comparing the actual contents, or iterating
     over chunks of the raw binary data. Current implementation doesn't check
@@ -216,7 +215,7 @@ class Element(object):
 
 
     @classmethod
-    def encode(cls, value, length=None, lengthSize=None):
+    def encode(cls, value, length=None, lengthSize=None, infinite=False):
         """ Encode an EBML element.
 
             @param value: The value to encode, or a list of values to encode.
@@ -229,6 +228,8 @@ class Element(object):
                 size, overriding the variable length encoding.
             @return: A bytearray containing the encoded EBML data.
         """
+        if infinite and not issubclass(cls, MasterElement):
+            raise ValueError("Only Master elements can have 'infinite' lengths")
         length = cls.length if length is None else length
         if isinstance(value, (list, tuple)):
             if not cls.multiple:
@@ -236,10 +237,10 @@ class Element(object):
                                  % cls.name)
             result = bytearray()
             for v in value:
-                result.extend(cls.encode(v, length=length, lengthSize=lengthSize))
+                result.extend(cls.encode(v, length, lengthSize, infinite))
             return result
         payload = cls.encodePayload(value, length=length)
-        length = length or len(payload)
+        length = None if infinite else (length or len(payload))
         encId = encoding.encodeId(cls.id)
         return encId + encoding.encodeSize(length, lengthSize) + payload
 
@@ -552,6 +553,8 @@ class MasterElement(Element):
 
 
     def __iter__(self):
+        """ x.__iter__() <==> iter(x)
+        """
         # TODO: Better support for 'infinite' elements (getting the size of
         # an infinite element iterates over it, so there's duplicated effort.)
         pos = self.payloadOffset
@@ -622,12 +625,14 @@ class MasterElement(Element):
     def encodePayload(cls, data, length=None):
         """ Type-specific payload encoder for 'master' elements.
         """
-        if isinstance(data, dict):
+        result = bytearray()
+        if data is None:
+            return result
+        elif isinstance(data, dict):
             data = data.items()
         elif not isinstance(data, (list, tuple)):
             raise TypeError("wrong type for %s payload: %s" % (cls.name,
                                                                type(data)))
-        result = bytearray()
         for k,v in data:
             if k not in cls.schema:
                 raise TypeError("Element type %r not found in schema" % k)
@@ -638,23 +643,34 @@ class MasterElement(Element):
 
 
     @classmethod
-    def encode(cls, data, **kwargs):
+    def encode(cls, data, length=None, lengthSize=None, infinite=False):
         """ Encode an EBML master element.
 
             @param data: The data to encode, provided as a dictionary keyed by
                 element name, a list of two-item name/value tuples, or a list
                 of either. Note: individual items in a list of name/value
                 pairs *must* be tuples!
+            @keyword infinite: If `True`, the element will be written with an
+                undefined size. When parsed, its end will be determined by the
+                occurrence of an invalid child element (or end-of-file).
             @return: A bytearray containing the encoded EBML binary.
         """
+        # TODO: Use 'length' to automatically generate `Void` element?
         if isinstance(data, list) and len(data)>0 and isinstance(data[0],list):
             # List of lists: special case for 'master' elements.
             # Encode as multiple 'master' elements.
             result = bytearray()
             for v in data:
-                result.extend(cls.encode(v))
+                result.extend(cls.encode(v, length=length,
+                                         lengthSize=lengthSize,
+                                         infinite=infinite))
             return result
-        return super(MasterElement, cls).encode(data)
+
+        # TODO: Remove 'infinite' kwarg from `Element.encode()` and handle it
+        # here, since it only applied to Master elements.
+        return super(MasterElement, cls).encode(data, length=length,
+                                                lengthSize=lengthSize,
+                                                infinite=infinite)
 
 
     def dump(self):
