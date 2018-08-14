@@ -17,7 +17,8 @@ EBML files quickly and efficiently, and that's about it.
     over chunks of the raw binary data. Current implementation doesn't check
     element contents, just ID and payload size (for speed).
 @todo: Document-wide caching, for future handling of streamed data. Affects
-    the longer-term streaming TODO, listed below.
+    the longer-term streaming TODO (listed below) and optimization of
+    'infinite' elements (listed above).
 @todo: Clean up and standardize usage of the term 'size' versus 'length.'
 @todo: General documentation (more detailed than the README) and examples.
 @todo: Document the best way to load schemata in a PyInstaller executable.
@@ -78,7 +79,8 @@ SCHEMATA = {}
 #===============================================================================
 
 class Element(object):
-    """ Base class for all EBML elements.
+    """ Base class for all EBML elements. Each data type has its own subclass,
+        and these subclasses get subclassed when a Schema is read.
 
         @cvar id: The element's EBML ID.
         @cvar name: The element's name.
@@ -97,6 +99,9 @@ class Element(object):
         @cvar length: An explicit length (in bytes) of the element when
             encoding. `None` will use standard EBML variable-length encoding.
     """
+    # Parent `Schema`
+    schema = None
+
     # Python native data type.
     dtype = bytearray
 
@@ -163,6 +168,20 @@ class Element(object):
                     and self.schema == other.schema)
         except AttributeError:
             return False
+
+    @classmethod
+    def _isValidChild(cls, elId):
+        """
+        """
+        if not cls.children:
+            return False
+        try:
+            return elId in cls._childIds
+        except AttributeError:
+            cls._childIds = set(cls.children)
+            if cls.schema is not None:
+                cls._childIds.update(cls.schema.globals)
+            return elId in cls._childIds
 
 
     @property
@@ -525,11 +544,11 @@ class MasterElement(Element):
             pos = end = self.payloadOffset
             elen = 0
             el = None
-            while el is None or el.id in self.children:
+            while el is None or self._isValidChild(el.id):
                 self.stream.seek(pos)
                 end = pos
                 try:
-                    el, pos = self.parseElement(self.stream, noCache=True)
+                    el, pos = self.parseElement(self.stream, nocache=True)
                     elen += 1
                     # TODO: Cache parsed elements?
                 except TypeError as err:
@@ -552,7 +571,7 @@ class MasterElement(Element):
             self._size = esize
 
 
-    def __iter__(self):
+    def __iter__(self, nocache=False):
         """ x.__iter__() <==> iter(x)
         """
         # TODO: Better support for 'infinite' elements (getting the size of
@@ -562,7 +581,7 @@ class MasterElement(Element):
         while pos < payloadEnd:
             self.stream.seek(pos)
             try:
-                el, pos = self.parseElement(self.stream)
+                el, pos = self.parseElement(self.stream, nocache=nocache)
                 yield el
             except TypeError as err:
                 if "ord()" in str(err):
@@ -579,8 +598,8 @@ class MasterElement(Element):
             if self._value is not None:
                 self._length = len(self._value)
             else:
-                # TODO: Iterate without parsing if size isn't `None`
-                for n, _el in enumerate(self):
+                n = 0 # In case there's nothing to enumerate
+                for n, _el in enumerate(self.__iter__(nocache=True), 1):
                     pass
                 self._length = n
         return self._length
@@ -786,12 +805,14 @@ class Document(MasterElement):
         try:
             return self._length
         except AttributeError:
-            for n, _el in enumerate(self):
-                self._length = n
+            n = 0 # in case there's nothing to enumerate
+            for n, _el in enumerate(self.__iter__(nocache=True), 1):
+                pass
+            self._length = n
         return self._length
 
 
-    def __iter__(self):
+    def __iter__(self, nocache=False):
         """ Iterate root elements.
         """
         # TODO: Cache root elements, prevent unnecessary duplicates. Maybe a
@@ -800,7 +821,7 @@ class Document(MasterElement):
         while True:
             self.stream.seek(pos)
             try:
-                el, pos = self.parseElement(self.stream)
+                el, pos = self.parseElement(self.stream, nocache=nocache)
                 yield el
             except TypeError as err:
                 # Occurs at end of file (parsing 0 length string), it's okay.
@@ -826,10 +847,14 @@ class Document(MasterElement):
         if isinstance(idx, (int, long)):
             if idx < 0:
                 raise IndexError("Negative indices in a Document not (yet) supported")
+            n = None
             for n, el in enumerate(self):
                 if n == idx:
                     return el
-            raise IndexError("list index out of range (0-%d)" % (n-1))
+            if n is None:
+                # If object being enumerated is empty, `n` is never set.
+                raise IndexError("Document contained no readable data")
+            raise IndexError("list index out of range (0-%d)" % n)
         elif isinstance(idx, slice):
             raise IndexError("Document root slicing not (yet) supported")
         else:
