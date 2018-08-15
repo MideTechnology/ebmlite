@@ -169,20 +169,6 @@ class Element(object):
         except AttributeError:
             return False
 
-    @classmethod
-    def _isValidChild(cls, elId):
-        """
-        """
-        if not cls.children:
-            return False
-        try:
-            return elId in cls._childIds
-        except AttributeError:
-            cls._childIds = set(cls.children)
-            if cls.schema is not None:
-                cls._childIds.update(cls.schema.globals)
-            return elId in cls._childIds
-
 
     @property
     def value(self):
@@ -508,7 +494,10 @@ class MasterElement(Element):
             @param stream: The source file-like stream.
             @keyword nocache: If `True`, the parsed element's `precache`
                 attribute is ignored, and the element's value will not be
-                cached. For faster iteration.
+                cached. For faster iteration when the element value doesn't
+                matter (e.g. counting child elements).
+            @return: The parsed element and the offset of the next element
+                (i.e. the end of the parsed element).
         """
         offset = stream.tell()
         eid, idlen = readElementID(stream)
@@ -530,6 +519,25 @@ class MasterElement(Element):
         return el, payloadOffset + el.size
 
 
+    @classmethod
+    def _isValidChild(cls, elId):
+        """ Is the given element ID represent a valid sub-element, i.e.
+            explicitly specified as a child element or a 'global' in the
+            schema?
+        """
+        if not cls.children:
+            return False
+
+        try:
+            return elId in cls._childIds
+        except AttributeError:
+            # The set of valid child IDs hasn't been created yet.
+            cls._childIds = set(cls.children)
+            if cls.schema is not None:
+                cls._childIds.update(cls.schema.globals)
+            return elId in cls._childIds
+
+
     @property
     def size(self):
         """ The element's size. Master elements can be instantiated with this
@@ -542,15 +550,17 @@ class MasterElement(Element):
         except AttributeError:
             # An "infinite" element (size specified in file is all 0xFF)
             pos = end = self.payloadOffset
-            elen = 0
-            el = None
-            while el is None or self._isValidChild(el.id):
+            numChildren = 0
+            while True:
                 self.stream.seek(pos)
                 end = pos
                 try:
-                    el, pos = self.parseElement(self.stream, nocache=True)
-                    elen += 1
                     # TODO: Cache parsed elements?
+                    el, pos = self.parseElement(self.stream, nocache=True)
+                    if self._isValidChild(el.id):
+                        numChildren += 1
+                    else:
+                        break
                 except TypeError as err:
                     # Will occur at end of file; message will contain "ord()".
                     if "ord()" in str(err):
@@ -559,7 +569,7 @@ class MasterElement(Element):
                     raise
 
             self._size = end - self.payloadOffset
-            self._length = elen
+            self._length = numChildren
             return self._size
 
 
