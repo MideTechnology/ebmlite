@@ -1,12 +1,23 @@
 """
 Functions for decoding EBML elements and their values.
+
+Note: this module does not decode `Document`, `BinaryElement`, or
+`MasterElement` objects; these are handled entirely in `core.py`. `Document`
+and `MasterElement` objects are special cases, and `BinaryElement` objects do
+not require special decoding. 
 """
+
+__author__ = "dstokes"
+__copyright__ = "Copyright 2018 Mide Technology Corporation"
+
+__all__ = ['readElementID', 'readElementSize', 'readFloat', 'readInt',
+           'readUInt', 'readDate', 'readString', 'readUnicode']
 
 from datetime import datetime, timedelta
 import struct
 
 #===============================================================================
-# 
+#
 #===============================================================================
 
 # Pre-built structs for packing/unpacking various data types
@@ -51,7 +62,7 @@ def decodeIntLength(byte):
         return 6, byte & 0b11
     elif byte >= 2:
         return 7, byte & 0b1
-    
+
     return 8, 0
 
 
@@ -120,7 +131,7 @@ def readUInt(stream, size):
 
     if size == 0:
         return 0
-    
+
     data = stream.read(size)
     return _struct_uint64_unpack_from(data.rjust(8,'\x00'))[0]
 
@@ -134,7 +145,7 @@ def readInt(stream, size):
 
     if size == 0:
         return 0
-    
+
     data = stream.read(size)
     if ord(data[0]) & 0b10000000:
         pad = '\xff'
@@ -202,4 +213,3 @@ def readDate(stream, size=8):
     nanoseconds = _struct_int64_unpack(data)[0]
     delta = timedelta(microseconds=(nanoseconds // 1000))
     return datetime(2001, 1, 1, tzinfo=None) + delta
-

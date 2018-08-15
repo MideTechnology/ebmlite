@@ -1,11 +1,15 @@
 '''
-Module mide_ebml.ebmlite.encoding
+Functions for encoding EBML elements and their values.
 
-Created on Aug 11, 2017
+Note: this module does not encode Document or MasterElement objects; they are
+special cases, handled in `core.py`.
 '''
 
 __author__ = "dstokes"
-__copyright__ = "Copyright 2017 Mide Technology Corporation"
+__copyright__ = "Copyright 2018 Mide Technology Corporation"
+
+__all__ = ['encodeBinary', 'encodeDate', 'encodeFloat', 'encodeId', 'encodeInt',
+           'encodeSize', 'encodeString', 'encodeUInt', 'encodeUnicode']
 
 import datetime
 import sys
@@ -14,7 +18,7 @@ from decoding import _struct_uint64, _struct_int64
 from decoding import _struct_float32, _struct_float64
 
 #===============================================================================
-# 
+#
 #===============================================================================
 
 # If no length is given, use the platform's size of a float.
@@ -35,7 +39,7 @@ LENGTH_PREFIXES = [0,
 STRING_CHARACTERS = (b"?"*32 + bytearray(range(32,127))).ljust(256, b'?')
 
 #===============================================================================
-# 
+#
 #===============================================================================
 
 def getLength(val):
@@ -62,7 +66,7 @@ def getLength(val):
 
 def encodeSize(val, length=None):
     """ Encode an element size.
-    
+
         @param val: The size to encode. If `None`, the EBML 'unknown' size
             will be returned (1 or `length` bytes, all bits 1).
         @keyword length: An explicit length for the encoded size. If `None`,
@@ -72,7 +76,7 @@ def encodeSize(val, length=None):
         # 'unknown' size: all bits 1.
         length = 1 if length is None else length
         return b'\xff' * length
-    
+
     length = getLength(val) if length is None else length
     try:
         prefix = LENGTH_PREFIXES[length]
@@ -94,7 +98,7 @@ def encodeId(eid, length=None):
     """
     if length is not None:
         if length < 1 or length > 4:
-            raise ValueError("Cannot encode an ID 0x%0x to length %d" % 
+            raise ValueError("Cannot encode an ID 0x%0x to length %d" %
                              (eid, length))
     return encodeUInt(eid, length)
 
@@ -152,15 +156,15 @@ def encodeFloat(val, length=None):
     elif length == 8:
         return _struct_float64.pack(val)
     else:
-        raise ValueError("Cannot encode float of length %d; only 0, 4, or 8" % 
+        raise ValueError("Cannot encode float of length %d; only 0, 4, or 8" %
                          length)
 
 
 def encodeBinary(val, length=None):
     """ Encode binary data.
-        
+
         @param val: A string or bytearray containing the data to encode.
-        @keyword length: An explicit length for the encoded data. A 
+        @keyword length: An explicit length for the encoded data. A
             `ValueError` will be raised if `length` is shorter than the
             actual length of the binary data.
     """
@@ -176,7 +180,7 @@ def encodeBinary(val, length=None):
     else:
         raise ValueError("Length of data (%d) exceeds specified length (%d)" %
                          (len(val), length))
-    
+
 
 def encodeString(val, length=None):
     """ Encode an ASCII string.
@@ -187,7 +191,7 @@ def encodeString(val, length=None):
     """
     if isinstance(val, unicode):
         val = val.encode('ascii', 'replace')
-        
+
     if length is not None:
         val = val[:length]
 
@@ -202,7 +206,7 @@ def encodeUnicode(val, length=None):
             will be truncated if the length is less than that of the original.
     """
     val = val.encode('utf_8')
-    
+
     if length is not None:
         val = val[:length]
 
