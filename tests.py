@@ -21,13 +21,44 @@ class Test(unittest.TestCase):
     def setUp(self):
         pass
 
-
+    
+    
     def tearDown(self):
         pass
+    
+    
+    
+    def testMkv(self):
+        file = '.\\testFiles\\video-1.mkv'
+        mkvXml = toXml(core.loadSchema('.\\schemata\\matroska.xml').load(file))
+        mkvName = os.path.split(mkvXml.attrib['source'])[1]
 
+        self.assertEqual(mkvName, 'video-1.mkv', 'video name is wrong')
 
-    def testName(self):
-        pass
+        mkvString = ET.tostring(mkvXml, encoding='utf-8')
+        f = open('.\\testFiles\\temp.xml', 'wt')
+        f.write(mkvString)
+        
+        f.close()
+        # os.remove('c:\\users\\cflanigan\\desktop\\TEMP\\temp.xml')
+    
+    
+    
+    def testIde(self):
+        file = '.\\testFiles\\SSX46714-doesnot.IDE'
+        ideXml = toXml(core.loadSchema('.\\schemata\\mide.xml').load(file))
+        ideName = os.path.split(ideXml.attrib['source'])[1]
+        nonData = [e for e in ideXml.getchildren() if e.tag != 'ChannelDataBlock']
+        
+        ideString = ET.tostring(ideXml, encoding='utf-8')
+        
+        nonDataEls = [el for el in ideXml if el.tag != 'ChannelDataBlock']
+        
+        self.assertEqual(nonDataEls[0].tag, 'RecordingProperties', 'Recording ' \
+                         + 'properties not present in IDE file')
+        
+    
+    
 class testDecoding(unittest.TestCase):
     
     def setUp(self):

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Schema name"Matroska">
+<Schema name="Matroska">
 <MasterElement name="EBML" id="0x1A45DFA3" mandatory="1" multiple="1" minver="1">Set the EBML characteristics of the data to follow. Each EBML document has to start with this.
     <UIntegerElement name="EBMLVersion" id="0x4286" mandatory="1" default="1" minver="1">The version of EBML parser used to create the file.</UIntegerElement>
     <UIntegerElement name="EBMLReadVersion" id="0x42F7" mandatory="1" default="1" minver="1">The minimum EBML version a parser has to support to read this file.</UIntegerElement>
