@@ -9,11 +9,30 @@ import os, sys
 import numpy as np
 from datetime import datetime, timedelta
 
+from core     import *
 from decoding import *
 from encoding import *
 from mock     import *
 from numpy    import inf
 from util     import *
+
+
+    
+class MockStream(object):
+    def __init__(self):
+        self.string = ''
+    
+    def read(self, n=None):
+        if n is None:
+            n = len(self.string)
+        retVal = self.string[:n]
+        self.string = self.string[n:]
+        return retVal
+    
+    def seek(self, n):
+        self.string = self.string[n:]
+        
+        
 
 class Test(unittest.TestCase):
 
@@ -63,19 +82,7 @@ class testDecoding(unittest.TestCase):
     
     def setUp(self):
         
-        class mockStream(object):
-            
-            def __init__(self):
-                self.string = ''
-            
-            def read(self, n=None):
-                if n is None:
-                    n = len(self.string)
-                retVal = self.string[:n]
-                self.string = self.string[n:]
-                return retVal
-        
-        self.mockStream = mockStream()
+        self.mockStream = MockStream()
         
     
     def testDecodeIntLen(self):
@@ -403,9 +410,10 @@ class testEncoding(unittest.TestCase):
 
         self.assertEqual(encodeDate(zeroTime + delta), '\x00\x00\x00\x00ABPh')
                 
-        
-
-
+                
+    
+    
+    
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()
