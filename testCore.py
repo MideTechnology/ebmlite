@@ -16,16 +16,27 @@ from util     import *
 class MockStream(object):
     def __init__(self):
         self.string = ''
+        self.position = 0
     
     def read(self, n=None):
         if n is None:
-            n = len(self.string)
-        retVal = self.string[:n]
-        self.string = self.string[n:]
+            n = len(self.string) - self.position
+        retVal = self.string[self.position:self.position+n]
+        self.position += n
         return retVal
     
-    def seek(self, n):
-        self.string = self.string[n:]
+    def seek(self, offset, whence=0):
+        if whence == 0:
+            self.position = offset
+        elif whence == 1:
+            self.position += offset
+        else:
+            self.position = len(self.string) + offset
+        
+        return self.position 
+        
+    def tell(self):
+        return self.position
         
         
                             
@@ -63,7 +74,7 @@ class testCoreElement(unittest.TestCase):
         self.assertEqual(self.element.value, '\x71\xea')
         
         # Test that mockstring is empty and that the value has been cached
-        self.assertEqual(self.mockStream.string, '')
+        self.assertEqual(self.mockStream.position, 6)
         self.assertEqual(self.element.value, '\x71\xea')
     
     
@@ -375,13 +386,145 @@ class testUnknownElements(unittest.TestCase):
     
     
     
-    def setup(self):
-        pass
+    def setUp(self):
+                
+        self.mockStream = MockStream()
+        
+        # -1000 = -0b0000 0011  1110 1000 =>
+        # 0b1111 1100  0001 1000 =>
+        # 0xfc18
+        self.mockStream.string = '\x00\x00\x00A'
+                
+        self.unkEl1 = VoidElement(stream=self.mockStream, offset=1, size=4, \
+                                     payloadOffset=1)
+        self.unkEl1.id = 0x7c        
+        self.unkEl1.schema = 'mide.xml'
+                
+        self.unkEl2 = VoidElement(stream=self.mockStream, offset=1, size=4, \
+                                     payloadOffset=1)
+        self.unkEl2.id = 0x7c        
+        self.unkEl2.schema = 'mide.xml'
+                
+        self.unkEl3 = VoidElement(stream=self.mockStream, offset=1, size=4, \
+                                     payloadOffset=1)
+        self.unkEl3.id = 0x7d       
+        self.unkEl3.schema = 'mide.xml'
     
     
     
     def testUnknownEq(self):
-        pass    
+        self.assertEqual(self.unkEl1, self.unkEl2)
+        self.assertNotEqual(self.unkEl1, self.unkEl3)
+        
+        
+        
+class testMasterElements(unittest.TestCase):
+    
+    
+    
+    def setUp(self):
+                
+        self.mockStream = MockStream()
+        """ Master Element:   ID: 0x1A45DFA3
+                            Size: 0x84
+                           Value:
+                UInt Element:   ID: 0x4286
+                              Size: 0x81
+                             value: 0x42 
+        """
+        self.mockStream.string = '\x1A\x45\xDF\xA3\x84\x42\x86\x81\x10'
+        
+        self.element = MasterElement(stream=self.mockStream, \
+                                     offset=0, \
+                                     size=4, \
+                                     payloadOffset=5)
+        self.element.schema = loadSchema('.\\schemata\\mide.xml')
+        self.element.id = 0x1A45DFA3
+    
+    
+    
+    def testParse(self):
+        masterEl = MasterElement()
+        masterEl.id = 0x1A45DFA3
+        masterEl.size = 4
+        masterEl.schema = loadSchema('.\\schemata\\mide.xml')
+        self.assertEqual(masterEl, self.element)
+        
+        sEbmlVer = self.element.parse()[0]
+        sEbmlVer.stream = self.mockStream
+        ebmlVer = masterEl.schema.elements[0x4286](masterEl.stream, 5, 1, 8)
+        ebmlVer.stream = self.mockStream        
+        ebmlVer._value = 16
+        sEbmlVer == ebmlVer
+        self.assertEqual(sEbmlVer, ebmlVer)
+    
+    
+    
+    def testParseElement(self):        
+        self.mockStream.seek(5)
+        newVer = self.element.parseElement(self.mockStream)[0]
+        
+        ebmlVer = self.element.schema.elements[0x4286](self.mockStream, 5, 1, 8)
+        
+        self.assertEqual(newVer, ebmlVer)
+    
+    
+    
+    def testIter(self):
+        self.mockStream.seek(5)
+        
+        ebmlVer = self.element.schema.elements[0x4286](self.mockStream, 5, 1, 8)
+        
+        self.assertEqual(list(self.element), [ebmlVer])
+    
+    
+    
+    def testLen(self):
+        self.assertEqual(len(self.element), 0)
+    
+    
+    
+    def testValue(self):
+        self.mockStream.seek(5)
+        
+        ebmlVer = self.element.schema.elements[0x4286](self.mockStream, 5, 1, 8)
+        self.assertEqual(self.element.value, [ebmlVer])
+    
+    
+    
+    def testGetItem(self):
+        self.mockStream.seek(5)
+        
+        ebmlVer = self.element.schema.elements[0x4286](self.mockStream, 5, 1, 8)
+        self.assertEqual(self.element[0], ebmlVer)
+    
+    
+    
+    def testGc(self):
+        self.assertIsNone(self.element._value)
+        
+        self.element.value
+        self.assertIsNotNone(self.element._value)
+        
+        self.element.gc()
+        self.assertIsNone(self.element._value)
+    
+    
+    
+    def testEncodePayload(self):
+        print self.element.encodePayload({0x4286:16})
+        pass
+    
+    
+    
+    def testEncode(self):
+        pass
+    
+    
+    
+    def testDump(self):
+        pass
+        
     
     
 if __name__ == "__main__":
