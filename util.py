@@ -100,7 +100,7 @@ def xmlElement2ebml(xmlEl, ebmlFile, schema, sizeLength=4, unknown=True):
     try:
         cls = schema[xmlEl.tag]
         encId = encoding.encodeId(cls.id)
-    except KeyError:
+    except (KeyError, AttributeError):
         # Element name not in schema. Go ahead if allowed (`unknown` is `True`)
         # and the XML element specifies an ID,
         if not unknown:
@@ -112,6 +112,10 @@ def xmlElement2ebml(xmlEl, ebmlFile, schema, sizeLength=4, unknown=True):
                             "attribute in XML: %s" % xmlEl.tag)
         cls = core.UnknownElement
         encId = encoding.encodeId(int(eid, 16))
+        cls.id = 0
+        for b in eid:
+            cls.id *= 256
+            cls.id += ord(b)
 
     sl = int(xmlEl.get('sizeLength', sizeLength))
 
