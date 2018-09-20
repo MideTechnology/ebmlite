@@ -1174,7 +1174,7 @@ class Schema(object):
     def __getitem__(self, key):
         """ Get an Element class from the schema, by name or by ID. """
         try:
-            self.elements[key]
+            return self.elements[key]
         except KeyError:
             return self.elementsByName[key]
 
