@@ -54,6 +54,7 @@ class testDecoding(unittest.TestCase):
                            
         for id, i, eID in zip(idBytes, range(1, len(idBytes) + 1), eIDs):
             self.mockStream.string = id
+            self.mockStream.seek(0)
             readElIDOut = readElementID(self.mockStream)
             self.assertEqual(readElIDOut, (eID, i))
 
@@ -80,7 +81,8 @@ class testDecoding(unittest.TestCase):
                    0x41424344454647]
         
         for id, i, elSz in zip(idBytes, range(1, len(idBytes) + 1), elSizes):
-            self.mockStream.string = id
+            self.mockStream.string = id            
+            self.mockStream.seek(0)
             self.assertEqual(readElementSize(self.mockStream), (elSz, i))
        
 
@@ -96,6 +98,7 @@ class testDecoding(unittest.TestCase):
         
         for id, i, numOut in zip(idBytes, range(1, len(idBytes) + 1), ints):
             self.mockStream.string = id
+            self.mockStream.seek(0)
             a = readUInt(self.mockStream, i)
             self.assertEquals(a, numOut)
        
@@ -112,7 +115,8 @@ class testDecoding(unittest.TestCase):
         ints = [0x75, 0x4541, 0x254142, 0x15414243]
         
         for id, i, numOut in zip(idBytes, range(1, len(idBytes) + 1), ints):
-            self.mockStream.string = id
+            self.mockStream.string = id            
+            self.mockStream.seek(0)
             a = readInt(self.mockStream, i)
             self.assertEquals(a, numOut)
             
@@ -128,6 +132,7 @@ class testDecoding(unittest.TestCase):
         
         for id, i, numOut in zip(idBytes, range(1, len(idBytes) + 1), ints):
             self.mockStream.string = id
+            self.mockStream.seek(0)
             a = readInt(self.mockStream, i)
             self.assertEquals(a, numOut)
             
@@ -137,32 +142,41 @@ class testDecoding(unittest.TestCase):
         # Test reading floating point numbers
         
         # 0 length
+        self.mockStream.seek(0)
         self.mockStream.string = ''
         self.assertEqual(readFloat(self.mockStream, 0), 0.0)
         
         # 4-bit length
+        self.mockStream.seek(0)
         self.mockStream.string = '\x00\x00\x00\x00'
         self.assertEqual(readFloat(self.mockStream, 4), 0.0)
         
+        self.mockStream.seek(0)
         self.mockStream.string = '\x3f\x80\x00\x00'
         self.assertEqual(readFloat(self.mockStream, 4), 1.0)
         
+        self.mockStream.seek(0)
         self.mockStream.string = '\xc0\x00\x00\x00'
         self.assertEqual(readFloat(self.mockStream, 4), -2.0)
         
+        self.mockStream.seek(0)
         self.mockStream.string = '\x3e\xaa\xaa\xab'
         self.assertEqual(np.float32(readFloat(self.mockStream, 4)), np.float32(1.0/3.0))
     
         # 8-bit length
+        self.mockStream.seek(0)
         self.mockStream.string = '\x00\x00\x00\x00\x00\x00\x00\x00'
         self.assertEqual(readFloat(self.mockStream, 8), 0.0)
         
+        self.mockStream.seek(0)
         self.mockStream.string = '\x3f\xf0\x00\x00\x00\x00\x00\x00'
         self.assertEqual(readFloat(self.mockStream, 8), 1.0)
         
+        self.mockStream.seek(0)
         self.mockStream.string = '\xc0\x00\x00\x00\x00\x00\x00\x00'
         self.assertEqual(readFloat(self.mockStream, 8), -2.0)
         
+        self.mockStream.seek(0)
         self.mockStream.string = '\x3f\xd5\x55\x55\x55\x55\x55\x55'
         self.assertEqual(readFloat(self.mockStream, 8), 1.0/3.0)
     
