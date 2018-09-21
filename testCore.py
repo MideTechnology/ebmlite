@@ -3,6 +3,8 @@ import core
 import os, sys
 import numpy as np
 from datetime import datetime, timedelta
+import collections
+import types
 
 from core     import *
 from decoding import *
@@ -14,9 +16,10 @@ from util     import *
 
     
 class MockStream(object):
-    def __init__(self):
-        self.string = ''
+    def __init__(self, string=None):
+        self.string = '' if string is None else string
         self.position = 0
+        self.isClosed = False
     
     def read(self, n=None):
         if n is None:
@@ -37,6 +40,12 @@ class MockStream(object):
         
     def tell(self):
         return self.position
+    
+    def close(self):
+        self.isClosed = True
+        
+    def write(self, str):
+        self.string += str
         
         
                             
@@ -55,7 +64,14 @@ class testCoreElement(unittest.TestCase):
         #     data: 0111 0001  1110 1010
         self.mockStream.string = '\x4f\x56\x71\xea'
         
-        self.element = Element(stream=self.mockStream, offset=0, size=4, \
+        GenericElement = type('GenericElement', (Element,), \
+                              {'id':0x4343, 'name':'Generic Element', \
+                               'schema':loadSchema('.\\schemata\\mide.xml'), \
+                               'mandatory':False, 'multiple':False, \
+                               'precache':False, 'length':4, 'children':dict(), \
+                               '__doc__':'no'})
+        
+        self.element = GenericElement(stream=self.mockStream, offset=0, size=4, \
                                payloadOffset=2)
         
         
@@ -119,7 +135,7 @@ class testCoreElement(unittest.TestCase):
         """ Test encoding a full EBML element. """
         
         # TODO figure out why this isn't cooperating
-        # self.assertEqual(self.element.encode('\x71\xea', 2), '\x71\xea')
+        self.assertEqual(self.element.encode('\x71\xea', 2), 'CC\x82\x71\xea')
         pass
     
     
@@ -149,7 +165,7 @@ class testIntElements(unittest.TestCase):
         self.intEl1.id = 0x7c        
         self.intEl1.schema = 'mide.xml'
         
-        self.uintEl1 = UIntegerElement(stream=self.mockStream, offset=0, size=4, 
+        self.uintEl1 = UIntegerElement(stream=self.mockStream, offset=0, size=4, \
                                        payloadOffset=2)
 
     
@@ -423,6 +439,8 @@ class testMasterElements(unittest.TestCase):
     
     
     def setUp(self):
+        
+        schema = loadSchema('.\\schemata\\mide.xml')
                 
         self.mockStream = MockStream()
         """ Master Element:   ID: 0x1A45DFA3
@@ -434,10 +452,10 @@ class testMasterElements(unittest.TestCase):
         """
         self.mockStream.string = '\x1A\x45\xDF\xA3\x84\x42\x86\x81\x10'
         
-        self.element = MasterElement(stream=self.mockStream, \
-                                     offset=0, \
-                                     size=4, \
-                                     payloadOffset=5)
+        self.element = schema.elements[0x1A45DFA3](stream=self.mockStream, \
+                                                   offset=0, \
+                                                   size=4, \
+                                                   payloadOffset=5)
         self.element.schema = loadSchema('.\\schemata\\mide.xml')
         self.element.id = 0x1A45DFA3
     
@@ -512,18 +530,146 @@ class testMasterElements(unittest.TestCase):
     
     
     def testEncodePayload(self):
-        print self.element.encodePayload({0x4286:16})
-        pass
+        self.assertEqual(self.element.encodePayload({0x4286:16}), \
+                         bytearray('\x42\x86\x81\x10'))
     
     
     
     def testEncode(self):
-        pass
+        self.assertEqual(self.element.encode({0x4286:16}), \
+                         bytearray('\x1A\x45\xDF\xA3\x84\x42\x86\x81\x10'))
     
     
     
     def testDump(self):
-        pass
+        self.assertEqual(self.element.dump(), \
+                         collections.OrderedDict([['EBMLVersion', 16]]))
+        
+        
+        
+class testDocument(unittest.TestCase):
+    
+    
+    
+    def setUp(self):
+        self.schema = loadSchema('.\\schemata\\mide.xml')
+        self.doc = self.schema.load('.\\testFiles\\SSX46714-doesnot.IDE')
+        
+        self.stream = MockStream('test')
+    
+    
+    
+    def testClose(self):
+        self.assertFalse(self.doc.stream.closed)
+        self.doc.close()
+        self.assertTrue(self.doc.stream.closed)
+    
+    
+    
+    def testValue(self):
+        self.assertEqual([x for x in self.doc], [x for x in self.doc.value])
+        self.assertEqual(type(self.doc.value), types.GeneratorType)
+    
+    
+    
+    def testVersion(self):
+        self.assertEqual(self.doc.version, 2)
+        self.doc.info['DocTypeVersion'] = 5
+        self.assertEqual(self.doc.version, 5)
+    
+    
+    
+    def testType(self):
+        self.assertEqual(self.doc.type, 'mide')
+        self.doc.info['DocType'] = 'bork'
+        self.assertEqual(self.doc.type, 'bork')
+    
+    
+    
+    def testEncode(self):
+        self.stream.string = ''
+        self.doc.encode(self.stream, {0x52A1:50})
+        self.assertEqual(self.stream.string, '\x52\xA1\x81\x32')
+
+
+
+class testSchema(unittest.TestCase):
+    
+    
+    
+    def setUp(self):
+        self.schema = loadSchema('.\\schemata\\mide.xml')
+        
+        self.stream = MockStream('test')
+    
+    
+    
+    def testAddElement(self):
+        self.assertNotIn(0x4DAB, self.schema.elements.keys())
+        self.schema.addElement(0x4dab, 'Dabs', core.StringElement)
+        self.assertIn(0x4DAB, self.schema.elements.keys())
+        cls = self.schema[0x4DAB]
+        self.assertEqual(cls.id, 0x4DAB)
+        self.assertEqual(cls.name, 'Dabs')
+        self.assertEqual(cls.schema, self.schema)
+    
+    
+    
+    def testGet(self):
+        self.assertEqual(self.schema.get(0x1A45DFA3).name, 'EBML')
+        self.assertIsNone(self.schema.get(-1))
+        self.assertEqual(self.schema.get(-1, 5), 5)
+    
+    
+    
+    def testLoad(self):
+        ide = self.schema.load('.\\testFiles\\SSX46714-doesnot.IDE')
+        self.assertEqual(dict(ide.info), 
+                         {'DocTypeVersion':2, 'EBMLVersion':1,
+                          'EBMLMaxIDLength':4, 'EBMLReadVersion':1,
+                          'EBMLMaxSizeLength':8, 'DocTypeReadVersion':2, 
+                          'DocType':'mide'})
+    
+    
+    
+    def testLoads(self):
+        with open('.\\testFiles\\SSX46714-doesnot.IDE', 'rb') as f:
+            s = f.read()
+        ide = self.schema.loads(s)
+        self.assertEqual(dict(ide.info), 
+                         {'DocTypeVersion':2, 'EBMLVersion':1,
+                          'EBMLMaxIDLength':4, 'EBMLReadVersion':1,
+                          'EBMLMaxSizeLength':8, 'DocTypeReadVersion':2, 
+                          'DocType':'mide'})
+    
+    
+    
+    def testVersion(self):
+        self.assertEqual(self.schema.version, 2)
+    
+    
+    
+    def testType(self):
+        self.assertEqual(self.schema.type, 'mide')
+    
+    
+    
+    def testEncode(self):
+        stream = MockStream('')
+        self.schema.encode(stream, {0x52A1:50})
+        self.assertEqual(stream.string, '\x52\xA1\x81\x32')
+    
+    
+    
+    def testEncodes(self):
+        self.assertEqual(self.schema.encodes({0x52A1:50}), '\x52\xA1\x81\x32')
+    
+    
+    
+    def testVerify(self):
+        self.assertTrue(self.schema.verify('\x42\x86\x81\x01'))
+        with self.assertRaises(IOError):
+            self.schema.verify('\x00\x42\x86\x81\x01')
         
     
     
