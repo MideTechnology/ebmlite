@@ -112,10 +112,7 @@ def xmlElement2ebml(xmlEl, ebmlFile, schema, sizeLength=4, unknown=True):
                             "attribute in XML: %s" % xmlEl.tag)
         cls = core.UnknownElement
         encId = encoding.encodeId(int(eid, 16))
-        cls.id = 0
-        for b in eid:
-            cls.id *= 256
-            cls.id += ord(b)
+        cls.id = int(eid, 16)
 
     sl = int(xmlEl.get('sizeLength', sizeLength))
 
