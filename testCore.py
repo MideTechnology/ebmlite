@@ -1,53 +1,22 @@
 import unittest
 import core
 import os, sys
-import numpy as np
-from datetime import datetime, timedelta
 import collections
 import types
 
+import numpy as np
+
+from datetime import datetime, timedelta
+from difflib  import ndiff
 from core     import *
 from decoding import *
 from encoding import *
 from mock     import *
 from numpy    import inf
 from util     import *
+from tests    import MockStream
 
-
-    
-class MockStream(object):
-    def __init__(self, string=None):
-        self.string = '' if string is None else string
-        self.position = 0
-        self.isClosed = False
-    
-    def read(self, n=None):
-        if n is None:
-            n = len(self.string) - self.position
-        retVal = self.string[self.position:self.position+n]
-        self.position += n
-        return retVal
-    
-    def seek(self, offset, whence=0):
-        if whence == 0:
-            self.position = offset
-        elif whence == 1:
-            self.position += offset
-        else:
-            self.position = len(self.string) + offset
-        
-        return self.position 
-        
-    def tell(self):
-        return self.position
-    
-    def close(self):
-        self.isClosed = True
-        
-    def write(self, str):
-        self.string += str
-        
-        
+           
                             
 class testCoreElement(unittest.TestCase):
     
