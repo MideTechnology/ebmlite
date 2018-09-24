@@ -9,6 +9,7 @@ import os, sys
 import numpy as np
 from datetime import datetime, timedelta
 from difflib import ndiff
+from xml.dom.minidom import parseString
 
 from core     import *
 from decoding import *
@@ -67,43 +68,117 @@ class Test(unittest.TestCase):
     
     
     def testMkv(self):
-        file = '.\\testFiles\\video-1.mkv'
-        schema = core.loadSchema('.\\schemata\\matroska.xml')
+        schemaFile = '.\\schemata\\matroska.xml'
+        ebmlFile1 = '.\\testFiles\\video-1.mkv'
+        ebmlFile2 = '.\\testFiles\\video-2.mkv'
+        xmlFile1 = '.\\testFiles\\video-1.xml'
+        xmlFile2 = '.\\testFiles\\video-2.xml'
+        
+        schema = core.loadSchema(schemaFile)
         
         # Start with toXml
-        doc = schema.load(file, headers=True)
-        mkvRoot = toXml(doc)
-        s = ET.tostring(mkvRoot, encoding='UTF-8')
+        ebmlDoc1 = schema.load(ebmlFile1, headers=True)
+        ebmlRoot = toXml(ebmlDoc1)
+        xmlString1 = ET.tostring(ebmlRoot, encoding='UTF-8')
         
         # Save xml
-        with open('.\\testFiles\\video-1.xml', 'wt') as f:
-            f.write(s)
+        with open(xmlFile1, 'wt') as f:
+            f.write(xmlString1)
         
         # Convert xml2ebml
-        with open('.\\testFiles\\video-2.mkv', 'wb') as out:
-            xml2ebml('.\\testFiles\\video-1.xml', out, schema)
+        with open(ebmlFile2, 'wb') as out:
+            xml2ebml(xmlFile1, out, schema)
             
-            
-        doc2 = schema.load('.\\testFiles\\video-2.mkv', headers=True)
-        mkvRoot2 = toXml(doc2)
-        s2 = ET.tostring(mkvRoot2, encoding='UTF-8')
+        # write the second xml file            
+        ebmlDoc2 = schema.load(ebmlFile2, headers=True)        
+        mkvRoot2 = toXml(ebmlDoc2)
+        xmlString2 = ET.tostring(mkvRoot2, encoding='UTF-8')        
+        with open(xmlFile2, 'wt') as f:
+            f.write(xmlString2)
         
-        with open('.\\testFiles\\video-2.xml', 'wt') as f:
-            f.write(s2)
+        # Load back the XML files in order to compare the two
+        xmlDoc1 = loadXml(xmlFile1, schema)
+        xmlDoc2 = loadXml(xmlFile2, schema)
+        
+        # Compare each element from the XML
+        xmlEls1 = [xmlDoc1]
+        xmlEls2 = [xmlDoc2]        
+        while len(xmlEls1) > 0:
+            self.assertEqual(xmlEls1[0], xmlEls2[0], 'Element ' \
+                                                   + repr(xmlEls1[0]) \
+                                                   + ' was not converted properly')
+            for x in xmlEls1.pop(0).children.values():
+                if issubclass(x, Element):
+                    xmlEls1.append(x)
+            for x in xmlEls2.pop(0).children.values():
+                if issubclass(x, Element):
+                    xmlEls2.append(x)            
+    
     
     
     def testIde(self):
-        file = '.\\testFiles\\SSX46714-doesnot.IDE'
-        ideXml = toXml(core.loadSchema('.\\schemata\\mide.xml').load(file))
-        ideName = os.path.split(ideXml.attrib['source'])[1]
-        nonData = [e for e in ideXml.getchildren() if e.tag != 'ChannelDataBlock']
+        schemaFile = '.\\schemata\\mide.xml'
+        ebmlFile1 = '.\\testFiles\\SSX46714-doesnot.IDE'
+        ebmlFile2 = '.\\testFiles\\SSX46714-new.IDE'
+        xmlFile1 = '.\\testFiles\\ssx-1.xml'
+        xmlFile2 = '.\\testFiles\\ssx-2.xml'
         
-        ideString = ET.tostring(ideXml, encoding='utf-8')
+        schema = core.loadSchema(schemaFile)
         
-        nonDataEls = [el for el in ideXml if el.tag != 'ChannelDataBlock']
+        # Start with toXml
+        ebmlDoc1 = schema.load(ebmlFile1, headers=True)
+        ebmlRoot = toXml(ebmlDoc1)
+        xmlString1 = ET.tostring(ebmlRoot, encoding='UTF-8')
         
-        self.assertEqual(nonDataEls[0].tag, 'RecordingProperties', 'Recording ' \
-                         + 'properties not present in IDE file')
+        # Save xml
+        with open(xmlFile1, 'wt') as f:
+            f.write(xmlString1)
+        
+        # Convert xml2ebml
+        with open(ebmlFile2, 'wb') as out:
+            xml2ebml(xmlFile1, out, schema)
+            
+        # write the second xml file            
+        ebmlDoc2 = schema.load(ebmlFile2, headers=True)        
+        mkvRoot2 = toXml(ebmlDoc2)
+        xmlString2 = ET.tostring(mkvRoot2, encoding='UTF-8')        
+        with open(xmlFile2, 'wt') as f:
+            f.write(xmlString2)
+        
+        # Load back the XML files in order to compare the two
+        xmlDoc1 = loadXml(xmlFile1, schema)
+        xmlDoc2 = loadXml(xmlFile2, schema)
+        
+        # Compare each element from the XML
+        xmlEls1 = [xmlDoc1]
+        xmlEls2 = [xmlDoc2]        
+        while len(xmlEls1) > 0:
+            self.assertEqual(xmlEls1[0], xmlEls2[0], 'Element ' \
+                                                   + repr(xmlEls1[0]) \
+                                                   + ' was not converted properly')
+            for x in xmlEls1.pop(0).children.values():
+                if issubclass(x, Element):
+                    xmlEls1.append(x)
+            for x in xmlEls2.pop(0).children.values():
+                if issubclass(x, Element):
+                    xmlEls2.append(x)      
+                    
+                    
+                    
+    def testPPrint(self):
+        schemaFile = '.\\schemata\\mide.xml'
+        schema = core.loadSchema(schemaFile)
+        
+        ebmlDoc = schema.load('.\\testFiles\\SSX46714-doesnot.IDE', headers=True)
+        
+        pprint(ebmlDoc, out=open('.\\testFiles\\IDE-Pretty.txt', 'wt'))
+        xmlString = ET.tostring(toXml(ebmlDoc))
+        prettyXmlFile = open('.\\testFiles\\IDE-Pretty.xml', 'wt')
+        parseString(xmlString).writexml(prettyXmlFile, \
+                                        addindent='\t', \
+                                        newl='\n', \
+                                        encoding='utf-8')
+        # pprint(toXml(ebmlDoc), out=open('.\\testFiles\\IDE-Pretty.xml', 'wt'))
                 
                 
                 
