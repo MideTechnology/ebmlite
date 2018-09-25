@@ -2,7 +2,6 @@
 EBMLite: A lightweight EBML parsing library. It is designed to crawl through
 EBML files quickly and efficiently, and that's about it.
 
-@todo: Unit tests.
 @todo: Complete EBML encoding. Specifically, make 'master' elements write
     directly to the stream, rather than build bytearrays, so huge 'master'
     elements can be handled. It appears that the official spec may prohibit
@@ -676,6 +675,7 @@ class Document(MasterElement):
             self.filename = stream.name
         except AttributeError:
             self.filename = ""
+
 
         if name is None:
             if self.filename:

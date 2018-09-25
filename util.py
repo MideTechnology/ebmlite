@@ -94,6 +94,7 @@ def xmlElement2ebml(xmlEl, ebmlFile, schema, sizeLength=4, unknown=True):
             be written.
         @param schema: An `ebmlite.core.Schema` instance to use when
             writing the EBML document.
+        @keyword sizeLength:
         @param unknown: If `True`, unknown element names will be allowed,
             provided their XML elements include an ``id`` attribute with the
             EBML ID (in hexadecimal).
@@ -177,7 +178,7 @@ def xml2ebml(xmlFile, ebmlFile, schema, sizeLength=4, headers=True,
         @param unknown: If `True`, unknown element names will be allowed,
             provided their XML elements include an ``id`` attribute with the
             EBML ID (in hexadecimal).
-        @return TODO
+        @return: the size of the ebml file in bytes
         @raise NameError: raises if an xml element is not present in the schema.
     """
     if isinstance(ebmlFile, basestring):

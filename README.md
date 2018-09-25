@@ -113,6 +113,57 @@ The structure of the schema's XML defines the structure of the EBML document; ch
 
 **Note:** As seen in the example above, _ebmlite_ allows an EBML document to have multiple elements at its root level. Several other EBML libraries do this as well, but this is apparently counter to the official spec. Officially, an EBML document should have only a single root element, similar to an XML file.
 
+_ebmlite_
+----------------
+###Schema
+The Schema class is a factory used to encode and decode EBML files.  When it's initialized, it scans through the schema file and creates a new class for each element present in the file; then, when encoding or decoding files, it references these classes in order to encapsulate everything safely.  
+
+###Documents
+Documents are subclasses of MasterElements, which act as an interface to EBML files and act as the root node of the EBML tree.  Each Schema also creates a Document subclass to use, and the base Document class will not function without class variables defined by the Schema.  
+
+###Utils
+The functions provided by util.py will expose the majority of functionality needed to users, without the need to interface too deeply with this library.  The following functions are provided:
+* util.**toXml**(el, [parent=None,] [offsets=True,] [sizes=True,] [types=True,] [ids=True]):   
+Recursively converts EBML elements into xml elements.    
+Argument *el*: an EBML element or document.  
+Optional argument *parent*: The resulting XML element's parent element, if any.    
+Optional argument *offsets*: If `True`, create an ``offset`` attributes for each generated XML element, containing the corresponding EBML element's offset.   
+Optional argument *sizes*: If `True`, create ``size`` attributes containing the corresponding EBML element's size.  
+Optional argument *types*: If `True`, create ``type`` attributes containing the name of the corresponding EBML element type.  
+Optional argument *ids*: If `True`, create ``id`` attributes containing the corresponding EBML element's EBML ID.      
+Returns the root of an XML tree created using the xml.etree.ElementTree built-in class.  
+
+
+* util.**xmlElement2ebml**(xmlEl, ebmlFile, schema, [sizeLength=4,] [unknown=True]):  
+Recursively converts XML elements tonight into EBML elements.   
+Argument *xmlEl*: The XML element. Its tag must match an element defined in the `schema`.   
+Argument *ebmlFile*: An open file-like stream, to which the EBML data will be written.   
+Argument *schema*: An `ebmlite.core.Schema` instance to use when writing the EBML document.    
+Optional argument *sizeLength*:    
+Optional argument *unknown*: If `True`, unknown element names will be allowed, provided their XML elements include an ``id`` attribute with the EBML ID (in hexadecimal).  
+Returns the length of the encoded element, including header and children.   
+Raises *NameError*: raised if an xml element is not present in the schema and unknown is False, OR if the xml element does not have an ID.   
+
+
+* util.**xml2ebml**(xmlFile, ebmlFile, schema, [sizeLength=4,] [headers=True,] [unknown=True]):
+
+
+
+* util.**loadXml**: 
+* util.**pprint**
+
+Utils can also be called from the command line with the following syntax:
+```commandline
+python util.py {xml2ebml|ebml2xml|view} {FILE1.ebml|FILE1.xml} SCHEMA.xml [-o {FILE2.xml|FILE2.ebml}] [-c|--clobber] [-p|--pretty] 
+```
+The program requires you to specify a mode: xml2ebml, ebml2xml, or view.  The first two modes convert xml files to ebml files and ebml files to xml files, respectively; the last mode formats an IDE file to be human-readable.  
+FILE1: The location of the ebml or xml file to convert/view.  
+SCHEMA: The location of the schema to use when interpreting these files.  
+FILE2: The location to output to; otherwise, the output is directed into the console.  
+-c|--clobber: If FILE2 exists, then overwrite it, otherwise the program will fail.  
+-p|--pretty: Prints the output in a human-readable format.
+    
+
 To Do
 =====
 * Complete documentation and example code.
