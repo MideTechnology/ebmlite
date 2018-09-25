@@ -1,8 +1,8 @@
-'''
+"""
 Module mide_ebml.ebmlite.encoding
 
 Created on Aug 11, 2017
-'''
+"""
 
 __author__ = "dstokes"
 __copyright__ = "Copyright 2017 Mide Technology Corporation"
@@ -40,6 +40,8 @@ STRING_CHARACTERS = (b"?"*32 + bytearray(range(32,127))).ljust(256, b'?')
 
 def getLength(val):
     """ Calculate the encoded length of a value.
+        @param val: A value to be encoded, generally either an ID or a size for an EBML element
+        @return The minimum length, in bytes, that can be used to represent (val)
     """
     # Brute force it. Ugly but faster than calculating it.
     if val <= 126:
@@ -67,6 +69,8 @@ def encodeSize(val, length=None):
             will be returned (1 or `length` bytes, all bits 1).
         @keyword length: An explicit length for the encoded size. If `None`,
             the size will be encoded at the minimum length required.
+        @return: an encoded size for an EBML element
+        @raise ValueError: raised if the length is invalid, or the length cannot be encoded
     """
     if val is None:
         # 'unknown' size: all bits 1.
@@ -91,6 +95,8 @@ def encodeId(eid, length=None):
         @param eid: The EBML ID to encode.
         @keyword length: An explicit length for the encoded data. A `ValueError`
             will be raised if the length is too short to encode the value.
+        @return: The encoded ID eid
+        @raise ValueError: raised if length is less than one or more than 4.
     """
     if length is not None:
         if length < 1 or length > 4:
@@ -105,6 +111,8 @@ def encodeUInt(val, length=None):
         @param val: The unsigned integer value to encode.
         @keyword length: An explicit length for the encoded data. A `ValueError`
             will be raised if the length is too short to encode the value.
+        @return: binary representation of val as an unsigned integer, left-padded with 00
+        @raise ValueError: raised if val is longer than length.
     """
     packed = _struct_uint64.pack(val).lstrip(b'\x00')
     if length is None:
@@ -121,6 +129,8 @@ def encodeInt(val, length=None):
         @param val: The signed integer value to encode.
         @keyword length: An explicit length for the encoded data. A `ValueError`
             will be raised if the length is too short to encode the value.
+        @return: binary representation of val as a signed integer, left-padded with 00
+        @raise ValueError: raised if val is longer than length.
     """
     pad = b"\xff" if val < 0 else b"\x00"
     packed = _struct_int64.pack(val).lstrip(pad)
@@ -138,6 +148,8 @@ def encodeFloat(val, length=None):
         @param val: The floating point value to encode.
         @keyword length: An explicit length for the encoded data. Must be
             `None`, 0, 4, or 8; otherwise, a `ValueError` will be raised.
+        @return: binary representation of val as a float, left-padded with 00
+        @raise ValueError: raised if val not length 0, 4, or 8
     """
     if length is None:
         if val is None or val == 0.0:
@@ -163,6 +175,8 @@ def encodeBinary(val, length=None):
         @keyword length: An explicit length for the encoded data. A 
             `ValueError` will be raised if `length` is shorter than the
             actual length of the binary data.
+        @return: binary representation of value as binary data, left-padded with 00
+        @raise ValueError: raised if val is longer than length.
     """
     if isinstance(val, unicode):
         val = val.encode('utf_8')
@@ -184,6 +198,7 @@ def encodeString(val, length=None):
         @param val: The string (or bytearray) to encode.
         @keyword length: An explicit length for the encoded data. The result
             will be truncated if the length is less than that of the original.
+        @return: binary representation of val as a string, truncated to length
     """
     if isinstance(val, unicode):
         val = val.encode('ascii', 'replace')
@@ -200,6 +215,7 @@ def encodeUnicode(val, length=None):
         @param val: The Unicode string to encode.
         @keyword length: An explicit length for the encoded data. The result
             will be truncated if the length is less than that of the original.
+        @return: binary representation of val as a unicode string, truncated to length
     """
     val = val.encode('utf_8')
     
@@ -216,6 +232,8 @@ def encodeDate(val, length=None):
         @param val: The `datetime.datetime` object value to encode.
         @keyword length: An explicit length for the encoded data. Must be
             `None` or 8; otherwise, a `ValueError` will be raised.
+        @return: binary representation of val as an 8-byte dateTime.
+        @raise ValueError: raised if the length of the input is not 8 bytes.
     """
     if length is None:
         length = 8

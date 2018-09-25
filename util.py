@@ -43,6 +43,7 @@ def toXml(el, parent=None, offsets=True, sizes=True, types=True, ids=True):
             name of the corresponding EBML element type.
         @keyword ids: If `True`, create ``id`` attributes containing the
             corresponding EBML element's EBML ID.
+        @return The root XML element of the file.
     """
     if isinstance(el, core.Document):
         elname = el.__class__.__name__
@@ -96,6 +97,9 @@ def xmlElement2ebml(xmlEl, ebmlFile, schema, sizeLength=4, unknown=True):
         @param unknown: If `True`, unknown element names will be allowed,
             provided their XML elements include an ``id`` attribute with the
             EBML ID (in hexadecimal).
+        @return The length of the encoded element, including header and children.
+        @raise NameError: raised if an xml element is not present in the schema and unknown is False, OR if the xml
+            element does not have an ID.
     """
     try:
         cls = schema[xmlEl.tag]
@@ -173,6 +177,8 @@ def xml2ebml(xmlFile, ebmlFile, schema, sizeLength=4, headers=True,
         @param unknown: If `True`, unknown element names will be allowed,
             provided their XML elements include an ``id`` attribute with the
             EBML ID (in hexadecimal).
+        @return TODO
+        @raise NameError: raises if an xml element is not present in the schema.
     """
     if isinstance(ebmlFile, basestring):
         ebmlFile = open(ebmlFile, 'wb')
@@ -233,6 +239,7 @@ def loadXml(xmlFile, schema, ebmlFile=None):
         @keyword ebmlFile: The name of the temporary EBML file to write, or
             ``:memory:`` to use RAM (like `sqlite3`). Defaults to an
             automatically-generated temporary file.
+        @return The root node of the specified EBML file
     """
     if ebmlFile == ":memory:":
         ebmlFile = StringIO()
@@ -350,10 +357,10 @@ if __name__ == "__main__":
         out = sys.stdout
 
     if args.mode == "xml2ebml":
-        xml2ebml(args.input, out, schema) #, sizeLength=4, headers=True, unknown=True)
+        xml2ebml(args.input, out, schema)  # , sizeLength=4, headers=True, unknown=True)
     elif args.mode == "ebml2xml":
         doc = schema.load(args.input, headers=True)
-        root = toXml(doc) #, offsets, sizes, types, ids)
+        root = toXml(doc)  # , offsets, sizes, types, ids)
         s = ET.tostring(root, encoding="utf-8")
         if args.pretty:
             parseString(s).writexml(out, addindent='\t', newl='\n', encoding='utf-8')

@@ -33,14 +33,14 @@ class testCoreElement(unittest.TestCase):
         #     data: 0111 0001  1110 1010
         self.mockStream.string = '\x4f\x56\x71\xea'
         
-        GenericElement = type('GenericElement', (Element,), \
-                              {'id':0x4343, 'name':'Generic Element', \
-                               'schema':loadSchema('.\\schemata\\mide.xml'), \
-                               'mandatory':False, 'multiple':False, \
-                               'precache':False, 'length':4, 'children':dict(), \
+        GenericElement = type('GenericElement', (Element,),
+                              {'id':0x4343, 'name':'Generic Element',
+                               'schema':loadSchema('.\\schemata\\mide.xml'),
+                               'mandatory':False, 'multiple':False,
+                               'precache':False, 'length':4, 'children':dict(),
                                '__doc__':'no'})
         
-        self.element = GenericElement(stream=self.mockStream, offset=0, size=4, \
+        self.element = GenericElement(stream=self.mockStream, offset=0, size=4,
                                payloadOffset=2)
         
         
@@ -83,7 +83,7 @@ class testCoreElement(unittest.TestCase):
         
         self.assertEqual(self.element._value, None)
         self.assertEqual(self.element.gc(), 0)
-        
+
         self.element.value
         self.assertEqual(self.element._value, '\x71\xea')
         
@@ -95,15 +95,14 @@ class testCoreElement(unittest.TestCase):
     def testEncodePayload(self):
         """ Test encoding a payload. """
         
-        self.assertEqual(self.element.encodePayload('\x4f\x56\x71\xea', length=4), \
+        self.assertEqual(self.element.encodePayload('\x4f\x56\x71\xea', length=4),
                          '\x4f\x56\x71\xea')
 
     
     
     def testEncode(self):
         """ Test encoding a full EBML element. """
-        
-        # TODO figure out why this isn't cooperating
+
         self.assertEqual(self.element.encode('\x71\xea', 2), 'CC\x82\x71\xea')
         pass
     
@@ -129,12 +128,12 @@ class testIntElements(unittest.TestCase):
         # 0xfc18
         self.mockStream.string = '\xfc\x18'
                 
-        self.intEl1 = IntegerElement(stream=self.mockStream, offset=0, size=4, \
+        self.intEl1 = IntegerElement(stream=self.mockStream, offset=0, size=4,
                                      payloadOffset=2)
         self.intEl1.id = 0x7c        
         self.intEl1.schema = 'mide.xml'
         
-        self.uintEl1 = UIntegerElement(stream=self.mockStream, offset=0, size=4, \
+        self.uintEl1 = UIntegerElement(stream=self.mockStream, offset=0, size=4,
                                        payloadOffset=2)
 
     
@@ -198,7 +197,7 @@ class testFloatElements(unittest.TestCase):
         # 0xfc18
         self.mockStream.string = '\x4f\x56\x3e\xaa\xaa\xab'
                 
-        self.floatEl = FloatElement(stream=self.mockStream, offset=0, size=4, \
+        self.floatEl = FloatElement(stream=self.mockStream, offset=0, size=4,
                                      payloadOffset=2)
         self.floatEl.id = 0x7c        
         self.floatEl.schema = 'mide.xml'
@@ -217,7 +216,7 @@ class testFloatElements(unittest.TestCase):
     
     
     def testFloatEncode(self):
-        self.assertEqual(self.floatEl.encodePayload(1.0/3.0, length=4), \
+        self.assertEqual(self.floatEl.encodePayload(1.0/3.0, length=4),
                          '\x3e\xaa\xaa\xab')
         
 
@@ -235,22 +234,22 @@ class testStringElements(unittest.TestCase):
         # 0xfc18
         self.mockStream.string = '\x4f\x40bork\x4f\x40bork'
                 
-        self.strEl1 = StringElement(stream=self.mockStream, offset=0, size=4, \
+        self.strEl1 = StringElement(stream=self.mockStream, offset=0, size=4,
                                      payloadOffset=2)
         self.strEl1.id = 0x7c        
         self.strEl1.schema = 'mide.xml'
                 
-        self.strEl2 = StringElement(stream=self.mockStream, offset=0, size=4, \
+        self.strEl2 = StringElement(stream=self.mockStream, offset=0, size=4,
                                      payloadOffset=2)
         self.strEl2.id = 0x7c        
         self.strEl2.schema = 'mide.xml'
                 
-        self.strEl3 = StringElement(stream=self.mockStream, offset=0, size=8, \
+        self.strEl3 = StringElement(stream=self.mockStream, offset=0, size=8,
                                      payloadOffset=2)
         self.strEl3.id = 0x5e        
         self.strEl3.schema = 'matroska.xml'
         
-        self.uniEl = UnicodeElement(stream=self.mockStream, offset=0, size=4, \
+        self.uniEl = UnicodeElement(stream=self.mockStream, offset=0, size=4,
                                     payloadOffset=2)
     
     
@@ -304,20 +303,20 @@ class testDataElements(unittest.TestCase):
         
         self.mockStream.string = '\x80\x07\x71\xe1\x58\x4d\x0f\x00\x00'
         
-        self.datEl = DateElement(stream=self.mockStream, offset=1, size=8, \
+        self.datEl = DateElement(stream=self.mockStream, offset=1, size=8,
                                  payloadOffset=1)
     
     
     
     def testDateParse(self):
         self.mockStream.seek(1)
-        self.assertEqual(self.datEl.parse(self.mockStream, 8), \
+        self.assertEqual(self.datEl.parse(self.mockStream, 8),
                          datetime.datetime(2018, 1, 1))
     
     
     
     def testDateEncode(self):
-        self.assertEqual(self.datEl.encodePayload(datetime.datetime(2018, 1, 1)), \
+        self.assertEqual(self.datEl.encodePayload(datetime.datetime(2018, 1, 1)),
                          '\x07\x71\xe1\x58\x4d\x0f\x00\x00')
     
     
@@ -349,7 +348,7 @@ class testVoidElements(unittest.TestCase):
         # 0xfc18
         self.mockStream.string = '\x00\x00\x00A'
                 
-        self.voiEl = VoidElement(stream=self.mockStream, offset=1, size=4, \
+        self.voiEl = VoidElement(stream=self.mockStream, offset=1, size=4,
                                      payloadOffset=1)
         self.voiEl.id = 0x7c        
         self.voiEl.schema = 'mide.xml'
@@ -362,7 +361,7 @@ class testVoidElements(unittest.TestCase):
     
     
     def testVoidEncode(self):
-        self.assertEqual(self.voiEl.encodePayload(0x41424344, length=4), \
+        self.assertEqual(self.voiEl.encodePayload(0x41424344, length=4),
                          '\xff\xff\xff\xff')
     
     
@@ -380,17 +379,17 @@ class testUnknownElements(unittest.TestCase):
         # 0xfc18
         self.mockStream.string = '\x00\x00\x00A'
                 
-        self.unkEl1 = VoidElement(stream=self.mockStream, offset=1, size=4, \
+        self.unkEl1 = VoidElement(stream=self.mockStream, offset=1, size=4,
                                      payloadOffset=1)
         self.unkEl1.id = 0x7c        
         self.unkEl1.schema = 'mide.xml'
                 
-        self.unkEl2 = VoidElement(stream=self.mockStream, offset=1, size=4, \
+        self.unkEl2 = VoidElement(stream=self.mockStream, offset=1, size=4,
                                      payloadOffset=1)
         self.unkEl2.id = 0x7c        
         self.unkEl2.schema = 'mide.xml'
                 
-        self.unkEl3 = VoidElement(stream=self.mockStream, offset=1, size=4, \
+        self.unkEl3 = VoidElement(stream=self.mockStream, offset=1, size=4,
                                      payloadOffset=1)
         self.unkEl3.id = 0x7d       
         self.unkEl3.schema = 'mide.xml'
@@ -421,9 +420,9 @@ class testMasterElements(unittest.TestCase):
         """
         self.mockStream.string = '\x1A\x45\xDF\xA3\x84\x42\x86\x81\x10'
         
-        self.element = schema.elements[0x1A45DFA3](stream=self.mockStream, \
-                                                   offset=0, \
-                                                   size=4, \
+        self.element = schema.elements[0x1A45DFA3](stream=self.mockStream,
+                                                   offset=0,
+                                                   size=4,
                                                    payloadOffset=5)
         self.element.schema = loadSchema('.\\schemata\\mide.xml')
         self.element.id = 0x1A45DFA3
@@ -442,7 +441,6 @@ class testMasterElements(unittest.TestCase):
         ebmlVer = masterEl.schema.elements[0x4286](masterEl.stream, 5, 1, 8)
         ebmlVer.stream = self.mockStream        
         ebmlVer._value = 16
-        sEbmlVer == ebmlVer
         self.assertEqual(sEbmlVer, ebmlVer)
     
     
@@ -489,29 +487,29 @@ class testMasterElements(unittest.TestCase):
     
     def testGc(self):
         self.assertIsNone(self.element._value)
-        
+
         self.element.value
         self.assertIsNotNone(self.element._value)
-        
+
         self.element.gc()
         self.assertIsNone(self.element._value)
     
     
     
     def testEncodePayload(self):
-        self.assertEqual(self.element.encodePayload({0x4286:16}), \
+        self.assertEqual(self.element.encodePayload({0x4286:16}),
                          bytearray('\x42\x86\x81\x10'))
     
     
     
     def testEncode(self):
-        self.assertEqual(self.element.encode({0x4286:16}), \
+        self.assertEqual(self.element.encode({0x4286:16}),
                          bytearray('\x1A\x45\xDF\xA3\x84\x42\x86\x81\x10'))
     
     
     
     def testDump(self):
-        self.assertEqual(self.element.dump(), \
+        self.assertEqual(self.element.dump(),
                          collections.OrderedDict([['EBMLVersion', 16]]))
         
         
