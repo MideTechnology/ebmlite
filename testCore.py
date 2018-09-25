@@ -1,18 +1,12 @@
 import unittest
-import core
-import os, sys
 import collections
 import types
 
 import numpy as np
 
-from datetime import datetime, timedelta
-from difflib  import ndiff
 from core     import *
 from decoding import *
 from encoding import *
-from mock     import *
-from numpy    import inf
 from util     import *
 from tests    import MockStream
 
