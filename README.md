@@ -115,13 +115,13 @@ The structure of the schema's XML defines the structure of the EBML document; ch
 
 _ebmlite_
 ----------------
-###Schema
+### Schema
 The ``Schema`` class is a factory used to encode and decode EBML files.  When it's initialized, it scans through the schema file and creates a new class for each element present in the file; then, when encoding or decoding files, it references these classes in order to encapsulate everything safely.  
 
-###Documents
+### Documents
 ``Documents`` are subclasses of MasterElements, which act as an interface to EBML files and act as the root node of the EBML tree.  Each ``Schema`` also creates a ``Document`` subclass to use, and the base ``Document`` class will not function without class variables defined by the ``Schema``.  
 
-###Utils
+### Utils
 The functions provided by util.py will expose the majority of functionality needed to users, without the need to interface too deeply with this library.  The following functions are provided:
 * util.**toXml**(el, [parent=``None``,] [offsets=``True``,] [sizes=``True``,] [types=``True``,] [ids=``True``]):   
 Recursively converts EBML elements into xml elements.    
