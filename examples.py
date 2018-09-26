@@ -11,9 +11,9 @@ from xml.dom.minidom import parseString
 # =======================================
 
 # Files to use in this example
-schemaFile = '.\\schemata\\mide.xml'
-ebmlFile1  = '.\\tests\\SSX46714-doesnot.IDE'
-xmlFile1   = '.\\tests\\example-xml.xml'
+schemaFile = './schemata/mide.xml'
+ebmlFile1  = './tests/SSX46714-doesnot.IDE'
+xmlFile1   = './tests/example-xml.xml'
 
 # load the schema to use with these files.  This creates an object that is used
 # to parse EBML files.
@@ -37,9 +37,9 @@ with open(xmlFile1, 'wt') as f:
 # =======================================
 
 # Files to use in this example
-schemaFile = '.\\schemata\\mide.xml'
-ebmlFile1  = '.\\tests\\example-ebml.ide'
-xmlFile1   = '.\\tests\\example-xml.xml'
+schemaFile = './schemata/mide.xml'
+ebmlFile1  = './tests/example-ebml.ide'
+xmlFile1   = './tests/example-xml.xml'
 
 # load the schema to use with these files.  This creates an object that is used
 # to parse EBML files.
@@ -56,9 +56,9 @@ xmlDoc1 = loadXml(xmlFile1, schema)
 # =======================================
 
 # Files to use in this example
-schemaFile = '.\\schemata\\mide.xml'
-ebmlFile1  = '.\\tests\\example-ebml.ide'
-prettyXml  = '.\\tests\\example-pretty.txt'
+schemaFile = './schemata/mide.xml'
+ebmlFile1  = './tests/example-ebml.ide'
+prettyXml  = './tests/example-pretty.txt'
 
 # load the schema to use with these files.  This creates an object that is used
 # to parse EBML files.
@@ -75,8 +75,8 @@ pprint(ebmlDoc1, out=open(prettyXml, 'wt'))
 # =======================================
 
 # Files to use in this example
-schemaFile = '.\\schemata\\mide.xml'
-ebmlFile1  = '.\\tests\\example-ebml.ide'
+schemaFile = './schemata/mide.xml'
+ebmlFile1  = './tests/example-ebml.ide'
 
 # load the schema to use with these files.  This creates an object that is used
 # to parse EBML files.
