@@ -178,7 +178,7 @@ def xml2ebml(xmlFile, ebmlFile, schema, sizeLength=4, headers=True,
         @param unknown: If `True`, unknown element names will be allowed,
             provided their XML elements include an ``id`` attribute with the
             EBML ID (in hexadecimal).
-        @return: the size of the ebml file in bytes
+        @return: the size of the ebml file in bytes.
         @raise NameError: raises if an xml element is not present in the schema.
     """
     if isinstance(ebmlFile, basestring):
@@ -240,7 +240,7 @@ def loadXml(xmlFile, schema, ebmlFile=None):
         @keyword ebmlFile: The name of the temporary EBML file to write, or
             ``:memory:`` to use RAM (like `sqlite3`). Defaults to an
             automatically-generated temporary file.
-        @return The root node of the specified EBML file
+        @return The root node of the specified EBML file.
     """
     if ebmlFile == ":memory:":
         ebmlFile = StringIO()

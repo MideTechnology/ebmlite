@@ -116,41 +116,87 @@ The structure of the schema's XML defines the structure of the EBML document; ch
 _ebmlite_
 ----------------
 ###Schema
-The Schema class is a factory used to encode and decode EBML files.  When it's initialized, it scans through the schema file and creates a new class for each element present in the file; then, when encoding or decoding files, it references these classes in order to encapsulate everything safely.  
+The ``Schema`` class is a factory used to encode and decode EBML files.  When it's initialized, it scans through the schema file and creates a new class for each element present in the file; then, when encoding or decoding files, it references these classes in order to encapsulate everything safely.  
 
 ###Documents
-Documents are subclasses of MasterElements, which act as an interface to EBML files and act as the root node of the EBML tree.  Each Schema also creates a Document subclass to use, and the base Document class will not function without class variables defined by the Schema.  
+``Documents`` are subclasses of MasterElements, which act as an interface to EBML files and act as the root node of the EBML tree.  Each ``Schema`` also creates a ``Document`` subclass to use, and the base ``Document`` class will not function without class variables defined by the ``Schema``.  
 
 ###Utils
 The functions provided by util.py will expose the majority of functionality needed to users, without the need to interface too deeply with this library.  The following functions are provided:
-* util.**toXml**(el, [parent=None,] [offsets=True,] [sizes=True,] [types=True,] [ids=True]):   
+* util.**toXml**(el, [parent=``None``,] [offsets=``True``,] [sizes=``True``,] [types=``True``,] [ids=``True``]):   
 Recursively converts EBML elements into xml elements.    
 Argument *el*: an EBML element or document.  
-Optional argument *parent*: The resulting XML element's parent element, if any.    
-Optional argument *offsets*: If `True`, create an ``offset`` attributes for each generated XML element, containing the corresponding EBML element's offset.   
-Optional argument *sizes*: If `True`, create ``size`` attributes containing the corresponding EBML element's size.  
-Optional argument *types*: If `True`, create ``type`` attributes containing the name of the corresponding EBML element type.  
-Optional argument *ids*: If `True`, create ``id`` attributes containing the corresponding EBML element's EBML ID.      
-Returns the root of an XML tree created using the xml.etree.ElementTree built-in class.  
+Optional argument *parent*: The resulting XML element's parent element, if any.  
+Optional argument *offsets*: If `True`, create an ``offset`` attributes for 
+        each generated XML element, containing the corresponding EBML element's 
+        offset.   
+Optional argument *sizes*: If `True`, create ``size`` attributes containing the 
+        corresponding EBML element's size.  
+Optional argument *types*: If `True`, create ``type`` attributes containing the 
+        name of the corresponding EBML element type.  
+Optional argument *ids*: If `True`, create ``id`` attributes containing the 
+        corresponding EBML element's EBML ID.      
+Returns the root of an XML tree created using the xml.etree.ElementTree 
+        built-in class.  
 
 
 * util.**xmlElement2ebml**(xmlEl, ebmlFile, schema, [sizeLength=4,] [unknown=True]):  
 Recursively converts XML elements tonight into EBML elements.   
-Argument *xmlEl*: The XML element. Its tag must match an element defined in the `schema`.   
-Argument *ebmlFile*: An open file-like stream, to which the EBML data will be written.   
-Argument *schema*: An `ebmlite.core.Schema` instance to use when writing the EBML document.    
+Argument *xmlEl*: The XML element. Its tag must match an element defined in the 
+        `schema`.   
+Argument *ebmlFile*: An open file-like stream, to which the EBML data will be 
+        written.   
+Argument *schema*: An `ebmlite.core.Schema` instance to use when writing the 
+        EBML document.    
 Optional argument *sizeLength*:    
-Optional argument *unknown*: If `True`, unknown element names will be allowed, provided their XML elements include an ``id`` attribute with the EBML ID (in hexadecimal).  
+Optional argument *unknown*: If `True`, unknown element names will be allowed, 
+        provided their XML elements include an ``id`` attribute with the EBML 
+        ID (in hexadecimal).  
 Returns the length of the encoded element, including header and children.   
-Raises *NameError*: raised if an xml element is not present in the schema and unknown is False, OR if the xml element does not have an ID.   
+Raises *NameError*: raised if an xml element is not present in the schema and 
+        unknown is False, OR if the xml element does not have an ID.   
 
 
 * util.**xml2ebml**(xmlFile, ebmlFile, schema, [sizeLength=4,] [headers=True,] [unknown=True]):
+Argument *xmlFile*: The XML source. Can be a filename, an open file-like 
+        stream, or a parsed XML document.   
+Argument *ebmlFile*: The EBML file to write. Can be a filename or an open 
+        file-like stream.   
+Argument *schema*: The EBML schema to use. Can be a filename or an instance of 
+        a `Schema`.   
+Optional argument *sizeLength*: The default length of each element's size 
+        descriptor. Must be large enough to store the largest 'master' element. 
+        If an XML element has a ``sizeLength`` attribute, it will override 
+        this.   
+Optional argument *headers*: If `True`, generate the standard ``EBML`` EBML 
+        element if the XML document does not contain one.   
+Optional argument *unknown*: If `True`, unknown element names will be allowed, 
+        provided their XML elements include an ``id`` attribute with the EBML 
+        ID (in hexadecimal).   
+Returns the size of the ebml file in bytes.   
+Raises NameError: raises if an xml element is not present in the schema.
 
 
+* util.**loadXml**(xmlFile, schema, [ebmlFile=``None``]):    
+Helpful utility to load an EBML document from an XML file.    
+Argument *xmlFile*: The XML source. Can be a filename, an open file-like 
+        stream, or a parsed XML document.   
+Argument *schema*: The EBML schema to use. Can be a filename or an instance of 
+        a `Schema`.   
+Optional Argument *ebmlFile*: The name of the temporary EBML file to write, or 
+        ``:memory:`` to use RAM (like `sqlite3`). Defaults to an 
+        automatically-generated temporary file.   
+Returns the root node of the specified EBML file
 
-* util.**loadXml**: 
-* util.**pprint**
+ 
+* util.**pprint**:    
+Test function to recursively crawl an EBML document or element and print its 
+        structure, with child elements shown indented.    
+Argument *el*: An instance of a `Document` or `Element` subclass.    
+Argument *values*: If `True`, show elements' values.    
+Optional Argument *out*: A file-like stream to which to write.    
+Optional argument *indent*: The string containing the character(s) used for each
+        indentation.
 
 Utils can also be called from the command line with the following syntax:
 ```commandline
