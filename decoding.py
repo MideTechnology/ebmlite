@@ -70,6 +70,7 @@ def decodeIDLength(byte):
     """ Extract the encoded ID size from an initial byte.
 
         @return: The size and the original byte (it is part of the ID).
+        @raise IOError: raise if the length of an ID is invalid.
     """
     if byte >= 128:
         return 1, byte
@@ -89,6 +90,7 @@ def readElementID(stream):
 
         @param stream: The source file-like object.
         @return: The decoded element ID and its length in bytes.
+        @raise IOError: raised if the length of the ID of an element is greater than 4 bytes.
     """
     ch = stream.read(1)
     length, eid = decodeIDLength(ord(ch))
@@ -159,6 +161,7 @@ def readFloat(stream, size):
 
         @param stream: The source file-like object.
         @return: The decoded value.
+        @raise IOError: raised if the length of this floating point number is not valid (0, 4, 8 bytes)
     """
     if size == 4:
         return _struct_float32_unpack(stream.read(size))[0]
@@ -206,6 +209,7 @@ def readDate(stream, size=8):
 
         @param stream: The source file-like object.
         @return: The decoded value (as `datetime.datetime`).
+        @raise IOError: raised if the length of the date is not 8 bytes.
     """
     if size != 8:
         raise IOError("Cannot read date value of length %d, only 8." % size)

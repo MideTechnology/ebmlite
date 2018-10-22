@@ -2,7 +2,6 @@
 EBMLite: A lightweight EBML parsing library. It is designed to crawl through
 EBML files quickly and efficiently, and that's about it.
 
-@todo: Unit tests.
 @todo: Complete EBML encoding. Specifically, make 'master' elements write
     directly to the stream, rather than build bytearrays, so huge 'master'
     elements can be handled. It appears that the official spec may prohibit
@@ -764,6 +763,7 @@ class Document(MasterElement):
         except AttributeError:
             self.filename = ""
 
+
         if name is None:
             if self.filename:
                 self.name = os.path.splitext(os.path.basename(self.filename))[0]
@@ -1262,7 +1262,7 @@ class Schema(object):
     def __getitem__(self, key):
         """ Get an Element class from the schema, by name or by ID. """
         try:
-            self.elements[key]
+            return self.elements[key]
         except KeyError:
             return self.elementsByName[key]
 

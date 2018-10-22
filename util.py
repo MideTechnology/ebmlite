@@ -43,6 +43,7 @@ def toXml(el, parent=None, offsets=True, sizes=True, types=True, ids=True):
             name of the corresponding EBML element type.
         @keyword ids: If `True`, create ``id`` attributes containing the
             corresponding EBML element's EBML ID.
+        @return The root XML element of the file.
     """
     if isinstance(el, core.Document):
         elname = el.__class__.__name__
@@ -93,14 +94,18 @@ def xmlElement2ebml(xmlEl, ebmlFile, schema, sizeLength=4, unknown=True):
             be written.
         @param schema: An `ebmlite.core.Schema` instance to use when
             writing the EBML document.
+        @keyword sizeLength:
         @param unknown: If `True`, unknown element names will be allowed,
             provided their XML elements include an ``id`` attribute with the
             EBML ID (in hexadecimal).
+        @return The length of the encoded element, including header and children.
+        @raise NameError: raised if an xml element is not present in the schema and unknown is False, OR if the xml
+            element does not have an ID.
     """
     try:
         cls = schema[xmlEl.tag]
         encId = encoding.encodeId(cls.id)
-    except KeyError:
+    except (KeyError, AttributeError):
         # Element name not in schema. Go ahead if allowed (`unknown` is `True`)
         # and the XML element specifies an ID,
         if not unknown:
@@ -112,6 +117,7 @@ def xmlElement2ebml(xmlEl, ebmlFile, schema, sizeLength=4, unknown=True):
                             "attribute in XML: %s" % xmlEl.tag)
         cls = core.UnknownElement
         encId = encoding.encodeId(int(eid, 16))
+        cls.id = int(eid, 16)
 
     sl = int(xmlEl.get('sizeLength', sizeLength))
 
@@ -172,6 +178,8 @@ def xml2ebml(xmlFile, ebmlFile, schema, sizeLength=4, headers=True,
         @param unknown: If `True`, unknown element names will be allowed,
             provided their XML elements include an ``id`` attribute with the
             EBML ID (in hexadecimal).
+        @return: the size of the ebml file in bytes.
+        @raise NameError: raises if an xml element is not present in the schema.
     """
     if isinstance(ebmlFile, basestring):
         ebmlFile = open(ebmlFile, 'wb')
@@ -232,6 +240,7 @@ def loadXml(xmlFile, schema, ebmlFile=None):
         @keyword ebmlFile: The name of the temporary EBML file to write, or
             ``:memory:`` to use RAM (like `sqlite3`). Defaults to an
             automatically-generated temporary file.
+        @return The root node of the specified EBML file.
     """
     if ebmlFile == ":memory:":
         ebmlFile = StringIO()
@@ -349,10 +358,10 @@ if __name__ == "__main__":
         out = sys.stdout
 
     if args.mode == "xml2ebml":
-        xml2ebml(args.input, out, schema) #, sizeLength=4, headers=True, unknown=True)
+        xml2ebml(args.input, out, schema)  # , sizeLength=4, headers=True, unknown=True)
     elif args.mode == "ebml2xml":
         doc = schema.load(args.input, headers=True)
-        root = toXml(doc) #, offsets, sizes, types, ids)
+        root = toXml(doc)  # , offsets, sizes, types, ids)
         s = ET.tostring(root, encoding="utf-8")
         if args.pretty:
             parseString(s).writexml(out, addindent='\t', newl='\n', encoding='utf-8')

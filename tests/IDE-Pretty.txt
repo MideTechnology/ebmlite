@@ -1,0 +1,1527 @@
+Offset Size   Element (ID): Value
+====== ====== =================================
+     0 344543  SSX46714-doesnot (Document, type mide)
+     0     31    EBML (ID 0x1A45DFA3): (master) 7 subelements
+     5      1      EBMLVersion (ID 0x4286): (int) 1
+     9      1      EBMLReadVersion (ID 0x42F7): (int) 1
+    13      1      EBMLMaxIDLength (ID 0x42F2): (int) 4
+    17      1      EBMLMaxSizeLength (ID 0x42F3): (int) 8
+    21      4      DocType (ID 0x4282): (str) 'mide'
+    28      1      DocTypeVersion (ID 0x4287): (int) 2
+    32      1      DocTypeReadVersion (ID 0x4285): (int) 2
+    36   1068    RecordingProperties (ID 0x18526570): (master) 5 subelements
+    42     86      RecorderInfo (ID 0x5210): (master) 7 subelements
+    46      1        RecorderTypeUID (ID 0x5211): (int) 53
+    50      2        RecorderSerial (ID 0x5212): (int) 4131
+    55      1        HwRev (ID 0x5216): (int) 11
+    59      1        FwRev (ID 0x5217): (int) 14
+    63     40        ProductName (ID 0x5214): (str) 'Slam Stick X (2000g+DC)'
+   106     16        PartNumber (ID 0x5218): (str) 'LOG-0002-02kG-DC'
+   125      4        DateOfManufacture (ID 0x5219): (int) 1507668316
+   132    183      SensorList (ID 0x5240): (master) 4 subelements
+   136     37        Sensor (ID 0x5241): (master) 3 subelements
+   139      1          SensorID (ID 0x5242): (int) 9
+   143     26          SensorName (ID 0x5243): (str) '832M1 High-G Accelerometer'
+   172      1          SensorBwLimitIDRef (ID 0x5244): (int) 9
+   176     38        Sensor (ID 0x5241): (master) 3 subelements
+   179      1          SensorID (ID 0x5242): (int) 32
+   183     27          SensorName (ID 0x5243): (str) 'ADXL345 Low-G Accelerometer'
+   213      1          SensorBwLimitIDRef (ID 0x5244): (int) 32
+   217     47        Sensor (ID 0x5241): (master) 2 subelements
+   220      1          SensorID (ID 0x5242): (int) 36
+   224     40          SensorName (ID 0x5243): (str) 'MPL3115 Int. Pressure/Temperature Sensor'
+   267     49        Sensor (ID 0x5241): (master) 2 subelements
+   270      1          SensorID (ID 0x5242): (int) 59
+   274     42          SensorName (ID 0x5243): (str) 'MS8607 Ctl Pad Pressure/Temperature Sensor'
+   319    687      ChannelList (ID 0x5270): (master) 4 subelements
+   323    178        Channel (ID 0x5271): (master) 9 subelements
+   327      1          ChannelID (ID 0x5272): (int) 8
+   331      4          ChannelFormat (ID 0x5275): (str) '<HHH'
+   338      3          ChannelName (ID 0x5273): (str) 'ADC'
+   344      1          ChannelCalibrationIDRef (ID 0x5274): (int) 9
+   348      9          TimeCodeScale (ID 0x5277): (str) '1.0/32768'
+   360      4          TimeCodeModulus (ID 0x5278): (int) 16777216
+   367     43          SubChannel (ID 0x52A0): (master) 8 subelements
+   370      1            SubChannelCalibrationIDRef (ID 0x52A3): (int) 1
+   374      1            SubChannelID (ID 0x52A1): (int) 0
+   378      1            SubChannelName (ID 0x52A2): (str) 'X'
+   382     12            SubChannelLabel (ID 0x52A5): (str) 'Acceleration'
+   397      1            SubChannelUnits (ID 0x52A6): (unicode) u'g'
+   401      1            SubChannelSensorRef (ID 0x52A9): (int) 9
+   405      1            SubChannelWarningRef (ID 0x52AA): (int) 0
+   409      1            SubChannelBwLimitIDRef (ID 0x52A4): (int) 9
+   413     43          SubChannel (ID 0x52A0): (master) 8 subelements
+   416      1            SubChannelCalibrationIDRef (ID 0x52A3): (int) 2
+   420      1            SubChannelID (ID 0x52A1): (int) 1
+   424      1            SubChannelName (ID 0x52A2): (str) 'Y'
+   428     12            SubChannelLabel (ID 0x52A5): (str) 'Acceleration'
+   443      1            SubChannelUnits (ID 0x52A6): (unicode) u'g'
+   447      1            SubChannelSensorRef (ID 0x52A9): (int) 9
+   451      1            SubChannelWarningRef (ID 0x52AA): (int) 0
+   455      1            SubChannelBwLimitIDRef (ID 0x52A4): (int) 9
+   459     43          SubChannel (ID 0x52A0): (master) 8 subelements
+   462      1            SubChannelCalibrationIDRef (ID 0x52A3): (int) 3
+   466      1            SubChannelID (ID 0x52A1): (int) 2
+   470      1            SubChannelName (ID 0x52A2): (str) 'Z'
+   474     12            SubChannelLabel (ID 0x52A5): (str) 'Acceleration'
+   489      1            SubChannelUnits (ID 0x52A6): (unicode) u'g'
+   493      1            SubChannelSensorRef (ID 0x52A9): (int) 9
+   497      1            SubChannelWarningRef (ID 0x52AA): (int) 0
+   501      1            SubChannelBwLimitIDRef (ID 0x52A4): (int) 9
+   505    196        Channel (ID 0x5271): (master) 9 subelements
+   509      1          ChannelID (ID 0x5272): (int) 32
+   513     18          ChannelName (ID 0x5273): (str) 'Low-g Acceleration'
+   534      1          ChannelCalibrationIDRef (ID 0x5274): (int) 32
+   538      4          ChannelFormat (ID 0x5275): (str) '<hhh'
+   545      9          TimeCodeScale (ID 0x5277): (str) '1.0/32768'
+   557      4          TimeCodeModulus (ID 0x5278): (int) 16777216
+   564     44          SubChannel (ID 0x52A0): (master) 7 subelements
+   567      1            SubChannelID (ID 0x52A1): (int) 0
+   571      6            SubChannelName (ID 0x52A2): (str) 'X (DC)'
+   580      1            SubChannelCalibrationIDRef (ID 0x52A3): (int) 33
+   584     12            SubChannelLabel (ID 0x52A5): (str) 'Acceleration'
+   599      1            SubChannelUnits (ID 0x52A6): (unicode) u'g'
+   603      1            SubChannelSensorRef (ID 0x52A9): (int) 32
+   607      1            SubChannelBwLimitIDRef (ID 0x52A4): (int) 32
+   611     44          SubChannel (ID 0x52A0): (master) 7 subelements
+   614      1            SubChannelID (ID 0x52A1): (int) 1
+   618      6            SubChannelName (ID 0x52A2): (str) 'Y (DC)'
+   627      1            SubChannelCalibrationIDRef (ID 0x52A3): (int) 34
+   631     12            SubChannelLabel (ID 0x52A5): (str) 'Acceleration'
+   646      1            SubChannelUnits (ID 0x52A6): (unicode) u'g'
+   650      1            SubChannelSensorRef (ID 0x52A9): (int) 32
+   654      1            SubChannelBwLimitIDRef (ID 0x52A4): (int) 32
+   658     44          SubChannel (ID 0x52A0): (master) 7 subelements
+   661      1            SubChannelID (ID 0x52A1): (int) 2
+   665      6            SubChannelName (ID 0x52A2): (str) 'Z (DC)'
+   674      1            SubChannelCalibrationIDRef (ID 0x52A3): (int) 35
+   678     12            SubChannelLabel (ID 0x52A5): (str) 'Acceleration'
+   693      1            SubChannelUnits (ID 0x52A6): (unicode) u'g'
+   697      1            SubChannelSensorRef (ID 0x52A9): (int) 32
+   701      1            SubChannelBwLimitIDRef (ID 0x52A4): (int) 32
+   705    118        Channel (ID 0x5271): (master) 7 subelements
+   709      3          ChannelFormat (ID 0x5275): (str) '>lh'
+   715      1          ChannelID (ID 0x5272): (int) 36
+   719     20          ChannelName (ID 0x5273): (str) 'Pressure/Temperature'
+   742      9          TimeCodeScale (ID 0x5277): (str) '1.0/32768'
+   754      4          TimeCodeModulus (ID 0x5278): (int) 16777216
+   761     28          SubChannel (ID 0x52A0): (master) 5 subelements
+   764      1            SubChannelCalibrationIDRef (ID 0x52A3): (int) 36
+   768      1            SubChannelID (ID 0x52A1): (int) 0
+   772      8            SubChannelLabel (ID 0x52A5): (str) 'Pressure'
+   783      2            SubChannelUnits (ID 0x52A6): (unicode) u'Pa'
+   788      1            SubChannelSensorRef (ID 0x52A9): (int) 36
+   792     32          SubChannel (ID 0x52A0): (master) 5 subelements
+   795      1            SubChannelID (ID 0x52A1): (int) 1
+   799      1            SubChannelCalibrationIDRef (ID 0x52A3): (int) 38
+   803     11            SubChannelLabel (ID 0x52A5): (str) 'Temperature'
+   817      3            SubChannelUnits (ID 0x52A6): (unicode) u'\xb0C'
+   823      1            SubChannelSensorRef (ID 0x52A9): (int) 36
+   827    179        Channel (ID 0x5271): (master) 7 subelements
+   831      3          ChannelFormat (ID 0x5275): (str) '<ff'
+   837      1          ChannelID (ID 0x5272): (int) 59
+   841     32          ChannelName (ID 0x5273): (str) 'Control Pad Pressure/Temperature'
+   876      9          TimeCodeScale (ID 0x5277): (str) '1.0/32768'
+   888      4          TimeCodeModulus (ID 0x5278): (int) 16777216
+   895     51          SubChannel (ID 0x52A0): (master) 6 subelements
+   898      1            SubChannelID (ID 0x52A1): (int) 0
+   902     20            SubChannelName (ID 0x52A2): (str) 'Control Pad Pressure'
+   925      1            SubChannelCalibrationIDRef (ID 0x52A3): (int) 60
+   929      8            SubChannelLabel (ID 0x52A5): (str) 'Pressure'
+   940      2            SubChannelUnits (ID 0x52A6): (unicode) u'Pa'
+   945      1            SubChannelSensorRef (ID 0x52A9): (int) 59
+   949     58          SubChannel (ID 0x52A0): (master) 6 subelements
+   952      1            SubChannelID (ID 0x52A1): (int) 1
+   956     23            SubChannelName (ID 0x52A2): (str) 'Control Pad Temperature'
+   982      1            SubChannelCalibrationIDRef (ID 0x52A3): (int) 61
+   986     11            SubChannelLabel (ID 0x52A5): (str) 'Temperature'
+  1000      3            SubChannelUnits (ID 0x52A6): (unicode) u'\xb0C'
+  1006      1            SubChannelSensorRef (ID 0x52A9): (int) 59
+  1010     55      BwLimitList (ID 0x5380): (master) 2 subelements
+  1014     25        BwLimit (ID 0x5381): (master) 5 subelements
+  1017      1          BwLimitID (ID 0x5382): (int) 9
+  1021      1          LowerCutoff (ID 0x5383): (str) '2'
+  1025      2          LowerRolloff (ID 0x5384): (str) '20'
+  1030      4          UpperCutoff (ID 0x5385): (str) '6000'
+  1037      2          UpperRolloff (ID 0x5386): (str) '20'
+  1042     24        BwLimit (ID 0x5381): (master) 5 subelements
+  1045      1          BwLimitID (ID 0x5382): (int) 32
+  1049      1          LowerCutoff (ID 0x5383): (str) '0'
+  1053      1          LowerRolloff (ID 0x5384): (str) '0'
+  1057      4          UpperCutoff (ID 0x5385): (str) '1600'
+  1064      2          UpperRolloff (ID 0x5386): (str) '20'
+  1069     37      WarningList (ID 0x5360): (master) 1 subelements
+  1073     34        Warning (ID 0x5361): (master) 5 subelements
+  1076      1          WarningID (ID 0x5362): (int) 0
+  1080      1          WarningChannelRef (ID 0x5363): (int) 36
+  1084      1          WarningSubChannelRef (ID 0x5364): (int) 1
+  1088      8          WarningRangeMin (ID 0x5365): (float) -20.0
+  1099      8          WarningRangeMax (ID 0x5366): (float) 80.0
+  1110    395    CalibrationList (ID 0x4B00): (master) 13 subelements
+  1114     29      UnivariatePolynomial (ID 0x4B01): (master) 4 subelements
+  1117      1        CalID (ID 0x4B03): (int) 9
+  1121      0        CalReferenceValue (ID 0x4B04): (float) 0.0
+  1124      8        PolynomialCoef (ID 0x4B08): (float) 0.061036087586785685
+  1135      8        PolynomialCoef (ID 0x4B08): (float) -2000.0
+  1146     46      BivariatePolynomial (ID 0x4B02): (master) 9 subelements
+  1149      1        CalID (ID 0x4B03): (int) 1
+  1153      0        CalReferenceValue (ID 0x4B04): (float) 0.0
+  1156      8        BivariateCalReferenceValue (ID 0x4B05): (float) 20.0
+  1167      1        BivariateChannelIDRef (ID 0x4B06): (int) 36
+  1171      1        BivariateSubChannelIDRef (ID 0x4B07): (int) 1
+  1175      0        PolynomialCoef (ID 0x4B08): (float) 0.0
+  1178      8        PolynomialCoef (ID 0x4B08): (float) 1.0
+  1189      0        PolynomialCoef (ID 0x4B08): (float) 0.0
+  1192      0        PolynomialCoef (ID 0x4B08): (float) 0.0
+  1195     46      BivariatePolynomial (ID 0x4B02): (master) 9 subelements
+  1198      1        CalID (ID 0x4B03): (int) 2
+  1202      0        CalReferenceValue (ID 0x4B04): (float) 0.0
+  1205      8        BivariateCalReferenceValue (ID 0x4B05): (float) 20.0
+  1216      1        BivariateChannelIDRef (ID 0x4B06): (int) 36
+  1220      1        BivariateSubChannelIDRef (ID 0x4B07): (int) 1
+  1224      0        PolynomialCoef (ID 0x4B08): (float) 0.0
+  1227      8        PolynomialCoef (ID 0x4B08): (float) 1.0
+  1238      0        PolynomialCoef (ID 0x4B08): (float) 0.0
+  1241      0        PolynomialCoef (ID 0x4B08): (float) 0.0
+  1244     46      BivariatePolynomial (ID 0x4B02): (master) 9 subelements
+  1247      1        CalID (ID 0x4B03): (int) 3
+  1251      0        CalReferenceValue (ID 0x4B04): (float) 0.0
+  1254      8        BivariateCalReferenceValue (ID 0x4B05): (float) 20.0
+  1265      1        BivariateChannelIDRef (ID 0x4B06): (int) 36
+  1269      1        BivariateSubChannelIDRef (ID 0x4B07): (int) 1
+  1273      0        PolynomialCoef (ID 0x4B08): (float) 0.0
+  1276      8        PolynomialCoef (ID 0x4B08): (float) 1.0
+  1287      0        PolynomialCoef (ID 0x4B08): (float) 0.0
+  1290      0        PolynomialCoef (ID 0x4B08): (float) 0.0
+  1293     21      UnivariatePolynomial (ID 0x4B01): (master) 4 subelements
+  1296      1        CalID (ID 0x4B03): (int) 32
+  1300      0        CalReferenceValue (ID 0x4B04): (float) 0.0
+  1303      8        PolynomialCoef (ID 0x4B08): (float) 0.00048828125
+  1314      0        PolynomialCoef (ID 0x4B08): (float) 0.0
+  1317     21      UnivariatePolynomial (ID 0x4B01): (master) 4 subelements
+  1320      1        CalID (ID 0x4B03): (int) 33
+  1324      0        CalReferenceValue (ID 0x4B04): (float) 0.0
+  1327      8        PolynomialCoef (ID 0x4B08): (float) 1.0
+  1338      0        PolynomialCoef (ID 0x4B08): (float) 0.0
+  1341     21      UnivariatePolynomial (ID 0x4B01): (master) 4 subelements
+  1344      1        CalID (ID 0x4B03): (int) 34
+  1348      0        CalReferenceValue (ID 0x4B04): (float) 0.0
+  1351      8        PolynomialCoef (ID 0x4B08): (float) 1.0
+  1362      0        PolynomialCoef (ID 0x4B08): (float) 0.0
+  1365     21      UnivariatePolynomial (ID 0x4B01): (master) 4 subelements
+  1368      1        CalID (ID 0x4B03): (int) 35
+  1372      0        CalReferenceValue (ID 0x4B04): (float) 0.0
+  1375      8        PolynomialCoef (ID 0x4B08): (float) 1.0
+  1386      0        PolynomialCoef (ID 0x4B08): (float) 0.0
+  1389     21      UnivariatePolynomial (ID 0x4B01): (master) 4 subelements
+  1392      1        CalID (ID 0x4B03): (int) 36
+  1396      0        CalReferenceValue (ID 0x4B04): (float) 0.0
+  1399      8        PolynomialCoef (ID 0x4B08): (float) 0.015625
+  1410      0        PolynomialCoef (ID 0x4B08): (float) 0.0
+  1413     21      UnivariatePolynomial (ID 0x4B01): (master) 4 subelements
+  1416      1        CalID (ID 0x4B03): (int) 38
+  1420      0        CalReferenceValue (ID 0x4B04): (float) 0.0
+  1423      8        PolynomialCoef (ID 0x4B08): (float) 0.00390625
+  1434      0        PolynomialCoef (ID 0x4B08): (float) 0.0
+  1437     21      UnivariatePolynomial (ID 0x4B01): (master) 4 subelements
+  1440      1        CalID (ID 0x4B03): (int) 59
+  1444      0        CalReferenceValue (ID 0x4B04): (float) 0.0
+  1447      8        PolynomialCoef (ID 0x4B08): (float) 1.0
+  1458      0        PolynomialCoef (ID 0x4B08): (float) 0.0
+  1461     21      UnivariatePolynomial (ID 0x4B01): (master) 4 subelements
+  1464      1        CalID (ID 0x4B03): (int) 60
+  1468      0        CalReferenceValue (ID 0x4B04): (float) 0.0
+  1471      8        PolynomialCoef (ID 0x4B08): (float) 100.0
+  1482      0        PolynomialCoef (ID 0x4B08): (float) 0.0
+  1485     21      UnivariatePolynomial (ID 0x4B01): (master) 4 subelements
+  1488      1        CalID (ID 0x4B03): (int) 61
+  1492      0        CalReferenceValue (ID 0x4B04): (float) 0.0
+  1495      8        PolynomialCoef (ID 0x4B08): (float) 1.0
+  1506      0        PolynomialCoef (ID 0x4B08): (float) 0.0
+  1509    185    RecorderConfigurationList (ID 0x18436668): (master) 14 subelements
+  1515      9      RecorderConfigurationItem (ID 0x5008): (master) 2 subelements
+  1518      3        ConfigID (ID 0x5001): (int) 130848
+  1524      0        UIntValue (ID 0x5101): (int) 0
+  1527     10      RecorderConfigurationItem (ID 0x5008): (master) 2 subelements
+  1530      3        ConfigID (ID 0x5001): (int) 327456
+  1536      1        UIntValue (ID 0x5101): (int) 16
+  1540     12      RecorderConfigurationItem (ID 0x5008): (master) 2 subelements
+  1543      3        ConfigID (ID 0x5001): (int) 196644
+  1549      3        UIntValue (ID 0x5101): (int) 90000
+  1555     11      RecorderConfigurationItem (ID 0x5008): (master) 2 subelements
+  1558      3        ConfigID (ID 0x5001): (int) 261896
+  1564      2        IntValue (ID 0x5102): (int) -1638
+  1569     10      RecorderConfigurationItem (ID 0x5008): (master) 2 subelements
+  1572      3        ConfigID (ID 0x5001): (int) 327972
+  1578      1        BooleanValue (ID 0x5100): (int) 1
+  1582     10      RecorderConfigurationItem (ID 0x5008): (master) 2 subelements
+  1585      3        ConfigID (ID 0x5001): (int) 392968
+  1591      1        BooleanValue (ID 0x5100): (int) 1
+  1595     11      RecorderConfigurationItem (ID 0x5008): (master) 2 subelements
+  1598      3        ConfigID (ID 0x5001): (int) 327432
+  1604      2        IntValue (ID 0x5102): (int) 1638
+  1609     10      RecorderConfigurationItem (ID 0x5008): (master) 2 subelements
+  1612      3        ConfigID (ID 0x5001): (int) 130824
+  1618      1        UIntValue (ID 0x5101): (int) 1
+  1622      9      RecorderConfigurationItem (ID 0x5008): (master) 2 subelements
+  1625      3        ConfigID (ID 0x5001): (int) 392992
+  1631      0        UIntValue (ID 0x5101): (int) 0
+  1634     10      RecorderConfigurationItem (ID 0x5008): (master) 2 subelements
+  1637      3        ConfigID (ID 0x5001): (int) 196900
+  1643      1        IntValue (ID 0x5102): (int) -15
+  1647      9      RecorderConfigurationItem (ID 0x5008): (master) 2 subelements
+  1650      3        ConfigID (ID 0x5001): (int) 458555
+  1656      0        UIntValue (ID 0x5101): (int) 0
+  1659     10      RecorderConfigurationItem (ID 0x5008): (master) 2 subelements
+  1662      3        ConfigID (ID 0x5001): (int) 327716
+  1668      1        BooleanValue (ID 0x5100): (int) 1
+  1672     10      RecorderConfigurationItem (ID 0x5008): (master) 2 subelements
+  1675      3        ConfigID (ID 0x5001): (int) 262436
+  1681      1        IntValue (ID 0x5102): (int) 35
+  1685     12      RecorderConfigurationItem (ID 0x5008): (master) 2 subelements
+  1688      3        ConfigID (ID 0x5001): (int) 262180
+  1694      3        UIntValue (ID 0x5101): (int) 110000
+  1700      4    ElementTag (ID 0xFC): (int) 408125543
+  1706      4    Sync (ID 0xFA): (bytearray)
+  1712     19    Attribute (ID 0x6110): (master) 2 subelements
+  1716     12      AttributeName (ID 0x612F): (unicode) u'DIAG-DISCONT'
+  1731      1      UIntAttribute (ID 0x6121): (int) 0
+  1735      4    TimeBaseUTC (ID 0x5462): (int) 1530017915
+  1742     40    ChannelDataBlock (ID 0xA1): (master) 6 subelements
+  1744      1      ChannelIDRef (ID 0xB0): (int) 36
+  1747      1      StartTimeCodeAbs (ID 0xB8): (int) 130
+  1750      1      EndTimeCodeAbs (ID 0xB9): (int) 130
+  1753      1      ChannelFlags (ID 0xB1): (int) 0
+  1756     18      Void (ID 0xEC): (bytearray)
+  1776      6      ChannelDataPayload (ID 0xB2): (bytearray)
+  1784     22    Attribute (ID 0x6110): (master) 2 subelements
+  1788      4      AttributeName (ID 0x612F): (unicode) u'DIAG'
+  1795     12      BinaryAttribute (ID 0x6125): (bytearray)
+  1810     22    Attribute (ID 0x6110): (master) 2 subelements
+  1814      4      AttributeName (ID 0x612F): (unicode) u'DIAG'
+  1821     12      BinaryAttribute (ID 0x6125): (bytearray)
+  1836     22    Attribute (ID 0x6110): (master) 2 subelements
+  1840      4      AttributeName (ID 0x612F): (unicode) u'DIAG'
+  1847     12      BinaryAttribute (ID 0x6125): (bytearray)
+  1862     22    Attribute (ID 0x6110): (master) 2 subelements
+  1866      4      AttributeName (ID 0x612F): (unicode) u'DIAG'
+  1873     12      BinaryAttribute (ID 0x6125): (bytearray)
+  1888     22    Attribute (ID 0x6110): (master) 2 subelements
+  1892      4      AttributeName (ID 0x612F): (unicode) u'DIAG'
+  1899     12      BinaryAttribute (ID 0x6125): (bytearray)
+  1914     22    Attribute (ID 0x6110): (master) 2 subelements
+  1918      4      AttributeName (ID 0x612F): (unicode) u'DIAG'
+  1925     12      BinaryAttribute (ID 0x6125): (bytearray)
+  1940      4    Sync (ID 0xFA): (bytearray)
+  1946   5627    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+  1949      1      ChannelIDRef (ID 0xB0): (int) 8
+  1952      1      StartTimeCodeAbs (ID 0xB8): (int) 146
+  1955      2      EndTimeCodeAbs (ID 0xB9): (int) 6221
+  1959      1      ChannelFlags (ID 0xB1): (int) 0
+  1962     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+  1982      2      MediaWriteLatency (ID 0xBE): (int) 6282
+  1986     17      Void (ID 0xEC): (bytearray)
+  2005   5568      ChannelDataPayload (ID 0xB2): (bytearray)
+  7576    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+  7579      1      ChannelIDRef (ID 0xB0): (int) 32
+  7582      2      StartTimeCodeAbs (ID 0xB8): (int) 356
+  7586      2      EndTimeCodeAbs (ID 0xB9): (int) 5311
+  7590      1      ChannelFlags (ID 0xB1): (int) 0
+  7593     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+  7613      2      MediaWriteLatency (ID 0xBE): (int) 7905
+  7617     16      Void (ID 0xEC): (bytearray)
+  7635    360      ChannelDataPayload (ID 0xB2): (bytearray)
+  7998   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+  8001      1      ChannelIDRef (ID 0xB0): (int) 8
+  8004      2      StartTimeCodeAbs (ID 0xB8): (int) 6227
+  8008      2      EndTimeCodeAbs (ID 0xB9): (int) 12250
+  8012      1      ChannelFlags (ID 0xB1): (int) 0
+  8015     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+  8035      2      MediaWriteLatency (ID 0xBE): (int) 12311
+  8039     16      Void (ID 0xEC): (bytearray)
+  8057   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+ 13580    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+ 13583      1      ChannelIDRef (ID 0xB0): (int) 32
+ 13586      2      StartTimeCodeAbs (ID 0xB8): (int) 5395
+ 13590      2      EndTimeCodeAbs (ID 0xB9): (int) 10357
+ 13594      1      ChannelFlags (ID 0xB1): (int) 0
+ 13597     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+ 13617      2      MediaWriteLatency (ID 0xBE): (int) 12950
+ 13621     16      Void (ID 0xEC): (bytearray)
+ 13639    360      ChannelDataPayload (ID 0xB2): (bytearray)
+ 14002    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+ 14005      1      ChannelIDRef (ID 0xB0): (int) 32
+ 14008      2      StartTimeCodeAbs (ID 0xB8): (int) 10441
+ 14012      2      EndTimeCodeAbs (ID 0xB9): (int) 15402
+ 14016      1      ChannelFlags (ID 0xB1): (int) 0
+ 14019     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+ 14039      2      MediaWriteLatency (ID 0xBE): (int) 17996
+ 14043     16      Void (ID 0xEC): (bytearray)
+ 14061    360      ChannelDataPayload (ID 0xB2): (bytearray)
+ 14424   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+ 14427      1      ChannelIDRef (ID 0xB0): (int) 8
+ 14430      2      StartTimeCodeAbs (ID 0xB8): (int) 12257
+ 14434      2      EndTimeCodeAbs (ID 0xB9): (int) 18279
+ 14438      1      ChannelFlags (ID 0xB1): (int) 0
+ 14441     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+ 14461      2      MediaWriteLatency (ID 0xBE): (int) 18340
+ 14465     16      Void (ID 0xEC): (bytearray)
+ 14483   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+ 20006    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+ 20009      1      ChannelIDRef (ID 0xB0): (int) 32
+ 20012      2      StartTimeCodeAbs (ID 0xB8): (int) 15486
+ 20016      2      EndTimeCodeAbs (ID 0xB9): (int) 20448
+ 20020      1      ChannelFlags (ID 0xB1): (int) 0
+ 20023     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+ 20043      2      MediaWriteLatency (ID 0xBE): (int) 23042
+ 20047     16      Void (ID 0xEC): (bytearray)
+ 20065    360      ChannelDataPayload (ID 0xB2): (bytearray)
+ 20428   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+ 20431      1      ChannelIDRef (ID 0xB0): (int) 8
+ 20434      2      StartTimeCodeAbs (ID 0xB8): (int) 18286
+ 20438      2      EndTimeCodeAbs (ID 0xB9): (int) 24309
+ 20442      1      ChannelFlags (ID 0xB1): (int) 0
+ 20445     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+ 20465      2      MediaWriteLatency (ID 0xBE): (int) 24369
+ 20469     16      Void (ID 0xEC): (bytearray)
+ 20487   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+ 26010    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+ 26013      1      ChannelIDRef (ID 0xB0): (int) 32
+ 26016      2      StartTimeCodeAbs (ID 0xB8): (int) 20532
+ 26020      2      EndTimeCodeAbs (ID 0xB9): (int) 25494
+ 26024      1      ChannelFlags (ID 0xB1): (int) 0
+ 26027     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+ 26047      2      MediaWriteLatency (ID 0xBE): (int) 28088
+ 26051     16      Void (ID 0xEC): (bytearray)
+ 26069    360      ChannelDataPayload (ID 0xB2): (bytearray)
+ 26432   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+ 26435      1      ChannelIDRef (ID 0xB0): (int) 8
+ 26438      2      StartTimeCodeAbs (ID 0xB8): (int) 24315
+ 26442      2      EndTimeCodeAbs (ID 0xB9): (int) 30338
+ 26446      1      ChannelFlags (ID 0xB1): (int) 0
+ 26449     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+ 26469      2      MediaWriteLatency (ID 0xBE): (int) 30398
+ 26473     16      Void (ID 0xEC): (bytearray)
+ 26491   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+ 32014    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+ 32017      1      ChannelIDRef (ID 0xB0): (int) 32
+ 32020      2      StartTimeCodeAbs (ID 0xB8): (int) 25578
+ 32024      2      EndTimeCodeAbs (ID 0xB9): (int) 30540
+ 32028      1      ChannelFlags (ID 0xB1): (int) 0
+ 32031     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+ 32051      2      MediaWriteLatency (ID 0xBE): (int) 33133
+ 32055     16      Void (ID 0xEC): (bytearray)
+ 32073    360      ChannelDataPayload (ID 0xB2): (bytearray)
+ 32436   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+ 32439      1      ChannelIDRef (ID 0xB0): (int) 8
+ 32442      2      StartTimeCodeAbs (ID 0xB8): (int) 30344
+ 32446      2      EndTimeCodeAbs (ID 0xB9): (int) 36367
+ 32450      1      ChannelFlags (ID 0xB1): (int) 0
+ 32453     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+ 32473      2      MediaWriteLatency (ID 0xBE): (int) 36427
+ 32477     16      Void (ID 0xEC): (bytearray)
+ 32495   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+ 38018    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+ 38021      1      ChannelIDRef (ID 0xB0): (int) 32
+ 38024      2      StartTimeCodeAbs (ID 0xB8): (int) 30624
+ 38028      2      EndTimeCodeAbs (ID 0xB9): (int) 35585
+ 38032      1      ChannelFlags (ID 0xB1): (int) 0
+ 38035     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+ 38055      2      MediaWriteLatency (ID 0xBE): (int) 38179
+ 38059     16      Void (ID 0xEC): (bytearray)
+ 38077    360      ChannelDataPayload (ID 0xB2): (bytearray)
+ 38440   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+ 38443      1      ChannelIDRef (ID 0xB0): (int) 8
+ 38446      2      StartTimeCodeAbs (ID 0xB8): (int) 36374
+ 38450      2      EndTimeCodeAbs (ID 0xB9): (int) 42396
+ 38454      1      ChannelFlags (ID 0xB1): (int) 0
+ 38457     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+ 38477      2      MediaWriteLatency (ID 0xBE): (int) 42456
+ 38481     16      Void (ID 0xEC): (bytearray)
+ 38499   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+ 44022    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+ 44025      1      ChannelIDRef (ID 0xB0): (int) 32
+ 44028      2      StartTimeCodeAbs (ID 0xB8): (int) 35669
+ 44032      2      EndTimeCodeAbs (ID 0xB9): (int) 40631
+ 44036      1      ChannelFlags (ID 0xB1): (int) 0
+ 44039     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+ 44059      2      MediaWriteLatency (ID 0xBE): (int) 43225
+ 44063     16      Void (ID 0xEC): (bytearray)
+ 44081    360      ChannelDataPayload (ID 0xB2): (bytearray)
+ 44444    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+ 44447      1      ChannelIDRef (ID 0xB0): (int) 32
+ 44450      2      StartTimeCodeAbs (ID 0xB8): (int) 40715
+ 44454      2      EndTimeCodeAbs (ID 0xB9): (int) 45678
+ 44458      1      ChannelFlags (ID 0xB1): (int) 0
+ 44461     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+ 44481      2      MediaWriteLatency (ID 0xBE): (int) 48271
+ 44485     16      Void (ID 0xEC): (bytearray)
+ 44503    360      ChannelDataPayload (ID 0xB2): (bytearray)
+ 44866   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+ 44869      1      ChannelIDRef (ID 0xB0): (int) 8
+ 44872      2      StartTimeCodeAbs (ID 0xB8): (int) 42403
+ 44876      2      EndTimeCodeAbs (ID 0xB9): (int) 48426
+ 44880      1      ChannelFlags (ID 0xB1): (int) 0
+ 44883     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+ 44903      2      MediaWriteLatency (ID 0xBE): (int) 48485
+ 44907     16      Void (ID 0xEC): (bytearray)
+ 44925   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+ 50448    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+ 50451      1      ChannelIDRef (ID 0xB0): (int) 32
+ 50454      2      StartTimeCodeAbs (ID 0xB8): (int) 45762
+ 50458      2      EndTimeCodeAbs (ID 0xB9): (int) 50724
+ 50462      1      ChannelFlags (ID 0xB1): (int) 0
+ 50465     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+ 50485      2      MediaWriteLatency (ID 0xBE): (int) 53318
+ 50489     16      Void (ID 0xEC): (bytearray)
+ 50507    360      ChannelDataPayload (ID 0xB2): (bytearray)
+ 50870   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+ 50873      1      ChannelIDRef (ID 0xB0): (int) 8
+ 50876      2      StartTimeCodeAbs (ID 0xB8): (int) 48432
+ 50880      2      EndTimeCodeAbs (ID 0xB9): (int) 54455
+ 50884      1      ChannelFlags (ID 0xB1): (int) 0
+ 50887     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+ 50907      2      MediaWriteLatency (ID 0xBE): (int) 54514
+ 50911     16      Void (ID 0xEC): (bytearray)
+ 50929   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+ 56452    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+ 56455      1      ChannelIDRef (ID 0xB0): (int) 32
+ 56458      2      StartTimeCodeAbs (ID 0xB8): (int) 50808
+ 56462      2      EndTimeCodeAbs (ID 0xB9): (int) 55770
+ 56466      1      ChannelFlags (ID 0xB1): (int) 0
+ 56469     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+ 56489      2      MediaWriteLatency (ID 0xBE): (int) 58364
+ 56493     16      Void (ID 0xEC): (bytearray)
+ 56511    360      ChannelDataPayload (ID 0xB2): (bytearray)
+ 56874   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+ 56877      1      ChannelIDRef (ID 0xB0): (int) 8
+ 56880      2      StartTimeCodeAbs (ID 0xB8): (int) 54462
+ 56884      2      EndTimeCodeAbs (ID 0xB9): (int) 60484
+ 56888      1      ChannelFlags (ID 0xB1): (int) 0
+ 56891     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+ 56911      2      MediaWriteLatency (ID 0xBE): (int) 60543
+ 56915     16      Void (ID 0xEC): (bytearray)
+ 56933   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+ 62456    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+ 62459      1      ChannelIDRef (ID 0xB0): (int) 32
+ 62462      2      StartTimeCodeAbs (ID 0xB8): (int) 55854
+ 62466      2      EndTimeCodeAbs (ID 0xB9): (int) 60817
+ 62470      1      ChannelFlags (ID 0xB1): (int) 0
+ 62473     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+ 62493      2      MediaWriteLatency (ID 0xBE): (int) 63410
+ 62497     16      Void (ID 0xEC): (bytearray)
+ 62515    360      ChannelDataPayload (ID 0xB2): (bytearray)
+ 62878   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+ 62881      1      ChannelIDRef (ID 0xB0): (int) 8
+ 62884      2      StartTimeCodeAbs (ID 0xB8): (int) 60491
+ 62888      3      EndTimeCodeAbs (ID 0xB9): (int) 66514
+ 62893      1      ChannelFlags (ID 0xB1): (int) 0
+ 62896     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+ 62916      3      MediaWriteLatency (ID 0xBE): (int) 66582
+ 62921     14      Void (ID 0xEC): (bytearray)
+ 62937   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+ 68460    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+ 68463      1      ChannelIDRef (ID 0xB0): (int) 32
+ 68466      2      StartTimeCodeAbs (ID 0xB8): (int) 60901
+ 68470      3      EndTimeCodeAbs (ID 0xB9): (int) 65863
+ 68475      1      ChannelFlags (ID 0xB1): (int) 0
+ 68478     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+ 68498      3      MediaWriteLatency (ID 0xBE): (int) 68457
+ 68503     14      Void (ID 0xEC): (bytearray)
+ 68519    360      ChannelDataPayload (ID 0xB2): (bytearray)
+ 68882   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+ 68885      1      ChannelIDRef (ID 0xB0): (int) 8
+ 68888      3      StartTimeCodeAbs (ID 0xB8): (int) 66520
+ 68893      3      EndTimeCodeAbs (ID 0xB9): (int) 72543
+ 68898      1      ChannelFlags (ID 0xB1): (int) 0
+ 68901     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+ 68921      3      MediaWriteLatency (ID 0xBE): (int) 72601
+ 68926     13      Void (ID 0xEC): (bytearray)
+ 68941   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+ 74464    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+ 74467      1      ChannelIDRef (ID 0xB0): (int) 32
+ 74470      3      StartTimeCodeAbs (ID 0xB8): (int) 65947
+ 74475      3      EndTimeCodeAbs (ID 0xB9): (int) 70909
+ 74480      1      ChannelFlags (ID 0xB1): (int) 0
+ 74483     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+ 74503      3      MediaWriteLatency (ID 0xBE): (int) 73503
+ 74508     13      Void (ID 0xEC): (bytearray)
+ 74523    360      ChannelDataPayload (ID 0xB2): (bytearray)
+ 74886    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+ 74889      1      ChannelIDRef (ID 0xB0): (int) 32
+ 74892      3      StartTimeCodeAbs (ID 0xB8): (int) 70993
+ 74897      3      EndTimeCodeAbs (ID 0xB9): (int) 75955
+ 74902      1      ChannelFlags (ID 0xB1): (int) 0
+ 74905     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+ 74925      3      MediaWriteLatency (ID 0xBE): (int) 78549
+ 74930     13      Void (ID 0xEC): (bytearray)
+ 74945    360      ChannelDataPayload (ID 0xB2): (bytearray)
+ 75308   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+ 75311      1      ChannelIDRef (ID 0xB0): (int) 8
+ 75314      3      StartTimeCodeAbs (ID 0xB8): (int) 72550
+ 75319      3      EndTimeCodeAbs (ID 0xB9): (int) 78572
+ 75324      1      ChannelFlags (ID 0xB1): (int) 0
+ 75327     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+ 75347      3      MediaWriteLatency (ID 0xBE): (int) 78630
+ 75352     13      Void (ID 0xEC): (bytearray)
+ 75367   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+ 80890    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+ 80893      1      ChannelIDRef (ID 0xB0): (int) 32
+ 80896      3      StartTimeCodeAbs (ID 0xB8): (int) 76039
+ 80901      3      EndTimeCodeAbs (ID 0xB9): (int) 81001
+ 80906      1      ChannelFlags (ID 0xB1): (int) 0
+ 80909     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+ 80929      3      MediaWriteLatency (ID 0xBE): (int) 83595
+ 80934     13      Void (ID 0xEC): (bytearray)
+ 80949    360      ChannelDataPayload (ID 0xB2): (bytearray)
+ 81312   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+ 81315      1      ChannelIDRef (ID 0xB0): (int) 8
+ 81318      3      StartTimeCodeAbs (ID 0xB8): (int) 78579
+ 81323      3      EndTimeCodeAbs (ID 0xB9): (int) 84602
+ 81328      1      ChannelFlags (ID 0xB1): (int) 0
+ 81331     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+ 81351      3      MediaWriteLatency (ID 0xBE): (int) 84659
+ 81356     13      Void (ID 0xEC): (bytearray)
+ 81371   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+ 86894    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+ 86897      1      ChannelIDRef (ID 0xB0): (int) 32
+ 86900      3      StartTimeCodeAbs (ID 0xB8): (int) 81085
+ 86905      3      EndTimeCodeAbs (ID 0xB9): (int) 86047
+ 86910      1      ChannelFlags (ID 0xB1): (int) 0
+ 86913     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+ 86933      3      MediaWriteLatency (ID 0xBE): (int) 88650
+ 86938     13      Void (ID 0xEC): (bytearray)
+ 86953    360      ChannelDataPayload (ID 0xB2): (bytearray)
+ 87316   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+ 87319      1      ChannelIDRef (ID 0xB0): (int) 8
+ 87322      3      StartTimeCodeAbs (ID 0xB8): (int) 84608
+ 87327      3      EndTimeCodeAbs (ID 0xB9): (int) 90631
+ 87332      1      ChannelFlags (ID 0xB1): (int) 0
+ 87335     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+ 87355      3      MediaWriteLatency (ID 0xBE): (int) 90688
+ 87360     13      Void (ID 0xEC): (bytearray)
+ 87375   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+ 92898    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+ 92901      1      ChannelIDRef (ID 0xB0): (int) 32
+ 92904      3      StartTimeCodeAbs (ID 0xB8): (int) 86131
+ 92909      3      EndTimeCodeAbs (ID 0xB9): (int) 91093
+ 92914      1      ChannelFlags (ID 0xB1): (int) 0
+ 92917     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+ 92937      3      MediaWriteLatency (ID 0xBE): (int) 93686
+ 92942     13      Void (ID 0xEC): (bytearray)
+ 92957    360      ChannelDataPayload (ID 0xB2): (bytearray)
+ 93320   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+ 93323      1      ChannelIDRef (ID 0xB0): (int) 8
+ 93326      3      StartTimeCodeAbs (ID 0xB8): (int) 90637
+ 93331      3      EndTimeCodeAbs (ID 0xB9): (int) 96660
+ 93336      1      ChannelFlags (ID 0xB1): (int) 0
+ 93339     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+ 93359      3      MediaWriteLatency (ID 0xBE): (int) 96717
+ 93364     13      Void (ID 0xEC): (bytearray)
+ 93379   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+ 98902    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+ 98905      1      ChannelIDRef (ID 0xB0): (int) 32
+ 98908      3      StartTimeCodeAbs (ID 0xB8): (int) 91177
+ 98913      3      EndTimeCodeAbs (ID 0xB9): (int) 96139
+ 98918      1      ChannelFlags (ID 0xB1): (int) 0
+ 98921     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+ 98941      3      MediaWriteLatency (ID 0xBE): (int) 98732
+ 98946     13      Void (ID 0xEC): (bytearray)
+ 98961    360      ChannelDataPayload (ID 0xB2): (bytearray)
+ 99324   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+ 99327      1      ChannelIDRef (ID 0xB0): (int) 8
+ 99330      3      StartTimeCodeAbs (ID 0xB8): (int) 96667
+ 99335      3      EndTimeCodeAbs (ID 0xB9): (int) 102690
+ 99340      1      ChannelFlags (ID 0xB1): (int) 0
+ 99343     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+ 99363      3      MediaWriteLatency (ID 0xBE): (int) 102746
+ 99368     13      Void (ID 0xEC): (bytearray)
+ 99383   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+104906    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+104909      1      ChannelIDRef (ID 0xB0): (int) 32
+104912      3      StartTimeCodeAbs (ID 0xB8): (int) 96223
+104917      3      EndTimeCodeAbs (ID 0xB9): (int) 101184
+104922      1      ChannelFlags (ID 0xB1): (int) 0
+104925     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+104945      3      MediaWriteLatency (ID 0xBE): (int) 108327
+104950     13      Void (ID 0xEC): (bytearray)
+104965    360      ChannelDataPayload (ID 0xB2): (bytearray)
+105328   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+105331      1      ChannelIDRef (ID 0xB0): (int) 8
+105334      3      StartTimeCodeAbs (ID 0xB8): (int) 102696
+105339      3      EndTimeCodeAbs (ID 0xB9): (int) 108719
+105344      1      ChannelFlags (ID 0xB1): (int) 0
+105347     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+105367      3      MediaWriteLatency (ID 0xBE): (int) 108841
+105372     13      Void (ID 0xEC): (bytearray)
+105387   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+110910    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+110913      1      ChannelIDRef (ID 0xB0): (int) 32
+110916      3      StartTimeCodeAbs (ID 0xB8): (int) 101268
+110921      3      EndTimeCodeAbs (ID 0xB9): (int) 106230
+110926      1      ChannelFlags (ID 0xB1): (int) 0
+110929     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+110949      3      MediaWriteLatency (ID 0xBE): (int) 109072
+110954     13      Void (ID 0xEC): (bytearray)
+110969    360      ChannelDataPayload (ID 0xB2): (bytearray)
+111332    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+111335      1      ChannelIDRef (ID 0xB0): (int) 32
+111338      3      StartTimeCodeAbs (ID 0xB8): (int) 106314
+111343      3      EndTimeCodeAbs (ID 0xB9): (int) 111276
+111348      1      ChannelFlags (ID 0xB1): (int) 0
+111351     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+111371      3      MediaWriteLatency (ID 0xBE): (int) 113871
+111376     13      Void (ID 0xEC): (bytearray)
+111391    360      ChannelDataPayload (ID 0xB2): (bytearray)
+111754   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+111757      1      ChannelIDRef (ID 0xB0): (int) 8
+111760      3      StartTimeCodeAbs (ID 0xB8): (int) 108725
+111765      3      EndTimeCodeAbs (ID 0xB9): (int) 114748
+111770      1      ChannelFlags (ID 0xB1): (int) 0
+111773     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+111793      3      MediaWriteLatency (ID 0xBE): (int) 114804
+111798     13      Void (ID 0xEC): (bytearray)
+111813   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+117336    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+117339      1      ChannelIDRef (ID 0xB0): (int) 32
+117342      3      StartTimeCodeAbs (ID 0xB8): (int) 111360
+117347      3      EndTimeCodeAbs (ID 0xB9): (int) 116322
+117352      1      ChannelFlags (ID 0xB1): (int) 0
+117355     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+117375      3      MediaWriteLatency (ID 0xBE): (int) 118916
+117380     13      Void (ID 0xEC): (bytearray)
+117395    360      ChannelDataPayload (ID 0xB2): (bytearray)
+117758   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+117761      1      ChannelIDRef (ID 0xB0): (int) 8
+117764      3      StartTimeCodeAbs (ID 0xB8): (int) 114755
+117769      3      EndTimeCodeAbs (ID 0xB9): (int) 120777
+117774      1      ChannelFlags (ID 0xB1): (int) 0
+117777     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+117797      3      MediaWriteLatency (ID 0xBE): (int) 120833
+117802     13      Void (ID 0xEC): (bytearray)
+117817   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+123340    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+123343      1      ChannelIDRef (ID 0xB0): (int) 32
+123346      3      StartTimeCodeAbs (ID 0xB8): (int) 116406
+123351      3      EndTimeCodeAbs (ID 0xB9): (int) 121368
+123356      1      ChannelFlags (ID 0xB1): (int) 0
+123359     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+123379      3      MediaWriteLatency (ID 0xBE): (int) 123961
+123384     13      Void (ID 0xEC): (bytearray)
+123399    360      ChannelDataPayload (ID 0xB2): (bytearray)
+123762   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+123765      1      ChannelIDRef (ID 0xB0): (int) 8
+123768      3      StartTimeCodeAbs (ID 0xB8): (int) 120784
+123773      3      EndTimeCodeAbs (ID 0xB9): (int) 126807
+123778      1      ChannelFlags (ID 0xB1): (int) 0
+123781     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+123801      3      MediaWriteLatency (ID 0xBE): (int) 126862
+123806     13      Void (ID 0xEC): (bytearray)
+123821   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+129344    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+129347      1      ChannelIDRef (ID 0xB0): (int) 32
+129350      3      StartTimeCodeAbs (ID 0xB8): (int) 121452
+129355      3      EndTimeCodeAbs (ID 0xB9): (int) 126413
+129360      1      ChannelFlags (ID 0xB1): (int) 0
+129363     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+129383      3      MediaWriteLatency (ID 0xBE): (int) 129007
+129388     13      Void (ID 0xEC): (bytearray)
+129403    360      ChannelDataPayload (ID 0xB2): (bytearray)
+129766   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+129769      1      ChannelIDRef (ID 0xB0): (int) 8
+129772      3      StartTimeCodeAbs (ID 0xB8): (int) 126813
+129777      3      EndTimeCodeAbs (ID 0xB9): (int) 132836
+129782      1      ChannelFlags (ID 0xB1): (int) 0
+129785     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+129805      3      MediaWriteLatency (ID 0xBE): (int) 132891
+129810     13      Void (ID 0xEC): (bytearray)
+129825   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+135348    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+135351      1      ChannelIDRef (ID 0xB0): (int) 32
+135354      3      StartTimeCodeAbs (ID 0xB8): (int) 126497
+135359      3      EndTimeCodeAbs (ID 0xB9): (int) 131459
+135364      1      ChannelFlags (ID 0xB1): (int) 0
+135367     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+135387      3      MediaWriteLatency (ID 0xBE): (int) 134052
+135392     13      Void (ID 0xEC): (bytearray)
+135407    360      ChannelDataPayload (ID 0xB2): (bytearray)
+135770   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+135773      1      ChannelIDRef (ID 0xB0): (int) 8
+135776      3      StartTimeCodeAbs (ID 0xB8): (int) 132843
+135781      3      EndTimeCodeAbs (ID 0xB9): (int) 138865
+135786      1      ChannelFlags (ID 0xB1): (int) 0
+135789     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+135809      3      MediaWriteLatency (ID 0xBE): (int) 138920
+135814     13      Void (ID 0xEC): (bytearray)
+135829   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+141352    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+141355      1      ChannelIDRef (ID 0xB0): (int) 32
+141358      3      StartTimeCodeAbs (ID 0xB8): (int) 131543
+141363      3      EndTimeCodeAbs (ID 0xB9): (int) 136505
+141368      1      ChannelFlags (ID 0xB1): (int) 0
+141371     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+141391      3      MediaWriteLatency (ID 0xBE): (int) 139217
+141396     13      Void (ID 0xEC): (bytearray)
+141411    360      ChannelDataPayload (ID 0xB2): (bytearray)
+141774    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+141777      1      ChannelIDRef (ID 0xB0): (int) 32
+141780      3      StartTimeCodeAbs (ID 0xB8): (int) 136589
+141785      3      EndTimeCodeAbs (ID 0xB9): (int) 141550
+141790      1      ChannelFlags (ID 0xB1): (int) 0
+141793     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+141813      3      MediaWriteLatency (ID 0xBE): (int) 144144
+141818     13      Void (ID 0xEC): (bytearray)
+141833    360      ChannelDataPayload (ID 0xB2): (bytearray)
+142196   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+142199      1      ChannelIDRef (ID 0xB0): (int) 8
+142202      3      StartTimeCodeAbs (ID 0xB8): (int) 138872
+142207      3      EndTimeCodeAbs (ID 0xB9): (int) 144895
+142212      1      ChannelFlags (ID 0xB1): (int) 0
+142215     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+142235      3      MediaWriteLatency (ID 0xBE): (int) 144949
+142240     13      Void (ID 0xEC): (bytearray)
+142255   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+147778    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+147781      1      ChannelIDRef (ID 0xB0): (int) 32
+147784      3      StartTimeCodeAbs (ID 0xB8): (int) 141634
+147789      3      EndTimeCodeAbs (ID 0xB9): (int) 146596
+147794      1      ChannelFlags (ID 0xB1): (int) 0
+147797     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+147817      3      MediaWriteLatency (ID 0xBE): (int) 149190
+147822     13      Void (ID 0xEC): (bytearray)
+147837    360      ChannelDataPayload (ID 0xB2): (bytearray)
+148200   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+148203      1      ChannelIDRef (ID 0xB0): (int) 8
+148206      3      StartTimeCodeAbs (ID 0xB8): (int) 144901
+148211      3      EndTimeCodeAbs (ID 0xB9): (int) 150924
+148216      1      ChannelFlags (ID 0xB1): (int) 0
+148219     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+148239      3      MediaWriteLatency (ID 0xBE): (int) 150978
+148244     13      Void (ID 0xEC): (bytearray)
+148259   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+153782    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+153785      1      ChannelIDRef (ID 0xB0): (int) 32
+153788      3      StartTimeCodeAbs (ID 0xB8): (int) 146680
+153793      3      EndTimeCodeAbs (ID 0xB9): (int) 151642
+153798      1      ChannelFlags (ID 0xB1): (int) 0
+153801     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+153821      3      MediaWriteLatency (ID 0xBE): (int) 154243
+153826     13      Void (ID 0xEC): (bytearray)
+153841    360      ChannelDataPayload (ID 0xB2): (bytearray)
+154204   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+154207      1      ChannelIDRef (ID 0xB0): (int) 8
+154210      3      StartTimeCodeAbs (ID 0xB8): (int) 150930
+154215      3      EndTimeCodeAbs (ID 0xB9): (int) 156953
+154220      1      ChannelFlags (ID 0xB1): (int) 0
+154223     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+154243      3      MediaWriteLatency (ID 0xBE): (int) 157007
+154248     13      Void (ID 0xEC): (bytearray)
+154263   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+159786    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+159789      1      ChannelIDRef (ID 0xB0): (int) 32
+159792      3      StartTimeCodeAbs (ID 0xB8): (int) 151726
+159797      3      EndTimeCodeAbs (ID 0xB9): (int) 156688
+159802      1      ChannelFlags (ID 0xB1): (int) 0
+159805     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+159825      3      MediaWriteLatency (ID 0xBE): (int) 159282
+159830     13      Void (ID 0xEC): (bytearray)
+159845    360      ChannelDataPayload (ID 0xB2): (bytearray)
+160208   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+160211      1      ChannelIDRef (ID 0xB0): (int) 8
+160214      3      StartTimeCodeAbs (ID 0xB8): (int) 156960
+160219      3      EndTimeCodeAbs (ID 0xB9): (int) 162983
+160224      1      ChannelFlags (ID 0xB1): (int) 0
+160227     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+160247      3      MediaWriteLatency (ID 0xBE): (int) 163036
+160252     13      Void (ID 0xEC): (bytearray)
+160267   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+165790    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+165793      1      ChannelIDRef (ID 0xB0): (int) 32
+165796      3      StartTimeCodeAbs (ID 0xB8): (int) 156772
+165801      3      EndTimeCodeAbs (ID 0xB9): (int) 161734
+165806      1      ChannelFlags (ID 0xB1): (int) 0
+165809     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+165829      3      MediaWriteLatency (ID 0xBE): (int) 164329
+165834     13      Void (ID 0xEC): (bytearray)
+165849    360      ChannelDataPayload (ID 0xB2): (bytearray)
+166212   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+166215      1      ChannelIDRef (ID 0xB0): (int) 8
+166218      3      StartTimeCodeAbs (ID 0xB8): (int) 162989
+166223      3      EndTimeCodeAbs (ID 0xB9): (int) 169012
+166228      1      ChannelFlags (ID 0xB1): (int) 0
+166231     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+166251      3      MediaWriteLatency (ID 0xBE): (int) 169065
+166256     13      Void (ID 0xEC): (bytearray)
+166271   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+171794    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+171797      1      ChannelIDRef (ID 0xB0): (int) 32
+171800      3      StartTimeCodeAbs (ID 0xB8): (int) 161818
+171805      3      EndTimeCodeAbs (ID 0xB9): (int) 166780
+171810      1      ChannelFlags (ID 0xB1): (int) 0
+171813     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+171833      3      MediaWriteLatency (ID 0xBE): (int) 169374
+171838     13      Void (ID 0xEC): (bytearray)
+171853    360      ChannelDataPayload (ID 0xB2): (bytearray)
+172216    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+172219      1      ChannelIDRef (ID 0xB0): (int) 32
+172222      3      StartTimeCodeAbs (ID 0xB8): (int) 166864
+172227      3      EndTimeCodeAbs (ID 0xB9): (int) 171826
+172232      1      ChannelFlags (ID 0xB1): (int) 0
+172235     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+172255      3      MediaWriteLatency (ID 0xBE): (int) 174420
+172260     13      Void (ID 0xEC): (bytearray)
+172275    360      ChannelDataPayload (ID 0xB2): (bytearray)
+172638   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+172641      1      ChannelIDRef (ID 0xB0): (int) 8
+172644      3      StartTimeCodeAbs (ID 0xB8): (int) 169018
+172649      3      EndTimeCodeAbs (ID 0xB9): (int) 175041
+172654      1      ChannelFlags (ID 0xB1): (int) 0
+172657     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+172677      3      MediaWriteLatency (ID 0xBE): (int) 175094
+172682     13      Void (ID 0xEC): (bytearray)
+172697   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+178220    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+178223      1      ChannelIDRef (ID 0xB0): (int) 32
+178226      3      StartTimeCodeAbs (ID 0xB8): (int) 171910
+178231      3      EndTimeCodeAbs (ID 0xB9): (int) 176872
+178236      1      ChannelFlags (ID 0xB1): (int) 0
+178239     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+178259      3      MediaWriteLatency (ID 0xBE): (int) 179466
+178264     13      Void (ID 0xEC): (bytearray)
+178279    360      ChannelDataPayload (ID 0xB2): (bytearray)
+178642   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+178645      1      ChannelIDRef (ID 0xB0): (int) 8
+178648      3      StartTimeCodeAbs (ID 0xB8): (int) 175048
+178653      3      EndTimeCodeAbs (ID 0xB9): (int) 181070
+178658      1      ChannelFlags (ID 0xB1): (int) 0
+178661     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+178681      3      MediaWriteLatency (ID 0xBE): (int) 181123
+178686     13      Void (ID 0xEC): (bytearray)
+178701   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+184224    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+184227      1      ChannelIDRef (ID 0xB0): (int) 32
+184230      3      StartTimeCodeAbs (ID 0xB8): (int) 176956
+184235      3      EndTimeCodeAbs (ID 0xB9): (int) 181919
+184240      1      ChannelFlags (ID 0xB1): (int) 0
+184243     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+184263      3      MediaWriteLatency (ID 0xBE): (int) 184522
+184268     13      Void (ID 0xEC): (bytearray)
+184283    360      ChannelDataPayload (ID 0xB2): (bytearray)
+184646   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+184649      1      ChannelIDRef (ID 0xB0): (int) 8
+184652      3      StartTimeCodeAbs (ID 0xB8): (int) 181077
+184657      3      EndTimeCodeAbs (ID 0xB9): (int) 187100
+184662      1      ChannelFlags (ID 0xB1): (int) 0
+184665     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+184685      3      MediaWriteLatency (ID 0xBE): (int) 187152
+184690     13      Void (ID 0xEC): (bytearray)
+184705   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+190228    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+190231      1      ChannelIDRef (ID 0xB0): (int) 32
+190234      3      StartTimeCodeAbs (ID 0xB8): (int) 182003
+190239      3      EndTimeCodeAbs (ID 0xB9): (int) 186965
+190244      1      ChannelFlags (ID 0xB1): (int) 0
+190247     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+190267      3      MediaWriteLatency (ID 0xBE): (int) 189559
+190272     13      Void (ID 0xEC): (bytearray)
+190287    360      ChannelDataPayload (ID 0xB2): (bytearray)
+190650   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+190653      1      ChannelIDRef (ID 0xB0): (int) 8
+190656      3      StartTimeCodeAbs (ID 0xB8): (int) 187106
+190661      3      EndTimeCodeAbs (ID 0xB9): (int) 193129
+190666      1      ChannelFlags (ID 0xB1): (int) 0
+190669     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+190689      3      MediaWriteLatency (ID 0xBE): (int) 193181
+190694     13      Void (ID 0xEC): (bytearray)
+190709   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+196232    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+196235      1      ChannelIDRef (ID 0xB0): (int) 32
+196238      3      StartTimeCodeAbs (ID 0xB8): (int) 187049
+196243      3      EndTimeCodeAbs (ID 0xB9): (int) 192011
+196248      1      ChannelFlags (ID 0xB1): (int) 0
+196251     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+196271      3      MediaWriteLatency (ID 0xBE): (int) 194605
+196276     13      Void (ID 0xEC): (bytearray)
+196291    360      ChannelDataPayload (ID 0xB2): (bytearray)
+196654    497    ChannelDataBlock (ID 0xA1): (master) 6 subelements
+196657      1      ChannelIDRef (ID 0xB0): (int) 59
+196660      2      StartTimeCodeAbs (ID 0xB8): (int) 3438
+196664      3      EndTimeCodeAbs (ID 0xB9): (int) 190230
+196669      1      ChannelFlags (ID 0xB1): (int) 0
+196672     13      Void (ID 0xEC): (bytearray)
+196687    464      ChannelDataPayload (ID 0xB2): (bytearray)
+197154   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+197157      1      ChannelIDRef (ID 0xB0): (int) 8
+197160      3      StartTimeCodeAbs (ID 0xB8): (int) 193136
+197165      3      EndTimeCodeAbs (ID 0xB9): (int) 199158
+197170      1      ChannelFlags (ID 0xB1): (int) 0
+197173     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+197193      3      MediaWriteLatency (ID 0xBE): (int) 199210
+197198     13      Void (ID 0xEC): (bytearray)
+197213   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+202736    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+202739      1      ChannelIDRef (ID 0xB0): (int) 32
+202742      3      StartTimeCodeAbs (ID 0xB8): (int) 192095
+202747      3      EndTimeCodeAbs (ID 0xB9): (int) 197057
+202752      1      ChannelFlags (ID 0xB1): (int) 0
+202755     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+202775      3      MediaWriteLatency (ID 0xBE): (int) 199651
+202780     13      Void (ID 0xEC): (bytearray)
+202795    360      ChannelDataPayload (ID 0xB2): (bytearray)
+203158    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+203161      1      ChannelIDRef (ID 0xB0): (int) 32
+203164      3      StartTimeCodeAbs (ID 0xB8): (int) 197141
+203169      3      EndTimeCodeAbs (ID 0xB9): (int) 202103
+203174      1      ChannelFlags (ID 0xB1): (int) 0
+203177     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+203197      3      MediaWriteLatency (ID 0xBE): (int) 204696
+203202     13      Void (ID 0xEC): (bytearray)
+203217    360      ChannelDataPayload (ID 0xB2): (bytearray)
+203580   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+203583      1      ChannelIDRef (ID 0xB0): (int) 8
+203586      3      StartTimeCodeAbs (ID 0xB8): (int) 199165
+203591      3      EndTimeCodeAbs (ID 0xB9): (int) 205188
+203596      1      ChannelFlags (ID 0xB1): (int) 0
+203599     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+203619      3      MediaWriteLatency (ID 0xBE): (int) 205239
+203624     13      Void (ID 0xEC): (bytearray)
+203639   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+209162    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+209165      1      ChannelIDRef (ID 0xB0): (int) 32
+209168      3      StartTimeCodeAbs (ID 0xB8): (int) 202187
+209173      3      EndTimeCodeAbs (ID 0xB9): (int) 207149
+209178      1      ChannelFlags (ID 0xB1): (int) 0
+209181     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+209201      3      MediaWriteLatency (ID 0xBE): (int) 209742
+209206     13      Void (ID 0xEC): (bytearray)
+209221    360      ChannelDataPayload (ID 0xB2): (bytearray)
+209584   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+209587      1      ChannelIDRef (ID 0xB0): (int) 8
+209590      3      StartTimeCodeAbs (ID 0xB8): (int) 205194
+209595      3      EndTimeCodeAbs (ID 0xB9): (int) 211217
+209600      1      ChannelFlags (ID 0xB1): (int) 0
+209603     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+209623      3      MediaWriteLatency (ID 0xBE): (int) 211268
+209628     13      Void (ID 0xEC): (bytearray)
+209643   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+215166    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+215169      1      ChannelIDRef (ID 0xB0): (int) 32
+215172      3      StartTimeCodeAbs (ID 0xB8): (int) 207233
+215177      3      EndTimeCodeAbs (ID 0xB9): (int) 212195
+215182      1      ChannelFlags (ID 0xB1): (int) 0
+215185     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+215205      3      MediaWriteLatency (ID 0xBE): (int) 214788
+215210     13      Void (ID 0xEC): (bytearray)
+215225    360      ChannelDataPayload (ID 0xB2): (bytearray)
+215588   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+215591      1      ChannelIDRef (ID 0xB0): (int) 8
+215594      3      StartTimeCodeAbs (ID 0xB8): (int) 211223
+215599      3      EndTimeCodeAbs (ID 0xB9): (int) 217246
+215604      1      ChannelFlags (ID 0xB1): (int) 0
+215607     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+215627      3      MediaWriteLatency (ID 0xBE): (int) 217372
+215632     13      Void (ID 0xEC): (bytearray)
+215647   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+221170    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+221173      1      ChannelIDRef (ID 0xB0): (int) 32
+221176      3      StartTimeCodeAbs (ID 0xB8): (int) 212279
+221181      3      EndTimeCodeAbs (ID 0xB9): (int) 217248
+221186      1      ChannelFlags (ID 0xB1): (int) 0
+221189     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+221209      3      MediaWriteLatency (ID 0xBE): (int) 219834
+221214     13      Void (ID 0xEC): (bytearray)
+221229    360      ChannelDataPayload (ID 0xB2): (bytearray)
+221592   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+221595      1      ChannelIDRef (ID 0xB0): (int) 8
+221598      3      StartTimeCodeAbs (ID 0xB8): (int) 217253
+221603      3      EndTimeCodeAbs (ID 0xB9): (int) 223275
+221608      1      ChannelFlags (ID 0xB1): (int) 0
+221611     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+221631      3      MediaWriteLatency (ID 0xBE): (int) 223326
+221636     13      Void (ID 0xEC): (bytearray)
+221651   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+227174    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+227177      1      ChannelIDRef (ID 0xB0): (int) 32
+227180      3      StartTimeCodeAbs (ID 0xB8): (int) 217331
+227185      3      EndTimeCodeAbs (ID 0xB9): (int) 222287
+227190      1      ChannelFlags (ID 0xB1): (int) 0
+227193     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+227213      3      MediaWriteLatency (ID 0xBE): (int) 224880
+227218     13      Void (ID 0xEC): (bytearray)
+227233    360      ChannelDataPayload (ID 0xB2): (bytearray)
+227596   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+227599      1      ChannelIDRef (ID 0xB0): (int) 8
+227602      3      StartTimeCodeAbs (ID 0xB8): (int) 223281
+227607      3      EndTimeCodeAbs (ID 0xB9): (int) 229304
+227612      1      ChannelFlags (ID 0xB1): (int) 0
+227615     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+227635      3      MediaWriteLatency (ID 0xBE): (int) 229355
+227640     13      Void (ID 0xEC): (bytearray)
+227655   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+233178    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+233181      1      ChannelIDRef (ID 0xB0): (int) 32
+233184      3      StartTimeCodeAbs (ID 0xB8): (int) 222371
+233189      3      EndTimeCodeAbs (ID 0xB9): (int) 227332
+233194      1      ChannelFlags (ID 0xB1): (int) 0
+233197     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+233217      3      MediaWriteLatency (ID 0xBE): (int) 229926
+233222     13      Void (ID 0xEC): (bytearray)
+233237    360      ChannelDataPayload (ID 0xB2): (bytearray)
+233600    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+233603      1      ChannelIDRef (ID 0xB0): (int) 32
+233606      3      StartTimeCodeAbs (ID 0xB8): (int) 227416
+233611      3      EndTimeCodeAbs (ID 0xB9): (int) 232378
+233616      1      ChannelFlags (ID 0xB1): (int) 0
+233619     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+233639      3      MediaWriteLatency (ID 0xBE): (int) 234972
+233644     13      Void (ID 0xEC): (bytearray)
+233659    360      ChannelDataPayload (ID 0xB2): (bytearray)
+234022   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+234025      1      ChannelIDRef (ID 0xB0): (int) 8
+234028      3      StartTimeCodeAbs (ID 0xB8): (int) 229310
+234033      3      EndTimeCodeAbs (ID 0xB9): (int) 235333
+234038      1      ChannelFlags (ID 0xB1): (int) 0
+234041     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+234061      3      MediaWriteLatency (ID 0xBE): (int) 235384
+234066     13      Void (ID 0xEC): (bytearray)
+234081   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+239604    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+239607      1      ChannelIDRef (ID 0xB0): (int) 32
+239610      3      StartTimeCodeAbs (ID 0xB8): (int) 232462
+239615      3      EndTimeCodeAbs (ID 0xB9): (int) 237424
+239620      1      ChannelFlags (ID 0xB1): (int) 0
+239623     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+239643      3      MediaWriteLatency (ID 0xBE): (int) 240018
+239648     13      Void (ID 0xEC): (bytearray)
+239663    360      ChannelDataPayload (ID 0xB2): (bytearray)
+240026   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+240029      1      ChannelIDRef (ID 0xB0): (int) 8
+240032      3      StartTimeCodeAbs (ID 0xB8): (int) 235340
+240037      3      EndTimeCodeAbs (ID 0xB9): (int) 241362
+240042      1      ChannelFlags (ID 0xB1): (int) 0
+240045     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+240065      3      MediaWriteLatency (ID 0xBE): (int) 241413
+240070     13      Void (ID 0xEC): (bytearray)
+240085   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+245608    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+245611      1      ChannelIDRef (ID 0xB0): (int) 32
+245614      3      StartTimeCodeAbs (ID 0xB8): (int) 237508
+245619      3      EndTimeCodeAbs (ID 0xB9): (int) 242470
+245624      1      ChannelFlags (ID 0xB1): (int) 0
+245627     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+245647      3      MediaWriteLatency (ID 0xBE): (int) 245064
+245652     13      Void (ID 0xEC): (bytearray)
+245667    360      ChannelDataPayload (ID 0xB2): (bytearray)
+246030   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+246033      1      ChannelIDRef (ID 0xB0): (int) 8
+246036      3      StartTimeCodeAbs (ID 0xB8): (int) 241369
+246041      3      EndTimeCodeAbs (ID 0xB9): (int) 247391
+246046      1      ChannelFlags (ID 0xB1): (int) 0
+246049     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+246069      3      MediaWriteLatency (ID 0xBE): (int) 247442
+246074     13      Void (ID 0xEC): (bytearray)
+246089   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+251612    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+251615      1      ChannelIDRef (ID 0xB0): (int) 32
+251618      3      StartTimeCodeAbs (ID 0xB8): (int) 242554
+251623      3      EndTimeCodeAbs (ID 0xB9): (int) 247516
+251628      1      ChannelFlags (ID 0xB1): (int) 0
+251631     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+251651      3      MediaWriteLatency (ID 0xBE): (int) 250110
+251656     13      Void (ID 0xEC): (bytearray)
+251671    360      ChannelDataPayload (ID 0xB2): (bytearray)
+252034   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+252037      1      ChannelIDRef (ID 0xB0): (int) 8
+252040      3      StartTimeCodeAbs (ID 0xB8): (int) 247397
+252045      3      EndTimeCodeAbs (ID 0xB9): (int) 253420
+252050      1      ChannelFlags (ID 0xB1): (int) 0
+252053     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+252073      3      MediaWriteLatency (ID 0xBE): (int) 253471
+252078     13      Void (ID 0xEC): (bytearray)
+252093   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+257616    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+257619      1      ChannelIDRef (ID 0xB0): (int) 32
+257622      3      StartTimeCodeAbs (ID 0xB8): (int) 247600
+257627      3      EndTimeCodeAbs (ID 0xB9): (int) 252562
+257632      1      ChannelFlags (ID 0xB1): (int) 0
+257635     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+257655      3      MediaWriteLatency (ID 0xBE): (int) 255155
+257660     13      Void (ID 0xEC): (bytearray)
+257675    360      ChannelDataPayload (ID 0xB2): (bytearray)
+258038   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+258041      1      ChannelIDRef (ID 0xB0): (int) 8
+258044      3      StartTimeCodeAbs (ID 0xB8): (int) 253427
+258049      3      EndTimeCodeAbs (ID 0xB9): (int) 259449
+258054      1      ChannelFlags (ID 0xB1): (int) 0
+258057     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+258077      3      MediaWriteLatency (ID 0xBE): (int) 259500
+258082     13      Void (ID 0xEC): (bytearray)
+258097   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+263620    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+263623      1      ChannelIDRef (ID 0xB0): (int) 32
+263626      3      StartTimeCodeAbs (ID 0xB8): (int) 252646
+263631      3      EndTimeCodeAbs (ID 0xB9): (int) 257607
+263636      1      ChannelFlags (ID 0xB1): (int) 0
+263639     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+263659      3      MediaWriteLatency (ID 0xBE): (int) 260201
+263664     13      Void (ID 0xEC): (bytearray)
+263679    360      ChannelDataPayload (ID 0xB2): (bytearray)
+264042    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+264045      1      ChannelIDRef (ID 0xB0): (int) 32
+264048      3      StartTimeCodeAbs (ID 0xB8): (int) 257691
+264053      3      EndTimeCodeAbs (ID 0xB9): (int) 262653
+264058      1      ChannelFlags (ID 0xB1): (int) 0
+264061     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+264081      3      MediaWriteLatency (ID 0xBE): (int) 265247
+264086     13      Void (ID 0xEC): (bytearray)
+264101    360      ChannelDataPayload (ID 0xB2): (bytearray)
+264464   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+264467      1      ChannelIDRef (ID 0xB0): (int) 8
+264470      3      StartTimeCodeAbs (ID 0xB8): (int) 259456
+264475      3      EndTimeCodeAbs (ID 0xB9): (int) 265478
+264480      1      ChannelFlags (ID 0xB1): (int) 0
+264483     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+264503      3      MediaWriteLatency (ID 0xBE): (int) 265529
+264508     13      Void (ID 0xEC): (bytearray)
+264523   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+270046    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+270049      1      ChannelIDRef (ID 0xB0): (int) 32
+270052      3      StartTimeCodeAbs (ID 0xB8): (int) 262737
+270057      3      EndTimeCodeAbs (ID 0xB9): (int) 267699
+270062      1      ChannelFlags (ID 0xB1): (int) 0
+270065     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+270085      3      MediaWriteLatency (ID 0xBE): (int) 270292
+270090     13      Void (ID 0xEC): (bytearray)
+270105    360      ChannelDataPayload (ID 0xB2): (bytearray)
+270468   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+270471      1      ChannelIDRef (ID 0xB0): (int) 8
+270474      3      StartTimeCodeAbs (ID 0xB8): (int) 265484
+270479      3      EndTimeCodeAbs (ID 0xB9): (int) 271507
+270484      1      ChannelFlags (ID 0xB1): (int) 0
+270487     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+270507      3      MediaWriteLatency (ID 0xBE): (int) 271558
+270512     13      Void (ID 0xEC): (bytearray)
+270527   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+276050    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+276053      1      ChannelIDRef (ID 0xB0): (int) 32
+276056      3      StartTimeCodeAbs (ID 0xB8): (int) 267783
+276061      3      EndTimeCodeAbs (ID 0xB9): (int) 272745
+276066      1      ChannelFlags (ID 0xB1): (int) 0
+276069     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+276089      3      MediaWriteLatency (ID 0xBE): (int) 275338
+276094     13      Void (ID 0xEC): (bytearray)
+276109    360      ChannelDataPayload (ID 0xB2): (bytearray)
+276472   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+276475      1      ChannelIDRef (ID 0xB0): (int) 8
+276478      3      StartTimeCodeAbs (ID 0xB8): (int) 271514
+276483      3      EndTimeCodeAbs (ID 0xB9): (int) 277536
+276488      1      ChannelFlags (ID 0xB1): (int) 0
+276491     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+276511      3      MediaWriteLatency (ID 0xBE): (int) 277587
+276516     13      Void (ID 0xEC): (bytearray)
+276531   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+282054    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+282057      1      ChannelIDRef (ID 0xB0): (int) 32
+282060      3      StartTimeCodeAbs (ID 0xB8): (int) 272829
+282065      3      EndTimeCodeAbs (ID 0xB9): (int) 277791
+282070      1      ChannelFlags (ID 0xB1): (int) 0
+282073     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+282093      3      MediaWriteLatency (ID 0xBE): (int) 280384
+282098     13      Void (ID 0xEC): (bytearray)
+282113    360      ChannelDataPayload (ID 0xB2): (bytearray)
+282476   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+282479      1      ChannelIDRef (ID 0xB0): (int) 8
+282482      3      StartTimeCodeAbs (ID 0xB8): (int) 277543
+282487      3      EndTimeCodeAbs (ID 0xB9): (int) 283565
+282492      1      ChannelFlags (ID 0xB1): (int) 0
+282495     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+282515      3      MediaWriteLatency (ID 0xBE): (int) 283616
+282520     13      Void (ID 0xEC): (bytearray)
+282535   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+288058    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+288061      1      ChannelIDRef (ID 0xB0): (int) 32
+288064      3      StartTimeCodeAbs (ID 0xB8): (int) 277875
+288069      3      EndTimeCodeAbs (ID 0xB9): (int) 282836
+288074      1      ChannelFlags (ID 0xB1): (int) 0
+288077     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+288097      3      MediaWriteLatency (ID 0xBE): (int) 285429
+288102     13      Void (ID 0xEC): (bytearray)
+288117    360      ChannelDataPayload (ID 0xB2): (bytearray)
+288480   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+288483      1      ChannelIDRef (ID 0xB0): (int) 8
+288486      3      StartTimeCodeAbs (ID 0xB8): (int) 283571
+288491      3      EndTimeCodeAbs (ID 0xB9): (int) 289594
+288496      1      ChannelFlags (ID 0xB1): (int) 0
+288499     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+288519      3      MediaWriteLatency (ID 0xBE): (int) 289645
+288524     13      Void (ID 0xEC): (bytearray)
+288539   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+294062    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+294065      1      ChannelIDRef (ID 0xB0): (int) 32
+294068      3      StartTimeCodeAbs (ID 0xB8): (int) 282920
+294073      3      EndTimeCodeAbs (ID 0xB9): (int) 287882
+294078      1      ChannelFlags (ID 0xB1): (int) 0
+294081     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+294101      3      MediaWriteLatency (ID 0xBE): (int) 290475
+294106     13      Void (ID 0xEC): (bytearray)
+294121    360      ChannelDataPayload (ID 0xB2): (bytearray)
+294484    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+294487      1      ChannelIDRef (ID 0xB0): (int) 32
+294490      3      StartTimeCodeAbs (ID 0xB8): (int) 287966
+294495      3      EndTimeCodeAbs (ID 0xB9): (int) 292928
+294500      1      ChannelFlags (ID 0xB1): (int) 0
+294503     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+294523      3      MediaWriteLatency (ID 0xBE): (int) 295521
+294528     13      Void (ID 0xEC): (bytearray)
+294543    360      ChannelDataPayload (ID 0xB2): (bytearray)
+294906   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+294909      1      ChannelIDRef (ID 0xB0): (int) 8
+294912      3      StartTimeCodeAbs (ID 0xB8): (int) 289600
+294917      3      EndTimeCodeAbs (ID 0xB9): (int) 295623
+294922      1      ChannelFlags (ID 0xB1): (int) 0
+294925     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+294945      3      MediaWriteLatency (ID 0xBE): (int) 295674
+294950     13      Void (ID 0xEC): (bytearray)
+294965   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+300488    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+300491      1      ChannelIDRef (ID 0xB0): (int) 32
+300494      3      StartTimeCodeAbs (ID 0xB8): (int) 293012
+300499      3      EndTimeCodeAbs (ID 0xB9): (int) 297974
+300504      1      ChannelFlags (ID 0xB1): (int) 0
+300507     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+300527      3      MediaWriteLatency (ID 0xBE): (int) 300567
+300532     13      Void (ID 0xEC): (bytearray)
+300547    360      ChannelDataPayload (ID 0xB2): (bytearray)
+300910   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+300913      1      ChannelIDRef (ID 0xB0): (int) 8
+300916      3      StartTimeCodeAbs (ID 0xB8): (int) 295630
+300921      3      EndTimeCodeAbs (ID 0xB9): (int) 301652
+300926      1      ChannelFlags (ID 0xB1): (int) 0
+300929     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+300949      3      MediaWriteLatency (ID 0xBE): (int) 301703
+300954     13      Void (ID 0xEC): (bytearray)
+300969   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+306492    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+306495      1      ChannelIDRef (ID 0xB0): (int) 32
+306498      3      StartTimeCodeAbs (ID 0xB8): (int) 298058
+306503      3      EndTimeCodeAbs (ID 0xB9): (int) 303019
+306508      1      ChannelFlags (ID 0xB1): (int) 0
+306511     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+306531      3      MediaWriteLatency (ID 0xBE): (int) 305613
+306536     13      Void (ID 0xEC): (bytearray)
+306551    360      ChannelDataPayload (ID 0xB2): (bytearray)
+306914   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+306917      1      ChannelIDRef (ID 0xB0): (int) 8
+306920      3      StartTimeCodeAbs (ID 0xB8): (int) 301659
+306925      3      EndTimeCodeAbs (ID 0xB9): (int) 307681
+306930      1      ChannelFlags (ID 0xB1): (int) 0
+306933     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+306953      3      MediaWriteLatency (ID 0xBE): (int) 307732
+306958     13      Void (ID 0xEC): (bytearray)
+306973   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+312496    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+312499      1      ChannelIDRef (ID 0xB0): (int) 32
+312502      3      StartTimeCodeAbs (ID 0xB8): (int) 303103
+312507      3      EndTimeCodeAbs (ID 0xB9): (int) 308065
+312512      1      ChannelFlags (ID 0xB1): (int) 0
+312515     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+312535      3      MediaWriteLatency (ID 0xBE): (int) 310658
+312540     13      Void (ID 0xEC): (bytearray)
+312555    360      ChannelDataPayload (ID 0xB2): (bytearray)
+312918   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+312921      1      ChannelIDRef (ID 0xB0): (int) 8
+312924      3      StartTimeCodeAbs (ID 0xB8): (int) 307687
+312929      3      EndTimeCodeAbs (ID 0xB9): (int) 313710
+312934      1      ChannelFlags (ID 0xB1): (int) 0
+312937     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+312957      3      MediaWriteLatency (ID 0xBE): (int) 313761
+312962     13      Void (ID 0xEC): (bytearray)
+312977   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+318500    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+318503      1      ChannelIDRef (ID 0xB0): (int) 32
+318506      3      StartTimeCodeAbs (ID 0xB8): (int) 308149
+318511      3      EndTimeCodeAbs (ID 0xB9): (int) 313111
+318516      1      ChannelFlags (ID 0xB1): (int) 0
+318519     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+318539      3      MediaWriteLatency (ID 0xBE): (int) 315705
+318544     13      Void (ID 0xEC): (bytearray)
+318559    360      ChannelDataPayload (ID 0xB2): (bytearray)
+318922   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+318925      1      ChannelIDRef (ID 0xB0): (int) 8
+318928      3      StartTimeCodeAbs (ID 0xB8): (int) 313717
+318933      3      EndTimeCodeAbs (ID 0xB9): (int) 319739
+318938      1      ChannelFlags (ID 0xB1): (int) 0
+318941     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+318961      3      MediaWriteLatency (ID 0xBE): (int) 319790
+318966     13      Void (ID 0xEC): (bytearray)
+318981   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+324504    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+324507      1      ChannelIDRef (ID 0xB0): (int) 32
+324510      3      StartTimeCodeAbs (ID 0xB8): (int) 313195
+324515      3      EndTimeCodeAbs (ID 0xB9): (int) 318157
+324520      1      ChannelFlags (ID 0xB1): (int) 0
+324523     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+324543      3      MediaWriteLatency (ID 0xBE): (int) 320751
+324548     13      Void (ID 0xEC): (bytearray)
+324563    360      ChannelDataPayload (ID 0xB2): (bytearray)
+324926   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+324929      1      ChannelIDRef (ID 0xB0): (int) 8
+324932      3      StartTimeCodeAbs (ID 0xB8): (int) 319746
+324937      3      EndTimeCodeAbs (ID 0xB9): (int) 325768
+324942      1      ChannelFlags (ID 0xB1): (int) 0
+324945     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+324965      3      MediaWriteLatency (ID 0xBE): (int) 325843
+324970     13      Void (ID 0xEC): (bytearray)
+324985   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+330508    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+330511      1      ChannelIDRef (ID 0xB0): (int) 32
+330514      3      StartTimeCodeAbs (ID 0xB8): (int) 318241
+330519      3      EndTimeCodeAbs (ID 0xB9): (int) 323203
+330524      1      ChannelFlags (ID 0xB1): (int) 0
+330527     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+330547      3      MediaWriteLatency (ID 0xBE): (int) 326125
+330552     13      Void (ID 0xEC): (bytearray)
+330567    360      ChannelDataPayload (ID 0xB2): (bytearray)
+330930    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+330933      1      ChannelIDRef (ID 0xB0): (int) 32
+330936      3      StartTimeCodeAbs (ID 0xB8): (int) 323287
+330941      3      EndTimeCodeAbs (ID 0xB9): (int) 328250
+330946      1      ChannelFlags (ID 0xB1): (int) 0
+330949     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+330969      3      MediaWriteLatency (ID 0xBE): (int) 330844
+330974     13      Void (ID 0xEC): (bytearray)
+330989    360      ChannelDataPayload (ID 0xB2): (bytearray)
+331352   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+331355      1      ChannelIDRef (ID 0xB0): (int) 8
+331358      3      StartTimeCodeAbs (ID 0xB8): (int) 325774
+331363      3      EndTimeCodeAbs (ID 0xB9): (int) 331797
+331368      1      ChannelFlags (ID 0xB1): (int) 0
+331371     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+331391      3      MediaWriteLatency (ID 0xBE): (int) 331848
+331396     13      Void (ID 0xEC): (bytearray)
+331411   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+336934    419    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+336937      1      ChannelIDRef (ID 0xB0): (int) 32
+336940      3      StartTimeCodeAbs (ID 0xB8): (int) 328334
+336945      3      EndTimeCodeAbs (ID 0xB9): (int) 333296
+336950      1      ChannelFlags (ID 0xB1): (int) 0
+336953     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+336973      3      MediaWriteLatency (ID 0xBE): (int) 335890
+336978     13      Void (ID 0xEC): (bytearray)
+336993    360      ChannelDataPayload (ID 0xB2): (bytearray)
+337356   5579    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+337359      1      ChannelIDRef (ID 0xB0): (int) 8
+337362      3      StartTimeCodeAbs (ID 0xB8): (int) 331804
+337367      3      EndTimeCodeAbs (ID 0xB9): (int) 337826
+337372      1      ChannelFlags (ID 0xB1): (int) 0
+337375     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+337395      3      MediaWriteLatency (ID 0xBE): (int) 337877
+337400     13      Void (ID 0xEC): (bytearray)
+337415   5520      ChannelDataPayload (ID 0xB2): (bytearray)
+342938    239    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+342941      1      ChannelIDRef (ID 0xB0): (int) 32
+342944      3      StartTimeCodeAbs (ID 0xB8): (int) 333380
+342949      3      EndTimeCodeAbs (ID 0xB9): (int) 335819
+342954      1      ChannelFlags (ID 0xB1): (int) 0
+342957     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+342977      3      MediaWriteLatency (ID 0xBE): (int) 338321
+342982     13      Void (ID 0xEC): (bytearray)
+342997    180      ChannelDataPayload (ID 0xB2): (bytearray)
+343180    385    ChannelDataBlock (ID 0xA1): (master) 6 subelements
+343183      1      ChannelIDRef (ID 0xB0): (int) 59
+343186      3      StartTimeCodeAbs (ID 0xB8): (int) 193507
+343191      3      EndTimeCodeAbs (ID 0xB9): (int) 334402
+343196      1      ChannelFlags (ID 0xB1): (int) 0
+343199     12      Void (ID 0xEC): (bytearray)
+343213    352      ChannelDataPayload (ID 0xB2): (bytearray)
+343568    479    ChannelDataBlock (ID 0xA1): (master) 8 subelements
+343571      1      ChannelIDRef (ID 0xB0): (int) 8
+343574      3      StartTimeCodeAbs (ID 0xB8): (int) 337833
+343579      3      EndTimeCodeAbs (ID 0xB9): (int) 338285
+343584      1      ChannelFlags (ID 0xB1): (int) 0
+343587     18      ChannelDataMinMeanMax (ID 0xBC): (bytearray)
+343607      3      MediaWriteLatency (ID 0xBE): (int) 338392
+343612     13      Void (ID 0xEC): (bytearray)
+343627    420      ChannelDataPayload (ID 0xB2): (bytearray)
+344050     40    ChannelDataBlock (ID 0xA1): (master) 6 subelements
+344052      1      ChannelIDRef (ID 0xB0): (int) 36
+344055      2      StartTimeCodeAbs (ID 0xB8): (int) 32968
+344059      2      EndTimeCodeAbs (ID 0xB9): (int) 32968
+344063      1      ChannelFlags (ID 0xB1): (int) 0
+344066     16      Void (ID 0xEC): (bytearray)
+344084      6      ChannelDataPayload (ID 0xB2): (bytearray)
+344092     40    ChannelDataBlock (ID 0xA1): (master) 6 subelements
+344094      1      ChannelIDRef (ID 0xB0): (int) 36
+344097      3      StartTimeCodeAbs (ID 0xB8): (int) 65735
+344102      3      EndTimeCodeAbs (ID 0xB9): (int) 65735
+344107      1      ChannelFlags (ID 0xB1): (int) 0
+344110     14      Void (ID 0xEC): (bytearray)
+344126      6      ChannelDataPayload (ID 0xB2): (bytearray)
+344134     40    ChannelDataBlock (ID 0xA1): (master) 6 subelements
+344136      1      ChannelIDRef (ID 0xB0): (int) 36
+344139      3      StartTimeCodeAbs (ID 0xB8): (int) 98501
+344144      3      EndTimeCodeAbs (ID 0xB9): (int) 98501
+344149      1      ChannelFlags (ID 0xB1): (int) 0
+344152     14      Void (ID 0xEC): (bytearray)
+344168      6      ChannelDataPayload (ID 0xB2): (bytearray)
+344176     40    ChannelDataBlock (ID 0xA1): (master) 6 subelements
+344178      1      ChannelIDRef (ID 0xB0): (int) 36
+344181      3      StartTimeCodeAbs (ID 0xB8): (int) 131267
+344186      3      EndTimeCodeAbs (ID 0xB9): (int) 131267
+344191      1      ChannelFlags (ID 0xB1): (int) 0
+344194     14      Void (ID 0xEC): (bytearray)
+344210      6      ChannelDataPayload (ID 0xB2): (bytearray)
+344218     40    ChannelDataBlock (ID 0xA1): (master) 6 subelements
+344220      1      ChannelIDRef (ID 0xB0): (int) 36
+344223      3      StartTimeCodeAbs (ID 0xB8): (int) 164033
+344228      3      EndTimeCodeAbs (ID 0xB9): (int) 164033
+344233      1      ChannelFlags (ID 0xB1): (int) 0
+344236     14      Void (ID 0xEC): (bytearray)
+344252      6      ChannelDataPayload (ID 0xB2): (bytearray)
+344260     40    ChannelDataBlock (ID 0xA1): (master) 6 subelements
+344262      1      ChannelIDRef (ID 0xB0): (int) 36
+344265      3      StartTimeCodeAbs (ID 0xB8): (int) 196800
+344270      3      EndTimeCodeAbs (ID 0xB9): (int) 196800
+344275      1      ChannelFlags (ID 0xB1): (int) 0
+344278     14      Void (ID 0xEC): (bytearray)
+344294      6      ChannelDataPayload (ID 0xB2): (bytearray)
+344302     40    ChannelDataBlock (ID 0xA1): (master) 6 subelements
+344304      1      ChannelIDRef (ID 0xB0): (int) 36
+344307      3      StartTimeCodeAbs (ID 0xB8): (int) 229566
+344312      3      EndTimeCodeAbs (ID 0xB9): (int) 229566
+344317      1      ChannelFlags (ID 0xB1): (int) 0
+344320     14      Void (ID 0xEC): (bytearray)
+344336      6      ChannelDataPayload (ID 0xB2): (bytearray)
+344344     40    ChannelDataBlock (ID 0xA1): (master) 6 subelements
+344346      1      ChannelIDRef (ID 0xB0): (int) 36
+344349      3      StartTimeCodeAbs (ID 0xB8): (int) 262332
+344354      3      EndTimeCodeAbs (ID 0xB9): (int) 262332
+344359      1      ChannelFlags (ID 0xB1): (int) 0
+344362     14      Void (ID 0xEC): (bytearray)
+344378      6      ChannelDataPayload (ID 0xB2): (bytearray)
+344386     40    ChannelDataBlock (ID 0xA1): (master) 6 subelements
+344388      1      ChannelIDRef (ID 0xB0): (int) 36
+344391      3      StartTimeCodeAbs (ID 0xB8): (int) 295099
+344396      3      EndTimeCodeAbs (ID 0xB9): (int) 295099
+344401      1      ChannelFlags (ID 0xB1): (int) 0
+344404     14      Void (ID 0xEC): (bytearray)
+344420      6      ChannelDataPayload (ID 0xB2): (bytearray)
+344428     40    ChannelDataBlock (ID 0xA1): (master) 6 subelements
+344430      1      ChannelIDRef (ID 0xB0): (int) 36
+344433      3      StartTimeCodeAbs (ID 0xB8): (int) 327865
+344438      3      EndTimeCodeAbs (ID 0xB9): (int) 327865
+344443      1      ChannelFlags (ID 0xB1): (int) 0
+344446     14      Void (ID 0xEC): (bytearray)
+344462      6      ChannelDataPayload (ID 0xB2): (bytearray)
+344470     15    Attribute (ID 0x6110): (master) 2 subelements
+344474      8      AttributeName (ID 0x612F): (unicode) u'ExitCond'
+344485      1      UIntAttribute (ID 0x6121): (int) 1
+344489     40    ChannelDataBlock (ID 0xA1): (master) 6 subelements
+344491      1      ChannelIDRef (ID 0xB0): (int) 36
+344494      3      StartTimeCodeAbs (ID 0xB8): (int) 338315
+344499      3      EndTimeCodeAbs (ID 0xB9): (int) 338315
+344504      1      ChannelFlags (ID 0xB1): (int) 0
+344507     14      Void (ID 0xEC): (bytearray)
+344523      6      ChannelDataPayload (ID 0xB2): (bytearray)
+344531      4    Sync (ID 0xFA): (bytearray)
+344537      4    ElementTag (ID 0xFC): (int) -408125543
