@@ -46,6 +46,7 @@ class Test(unittest.TestCase):
         ebmlDoc2 = schema.load(ebmlFile2, headers=True)
         mkvRoot2 = util.toXml(ebmlDoc2)
         xmlString2 = ET.tostring(mkvRoot2, encoding='UTF-8')
+        # self.assertEqual(xmlString1, xmlString2, "xml strings aren't matching up")
         with open(xmlFile2, 'wt') as f:
             f.write(xmlString2)
 
@@ -66,6 +67,8 @@ class Test(unittest.TestCase):
             for x in xmlEls2.pop(0).children.values():
                 if issubclass(x, core.Element):
                     xmlEls2.append(x)
+
+
     def testIde(self):
         """ Test the functionality of the ebmlite library by converting a known
             good IDE file (a derivative of EBML) back and forth, then compare
@@ -86,7 +89,7 @@ class Test(unittest.TestCase):
 
         # Save xml
         with open(xmlFile1, 'wt') as f:
-            f.write(xmlString1)
+            f.write(xmlString1.replace('><', '>\r\n<'))
 
         # Convert xml2ebml
         with open(ebmlFile2, 'wb') as out:
@@ -97,7 +100,7 @@ class Test(unittest.TestCase):
         mkvRoot2 = util.toXml(ebmlDoc2)
         xmlString2 = ET.tostring(mkvRoot2, encoding='UTF-8')
         with open(xmlFile2, 'wt') as f:
-            f.write(xmlString2)
+            f.write(xmlString2.replace('><', '>\r\n<'))
 
         # Load back the XML files in order to compare the two
         xmlDoc1 = util.loadXml(xmlFile1, schema)
@@ -134,6 +137,29 @@ class Test(unittest.TestCase):
                                         newl='\n',
                                         encoding='utf-8')
 
+
+    def testInfiniteElement(self):
+        """ Test parsing an EBML file with an infinite-length element. """
+        schemaFile = './schemata/matroska.xml'
+        ebmlFile1 = './tests/video-2.mkv'
+        ebmlFile2 = './tests/video-3.mkv'
+        xmlFile1 = './tests/video-2.xml'
+        xmlFile2 = './tests/video-3.xml'
+
+        schema = core.loadSchema(schemaFile)
+
+        ebmlDoc1 = schema.load(ebmlFile1, headers=True)
+        ebmlRoot1 = util.toXml(ebmlDoc1)
+        xmlString1 = ET.tostring(ebmlRoot1, encoding='UTF-8')
+        with open(xmlFile1, 'wt') as f:
+            f.write(xmlString1.replace('><', '>\r\n<'))
+        ebmlDoc2 = schema.load(ebmlFile2, headers=True)
+        ebmlRoot2 = util.toXml(ebmlDoc2)
+        xmlString2 = ET.tostring(ebmlRoot2, encoding='UTF-8')
+        with open(xmlFile2, 'wt') as f:
+            f.write(xmlString2.replace('><', '>\r\n<'))
+
+        self.assertEqual(xmlString1, xmlString2, 'The XML for the regular file and the infinite length file are different')
 
 
 if __name__ == "__main__":

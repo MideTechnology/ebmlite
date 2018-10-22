@@ -117,6 +117,8 @@ def readElementSize(stream):
         size = _struct_uint64_unpack((chr(size) + stream.read(length-1)
                                       ).rjust(8,'\x00'))[0]
 
+    # print("size = %x, length = %x" % (size, int(2**(7*length))))
+
     if size == (2**(7*length)) - 1:
         # EBML 'unknown' size, all bytes 0xFF
         size = None
