@@ -143,23 +143,29 @@ class Test(unittest.TestCase):
         schemaFile = './schemata/matroska.xml'
         ebmlFile1 = './tests/video-2.mkv'
         ebmlFile2 = './tests/video-3.mkv'
-        xmlFile1 = './tests/video-2.xml'
-        xmlFile2 = './tests/video-3.xml'
 
         schema = core.loadSchema(schemaFile)
 
+        # Convert the MKV files into human-readable xml strings
         ebmlDoc1 = schema.load(ebmlFile1, headers=True)
         ebmlRoot1 = util.toXml(ebmlDoc1)
-        xmlString1 = ET.tostring(ebmlRoot1, encoding='UTF-8')
-        with open(xmlFile1, 'wt') as f:
-            f.write(xmlString1.replace('><', '>\r\n<'))
+        xmlString1 = ET.tostring(ebmlRoot1, encoding='UTF-8').replace('><', '>\r\n<')
+
         ebmlDoc2 = schema.load(ebmlFile2, headers=True)
         ebmlRoot2 = util.toXml(ebmlDoc2)
-        xmlString2 = ET.tostring(ebmlRoot2, encoding='UTF-8')
-        with open(xmlFile2, 'wt') as f:
-            f.write(xmlString2.replace('><', '>\r\n<'))
+        xmlString2 = ET.tostring(ebmlRoot2, encoding='UTF-8').replace('><', '>\r\n<')
 
-        self.assertEqual(xmlString1, xmlString2, 'The XML for the regular file and the infinite length file are different')
+        # Convert the xml strings into lists of lines to make comparison easier,
+        # dropping the second line because that will reference different source
+        # file names
+        xmlLines1 = xmlString1.splitlines()
+        xmlLines1 = [xmlLines1[0]] + xmlLines1[2:]
+        xmlLines2 = xmlString2.splitlines()
+        xmlLines2 = [xmlLines2[0]] + xmlLines2[2:]
+
+        # Compare as lists to narrow the location of any differences
+        self.assertListEqual(xmlLines1, xmlLines2,
+                             'One or more lines are different in the xml documents')
 
 
 if __name__ == "__main__":
