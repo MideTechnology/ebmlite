@@ -11,3 +11,6 @@
 *.pyc
 *.zip
 *~
+
+build/*
+dist/*
