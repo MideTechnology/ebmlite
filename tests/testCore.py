@@ -522,7 +522,7 @@ class testMasterElements(unittest.TestCase):
     def testLen(self):
         """ Test getting the length of a MasterElement. """
 
-        self.assertEqual(len(self.element), 0)
+        self.assertEqual(len(self.element), 1)
     
     
     
