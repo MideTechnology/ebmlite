@@ -11,7 +11,7 @@ from xml.dom.minidom import parseString
 # =======================================
 
 # Files to use in this example
-schemaFile = './schemata/mide.xml'
+schemaFile = './schemata/mide_ide.xml'
 ebmlFile1  = './tests/SSX46714-doesnot.IDE'
 xmlFile1   = './tests/example-xml.xml'
 
@@ -37,7 +37,7 @@ with open(xmlFile1, 'wt') as f:
 # =======================================
 
 # Files to use in this example
-schemaFile = './schemata/mide.xml'
+schemaFile = './schemata/mide_ide.xml'
 ebmlFile1  = './tests/example-ebml.ide'
 xmlFile1   = './tests/example-xml.xml'
 
@@ -56,7 +56,7 @@ xmlDoc1 = loadXml(xmlFile1, schema)
 # =======================================
 
 # Files to use in this example
-schemaFile = './schemata/mide.xml'
+schemaFile = './schemata/mide_ide.xml'
 ebmlFile1  = './tests/example-ebml.ide'
 prettyXml  = './tests/example-pretty.txt'
 
@@ -75,7 +75,7 @@ pprint(ebmlDoc1, out=open(prettyXml, 'wt'))
 # =======================================
 
 # Files to use in this example
-schemaFile = './schemata/mide.xml'
+schemaFile = './schemata/mide_ide.xml'
 ebmlFile1  = './tests/example-ebml.ide'
 
 # load the schema to use with these files.  This creates an object that is used
