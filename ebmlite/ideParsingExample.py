@@ -10,7 +10,7 @@ def getTypeMatch(el, elType):
 
 
 # Load the IDE file.
-schemaFile = './schemata/mide.xml'
+schemaFile = './schemata/mide_ide.xml'
 ebmlFile = './tests/SSX46714-doesNot.ide'
 schema = core.loadSchema(schemaFile)
 ideRoot = schema.load(ebmlFile)

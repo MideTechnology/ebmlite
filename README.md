@@ -5,7 +5,7 @@ _ebmlite_ is a lightweight, "pure Python" library for parsing EBML (Extensible B
 
 _ebmlite_ is currently a work-in-progress. It is usable (we use it extensively), but does not (yet) implement the full EBML specification. It is not currently an `setuptools` package; to use it, it must be explicitly placed where it can be imported (e.g. in the `PYTHONPATH`).
 
-Parts of _ebmlite_ were modeled after [python-ebml](https://github.com/jspiros/python-ebml), which we had previously been using, but is not a directly derivative work. _ebmlite_ can import _python-ebml_ schemata XML, but that is the extent of its cross-compatibility.
+Parts of _ebmlite_ were modeled after [python-ebml](https://github.com/jspiros/python-ebml), which we had previously been using, but is not a directly derivative work. _ebmlite_ can import _python-ebml_ schemata XML (to a limited extent), but that is the extent of its cross-compatibility.
 
 EBML Overview (the short version)
 ---------------------------------
@@ -25,7 +25,7 @@ _ebmlite_ schemata are defined in XML. From these XML files, a `Schema` instance
 
 ```python
 from ebmlite import loadSchema
-schema = loadSchema('mide.xml')
+schema = loadSchema('mide_ide.xml')
 doc = schema.load('test_file.ebml')
 ```
 
@@ -127,51 +127,51 @@ The functions provided by util.py will expose the majority of functionality need
 Recursively converts EBML elements into xml elements.    
 Argument *el*: an EBML element or document.  
 Optional argument *parent*: The resulting XML element's parent element, if any.  
-Optional argument *offsets*: If `True`, create an ``offset`` attributes for 
-        each generated XML element, containing the corresponding EBML element's 
+Optional argument *offsets*: If `True`, create an ``offset`` attributes for
+        each generated XML element, containing the corresponding EBML element's
         offset.   
-Optional argument *sizes*: If `True`, create ``size`` attributes containing the 
+Optional argument *sizes*: If `True`, create ``size`` attributes containing the
         corresponding EBML element's size.  
-Optional argument *types*: If `True`, create ``type`` attributes containing the 
+Optional argument *types*: If `True`, create ``type`` attributes containing the
         name of the corresponding EBML element type.  
-Optional argument *ids*: If `True`, create ``id`` attributes containing the 
+Optional argument *ids*: If `True`, create ``id`` attributes containing the
         corresponding EBML element's EBML ID.      
-Returns the root of an XML tree created using the xml.etree.ElementTree 
+Returns the root of an XML tree created using the xml.etree.ElementTree
         built-in class.  
 
 
 * util.**xmlElement2ebml**(xmlEl, ebmlFile, schema, [sizeLength=4,] [unknown=True]):  
 Recursively converts XML elements tonight into EBML elements.   
-Argument *xmlEl*: The XML element. Its tag must match an element defined in the 
+Argument *xmlEl*: The XML element. Its tag must match an element defined in the
         `schema`.   
-Argument *ebmlFile*: An open file-like stream, to which the EBML data will be 
+Argument *ebmlFile*: An open file-like stream, to which the EBML data will be
         written.   
-Argument *schema*: An `ebmlite.core.Schema` instance to use when writing the 
+Argument *schema*: An `ebmlite.core.Schema` instance to use when writing the
         EBML document.    
 Optional argument *sizeLength*:    
-Optional argument *unknown*: If `True`, unknown element names will be allowed, 
-        provided their XML elements include an ``id`` attribute with the EBML 
+Optional argument *unknown*: If `True`, unknown element names will be allowed,
+        provided their XML elements include an ``id`` attribute with the EBML
         ID (in hexadecimal).  
 Returns the length of the encoded element, including header and children.   
-Raises *NameError*: raised if an xml element is not present in the schema and 
+Raises *NameError*: raised if an xml element is not present in the schema and
         unknown is False, OR if the xml element does not have an ID.   
 
 
 * util.**xml2ebml**(xmlFile, ebmlFile, schema, [sizeLength=4,] [headers=True,] [unknown=True]):
-Argument *xmlFile*: The XML source. Can be a filename, an open file-like 
+Argument *xmlFile*: The XML source. Can be a filename, an open file-like
         stream, or a parsed XML document.   
-Argument *ebmlFile*: The EBML file to write. Can be a filename or an open 
+Argument *ebmlFile*: The EBML file to write. Can be a filename or an open
         file-like stream.   
-Argument *schema*: The EBML schema to use. Can be a filename or an instance of 
+Argument *schema*: The EBML schema to use. Can be a filename or an instance of
         a `Schema`.   
-Optional argument *sizeLength*: The default length of each element's size 
-        descriptor. Must be large enough to store the largest 'master' element. 
-        If an XML element has a ``sizeLength`` attribute, it will override 
+Optional argument *sizeLength*: The default length of each element's size
+        descriptor. Must be large enough to store the largest 'master' element.
+        If an XML element has a ``sizeLength`` attribute, it will override
         this.   
-Optional argument *headers*: If `True`, generate the standard ``EBML`` EBML 
+Optional argument *headers*: If `True`, generate the standard ``EBML`` EBML
         element if the XML document does not contain one.   
-Optional argument *unknown*: If `True`, unknown element names will be allowed, 
-        provided their XML elements include an ``id`` attribute with the EBML 
+Optional argument *unknown*: If `True`, unknown element names will be allowed,
+        provided their XML elements include an ``id`` attribute with the EBML
         ID (in hexadecimal).   
 Returns the size of the ebml file in bytes.   
 Raises NameError: raises if an xml element is not present in the schema.
@@ -179,18 +179,18 @@ Raises NameError: raises if an xml element is not present in the schema.
 
 * util.**loadXml**(xmlFile, schema, [ebmlFile=``None``]):    
 Helpful utility to load an EBML document from an XML file.    
-Argument *xmlFile*: The XML source. Can be a filename, an open file-like 
+Argument *xmlFile*: The XML source. Can be a filename, an open file-like
         stream, or a parsed XML document.   
-Argument *schema*: The EBML schema to use. Can be a filename or an instance of 
+Argument *schema*: The EBML schema to use. Can be a filename or an instance of
         a `Schema`.   
-Optional Argument *ebmlFile*: The name of the temporary EBML file to write, or 
-        ``:memory:`` to use RAM (like `sqlite3`). Defaults to an 
+Optional Argument *ebmlFile*: The name of the temporary EBML file to write, or
+        ``:memory:`` to use RAM (like `sqlite3`). Defaults to an
         automatically-generated temporary file.   
 Returns the root node of the specified EBML file
 
- 
+
 * util.**pprint**:    
-Test function to recursively crawl an EBML document or element and print its 
+Test function to recursively crawl an EBML document or element and print its
         structure, with child elements shown indented.    
 Argument *el*: An instance of a `Document` or `Element` subclass.    
 Argument *values*: If `True`, show elements' values.    
@@ -200,7 +200,7 @@ Optional argument *indent*: The string containing the character(s) used for each
 
 Utils can also be called from the command line with the following syntax:
 ```commandline
-python util.py {xml2ebml|ebml2xml|view} {FILE1.ebml|FILE1.xml} SCHEMA.xml [-o {FILE2.xml|FILE2.ebml}] [-c|--clobber] [-p|--pretty] 
+python util.py {xml2ebml|ebml2xml|view} {FILE1.ebml|FILE1.xml} SCHEMA.xml [-o {FILE2.xml|FILE2.ebml}] [-c|--clobber] [-p|--pretty]
 ```
 The program requires you to specify a mode: xml2ebml, ebml2xml, or view.  The first two modes convert xml files to ebml files and ebml files to xml files, respectively; the last mode formats an IDE file to be human-readable.  
 FILE1: The location of the ebml or xml file to convert/view.  
@@ -208,7 +208,7 @@ SCHEMA: The location of the schema to use when interpreting these files.
 FILE2: The location to output to; otherwise, the output is directed into the console.  
 -c|--clobber: If FILE2 exists, then overwrite it, otherwise the program will fail.  
 -p|--pretty: Prints the output in a human-readable format.
-    
+
 
 To Do
 =====
