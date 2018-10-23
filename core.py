@@ -9,15 +9,15 @@ EBML files quickly and efficiently, and that's about it.
     compromise until proper fix: handle root 'master' elements differently
     than deeper ones, more like the current `Document`.
 @todo: Validation. Enforce the hierarchy defined in each schema.
-@todo: Proper support for 'infinite' master elements (i.e `size` is `None`).
-    Requires validation; an invalid child element indicates the end of
-    the 'infinite' master.
+@todo: Optimize 'infinite' master elements (i.e `size` is `None`). See notes
+    in `MasterElement` class' method definitions.
 @todo: Improved `MasterElement.__eq__()` method, possibly doing a recursive
     crawl of both elements and comparing the actual contents, or iterating
     over chunks of the raw binary data. Current implementation doesn't check
     element contents, just ID and payload size (for speed).
 @todo: Document-wide caching, for future handling of streamed data. Affects
-    the longer-term streaming TODO, listed below.
+    the longer-term streaming TODO (listed below) and optimization of
+    'infinite' elements (listed above).
 @todo: Clean up and standardize usage of the term 'size' versus 'length.'
 @todo: General documentation (more detailed than the README) and examples.
 @todo: Document the best way to load schemata in a PyInstaller executable.
@@ -78,7 +78,8 @@ SCHEMATA = {}
 #===============================================================================
 
 class Element(object):
-    """ Base class for all EBML elements.
+    """ Base class for all EBML elements. Each data type has its own subclass,
+        and these subclasses get subclassed when a Schema is read.
 
         @cvar id: The element's EBML ID.
         @cvar name: The element's name.
@@ -97,6 +98,9 @@ class Element(object):
         @cvar length: An explicit length (in bytes) of the element when
             encoding. `None` will use standard EBML variable-length encoding.
     """
+    # Parent `Schema`
+    schema = None
+
     # Python native data type.
     dtype = bytearray
 
@@ -140,9 +144,6 @@ class Element(object):
         self.size = size
         self.payloadOffset = payloadOffset
         self._value = None
-
-        # For python-ebml compatibility. Remove later.
-        self.bodySize = size + (payloadOffset - offset)
 
 
     def __repr__(self):
@@ -218,7 +219,7 @@ class Element(object):
 
 
     @classmethod
-    def encode(cls, value, length=None, lengthSize=None):
+    def encode(cls, value, length=None, lengthSize=None, infinite=False):
         """ Encode an EBML element.
 
             @param value: The value to encode, or a list of values to encode.
@@ -231,6 +232,8 @@ class Element(object):
                 size, overriding the variable length encoding.
             @return: A bytearray containing the encoded EBML data.
         """
+        if infinite and not issubclass(cls, MasterElement):
+            raise ValueError("Only Master elements can have 'infinite' lengths")
         length = cls.length if length is None else length
         if isinstance(value, (list, tuple)):
             if not cls.multiple:
@@ -238,10 +241,10 @@ class Element(object):
                                  % cls.name)
             result = bytearray()
             for v in value:
-                result.extend(cls.encode(v, length=length, lengthSize=lengthSize))
+                result.extend(cls.encode(v, length, lengthSize, infinite))
             return result
         payload = cls.encodePayload(value, length=length)
-        length = length or len(payload)
+        length = None if infinite else (length or len(payload))
         encId = encoding.encodeId(cls.id)
         return encId + encoding.encodeSize(length, lengthSize) + payload
 
@@ -364,7 +367,6 @@ class StringElement(Element):
         return encoding.encodeString(data, length)
 
 
-
 #===============================================================================
 
 class UnicodeElement(StringElement):
@@ -410,7 +412,6 @@ class DateElement(IntegerElement):
     def encodePayload(cls, data, length=None):
         """ Type-specific payload encoder for date elements. """
         return encoding.encodeDate(data, length)
-
 
 
 #===============================================================================
@@ -484,10 +485,18 @@ class MasterElement(Element):
         return self.value
 
 
-    def parseElement(self, stream):
+    def parseElement(self, stream, nocache=False):
         """ Read the next element from a stream, instantiate a `MasterElement`
             object, and then return it and the offset of the next element
             (this element's position + size).
+
+            @param stream: The source file-like stream.
+            @keyword nocache: If `True`, the parsed element's `precache`
+                attribute is ignored, and the element's value will not be
+                cached. For faster iteration when the element value doesn't
+                matter (e.g. counting child elements).
+            @return: The parsed element and the offset of the next element
+                (i.e. the end of the parsed element).
         """
         offset = stream.tell()
         eid, idlen = readElementID(stream)
@@ -495,10 +504,6 @@ class MasterElement(Element):
         payloadOffset = offset + idlen + sizelen
 
         try:
-            # TODO: Enforce structure dictated by the schema by using only the
-            # elements that are children of this one, or are 'global.' Also,
-            # handle 'unknown' size elements, which end with the first invalid
-            # child element.
             etype = self.schema.elements[eid]
             el = etype(stream, offset, esize, payloadOffset)
         except KeyError:
@@ -506,22 +511,91 @@ class MasterElement(Element):
             el.id = eid
             el.schema = getattr(self, "schema", None)
 
-        if el.precache:
+        if el.precache and not nocache:
             # Read the value now, avoiding a seek later.
-            el._value = el.parse(stream, esize)
+            el._value = el.parse(stream, el.size)
 
-        return el, payloadOffset + esize
+        return el, payloadOffset + el.size
 
 
-    def __iter__(self):
-        # TODO: Support elements with 'unknown' length (quit when an invalid
-        # child element is read).
+    @classmethod
+    def _isValidChild(cls, elId):
+        """ Is the given element ID represent a valid sub-element, i.e.
+            explicitly specified as a child element or a 'global' in the
+            schema?
+        """
+        if not cls.children:
+            return False
+
+        try:
+            return elId in cls._childIds
+        except AttributeError:
+            # The set of valid child IDs hasn't been created yet.
+            cls._childIds = set(cls.children)
+            if cls.schema is not None:
+                cls._childIds.update(cls.schema.globals)
+            return elId in cls._childIds
+
+
+    @property
+    def size(self):
+        """ The element's size. Master elements can be instantiated with this
+            as `None`; this denotes an 'infinite' EBML element, and its size
+            will be determined by iterating over its contents until an invalid
+            child type is found, or the end-of-file is reached.
+        """
+        try:
+            return self._size
+        except AttributeError:
+            # An "infinite" element (size specified in file is all 0xFF)
+            pos = end = self.payloadOffset
+            numChildren = 0
+            while True:
+                self.stream.seek(pos)
+                end = pos
+                try:
+                    # TODO: Cache parsed elements?
+                    el, pos = self.parseElement(self.stream, nocache=True)
+                    if self._isValidChild(el.id):
+                        numChildren += 1
+                    else:
+                        break
+                except TypeError as err:
+                    # Will occur at end of file; message will contain "ord()".
+                    if "ord()" in str(err):
+                        break
+                    # Not the expected EOF TypeError!
+                    raise
+
+            self._size = end - self.payloadOffset
+            self._length = numChildren
+            return self._size
+
+
+    @size.setter
+    def size(self, esize):
+        if esize is not None:
+            # Only create the `_size` attribute for a real value. Don't
+            # define it if it's `None`, so `size` will get calculated.
+            self._size = esize
+
+
+    def __iter__(self, nocache=False):
+        """ x.__iter__() <==> iter(x)
+        """
+        # TODO: Better support for 'infinite' elements (getting the size of
+        # an infinite element iterates over it, so there's duplicated effort.)
         pos = self.payloadOffset
         payloadEnd = pos + self.size
         while pos < payloadEnd:
             self.stream.seek(pos)
-            el, pos = self.parseElement(self.stream)
-            yield el
+            try:
+                el, pos = self.parseElement(self.stream, nocache=nocache)
+                yield el
+            except TypeError as err:
+                if "ord()" in str(err):
+                    break
+                raise
 
 
     def __len__(self):
@@ -533,8 +607,8 @@ class MasterElement(Element):
             if self._value is not None:
                 self._length = len(self._value)
             else:
-                # TODO: Iterate without parsing if size isn't `None`
-                for n, _el in enumerate(self):
+                n = 0 # In case there's nothing to enumerate
+                for n, _el in enumerate(self.__iter__(nocache=True), 1):
                     pass
                 self._length = n
         return self._length
@@ -579,12 +653,14 @@ class MasterElement(Element):
     def encodePayload(cls, data, length=None):
         """ Type-specific payload encoder for 'master' elements.
         """
-        if isinstance(data, dict):
+        result = bytearray()
+        if data is None:
+            return result
+        elif isinstance(data, dict):
             data = data.items()
         elif not isinstance(data, (list, tuple)):
             raise TypeError("wrong type for %s payload: %s" % (cls.name,
                                                                type(data)))
-        result = bytearray()
         for k,v in data:
             if k not in cls.schema:
                 raise TypeError("Element type %r not found in schema" % k)
@@ -595,23 +671,34 @@ class MasterElement(Element):
 
 
     @classmethod
-    def encode(cls, data, **kwargs):
+    def encode(cls, data, length=None, lengthSize=None, infinite=False):
         """ Encode an EBML master element.
 
             @param data: The data to encode, provided as a dictionary keyed by
                 element name, a list of two-item name/value tuples, or a list
                 of either. Note: individual items in a list of name/value
                 pairs *must* be tuples!
+            @keyword infinite: If `True`, the element will be written with an
+                undefined size. When parsed, its end will be determined by the
+                occurrence of an invalid child element (or end-of-file).
             @return: A bytearray containing the encoded EBML binary.
         """
+        # TODO: Use 'length' to automatically generate `Void` element?
         if isinstance(data, list) and len(data)>0 and isinstance(data[0],list):
             # List of lists: special case for 'master' elements.
             # Encode as multiple 'master' elements.
             result = bytearray()
             for v in data:
-                result.extend(cls.encode(v))
+                result.extend(cls.encode(v, length=length,
+                                         lengthSize=lengthSize,
+                                         infinite=infinite))
             return result
-        return super(MasterElement, cls).encode(data)
+
+        # TODO: Remove 'infinite' kwarg from `Element.encode()` and handle it
+        # here, since it only applied to Master elements.
+        return super(MasterElement, cls).encode(data, length=length,
+                                                lengthSize=lengthSize,
+                                                infinite=infinite)
 
 
     def dump(self):
@@ -705,11 +792,6 @@ class Document(MasterElement):
             # the Document is actually used.
             pass
 
-        if self.size is not None:
-            self.bodySize = self.size - self.payloadOffset
-        else:
-            self.bodySize = None
-
 
     def __repr__(self):
         """ "x.__repr__() <==> repr(x) """
@@ -733,12 +815,14 @@ class Document(MasterElement):
         try:
             return self._length
         except AttributeError:
-            for n, _el in enumerate(self):
-                self._length = n
+            n = 0 # in case there's nothing to enumerate
+            for n, _el in enumerate(self.__iter__(nocache=True), 1):
+                pass
+            self._length = n
         return self._length
 
 
-    def __iter__(self):
+    def __iter__(self, nocache=False):
         """ Iterate root elements.
         """
         # TODO: Cache root elements, prevent unnecessary duplicates. Maybe a
@@ -747,7 +831,7 @@ class Document(MasterElement):
         while True:
             self.stream.seek(pos)
             try:
-                el, pos = self.parseElement(self.stream)
+                el, pos = self.parseElement(self.stream, nocache=nocache)
                 yield el
             except TypeError as err:
                 # Occurs at end of file (parsing 0 length string), it's okay.
@@ -773,10 +857,14 @@ class Document(MasterElement):
         if isinstance(idx, (int, long)):
             if idx < 0:
                 raise IndexError("Negative indices in a Document not (yet) supported")
+            n = None
             for n, el in enumerate(self):
                 if n == idx:
                     return el
-            raise IndexError("list index out of range (0-%d)" % (n-1))
+            if n is None:
+                # If object being enumerated is empty, `n` is never set.
+                raise IndexError("Document contained no readable data")
+            raise IndexError("list index out of range (0-%d)" % n)
         elif isinstance(idx, slice):
             raise IndexError("Document root slicing not (yet) supported")
         else:
