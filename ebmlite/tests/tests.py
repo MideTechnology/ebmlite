@@ -74,7 +74,7 @@ class Test(unittest.TestCase):
             good IDE file (a derivative of EBML) back and forth, then compare
             the results.
         """
-        schemaFile = './schemata/mide.xml'
+        schemaFile = './schemata/mide_ide.xml'
         ebmlFile1 = './tests/SSX46714-doesnot.IDE'
         ebmlFile2 = './tests/SSX46714-new.IDE'
         xmlFile1 = './tests/ssx-1.xml'
@@ -124,7 +124,7 @@ class Test(unittest.TestCase):
 
     def testPPrint(self):
         """ Test pretty-printing EBML files. """
-        schemaFile = './schemata/mide.xml'
+        schemaFile = './schemata/mide_ide.xml'
         schema = core.loadSchema(schemaFile)
 
         ebmlDoc = schema.load('./tests/SSX46714-doesnot.IDE', headers=True)

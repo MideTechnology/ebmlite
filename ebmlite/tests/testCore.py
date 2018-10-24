@@ -29,7 +29,7 @@ class testCoreElement(unittest.TestCase):
         
         GenericElement = type('GenericElement', (Element,),
                               {'id':0x4343, 'name':'Generic Element',
-                               'schema':loadSchema('./schemata/mide.xml'),
+                               'schema':loadSchema('./schemata/mide_ide.xml'),
                                'mandatory':False, 'multiple':False,
                                'precache':False, 'length':4, 'children':dict(),
                                '__doc__':'no'})
@@ -127,7 +127,7 @@ class testIntElements(unittest.TestCase):
         self.intEl1 = IntegerElement(stream=self.mockStream, offset=0, size=4,
                                      payloadOffset=2)
         self.intEl1.id = 0x7c        
-        self.intEl1.schema = 'mide.xml'
+        self.intEl1.schema = 'mide_ide.xml'
         
         self.uintEl1 = UIntegerElement(stream=self.mockStream, offset=0, size=4,
                                        payloadOffset=2)
@@ -160,15 +160,15 @@ class testIntElements(unittest.TestCase):
         # Create IntegerElements
         intEl1 = IntegerElement(stream=m1, offset=0, size=4, payloadOffset=2)
         intEl1.id = 0x7c
-        intEl1.schema = 'mide.xml'
+        intEl1.schema = 'mide_ide.xml'
         
         intEl2 = IntegerElement(stream=m2, offset=0, size=4, payloadOffset=2)
         intEl2.id = 0x7c
-        intEl2.schema = 'mide.xml'
+        intEl2.schema = 'mide_ide.xml'
         
         intEl3 = IntegerElement(stream=m3, offset=0, size=4, payloadOffset=2)
         intEl3.id = 0x7c
-        intEl3.schema = 'mide.xml'
+        intEl3.schema = 'mide_ide.xml'
 
         # Assert that the first two elements are not equal
         self.assertNotEqual(intEl1, intEl2)
@@ -209,7 +209,7 @@ class testFloatElements(unittest.TestCase):
         self.floatEl = FloatElement(stream=self.mockStream, offset=0, size=4,
                                      payloadOffset=2)
         self.floatEl.id = 0x7c        
-        self.floatEl.schema = 'mide.xml'
+        self.floatEl.schema = 'mide_ide.xml'
     
     
     
@@ -251,12 +251,12 @@ class testStringElements(unittest.TestCase):
         self.strEl1 = StringElement(stream=self.mockStream, offset=0, size=4,
                                      payloadOffset=2)
         self.strEl1.id = 0x7c        
-        self.strEl1.schema = 'mide.xml'
+        self.strEl1.schema = 'mide_ide.xml'
                 
         self.strEl2 = StringElement(stream=self.mockStream, offset=0, size=4,
                                      payloadOffset=2)
         self.strEl2.id = 0x7c        
-        self.strEl2.schema = 'mide.xml'
+        self.strEl2.schema = 'mide_ide.xml'
                 
         self.strEl3 = StringElement(stream=self.mockStream, offset=0, size=8,
                                      payloadOffset=2)
@@ -392,7 +392,7 @@ class testVoidElements(unittest.TestCase):
         self.voiEl = VoidElement(stream=self.mockStream, offset=1, size=4,
                                      payloadOffset=1)
         self.voiEl.id = 0x7c        
-        self.voiEl.schema = 'mide.xml'
+        self.voiEl.schema = 'mide_ide.xml'
     
     
     
@@ -428,17 +428,17 @@ class testUnknownElements(unittest.TestCase):
         self.unkEl1 = VoidElement(stream=self.mockStream, offset=1, size=4,
                                      payloadOffset=1)
         self.unkEl1.id = 0x7c        
-        self.unkEl1.schema = 'mide.xml'
+        self.unkEl1.schema = 'mide_ide.xml'
                 
         self.unkEl2 = VoidElement(stream=self.mockStream, offset=1, size=4,
                                      payloadOffset=1)
         self.unkEl2.id = 0x7c        
-        self.unkEl2.schema = 'mide.xml'
+        self.unkEl2.schema = 'mide_ide.xml'
                 
         self.unkEl3 = VoidElement(stream=self.mockStream, offset=1, size=4,
                                      payloadOffset=1)
         self.unkEl3.id = 0x7d       
-        self.unkEl3.schema = 'mide.xml'
+        self.unkEl3.schema = 'mide_ide.xml'
     
     
     
@@ -458,7 +458,7 @@ class testMasterElements(unittest.TestCase):
     def setUp(self):
         """ Set up a MasterElement with a single UIntegerElement child. """
         
-        schema = loadSchema('./schemata/mide.xml')
+        schema = loadSchema('./schemata/mide_ide.xml')
 
         """ Master Element:   ID: 0x1A45DFA3
                             Size: 0x84
@@ -473,7 +473,7 @@ class testMasterElements(unittest.TestCase):
                                                    offset=0,
                                                    size=4,
                                                    payloadOffset=5)
-        self.element.schema = loadSchema('./schemata/mide.xml')
+        self.element.schema = loadSchema('./schemata/mide_ide.xml')
         self.element.id = 0x1A45DFA3
     
     
@@ -484,7 +484,7 @@ class testMasterElements(unittest.TestCase):
         masterEl = MasterElement()
         masterEl.id = 0x1A45DFA3
         masterEl.size = 4
-        masterEl.schema = loadSchema('./schemata/mide.xml')
+        masterEl.schema = loadSchema('./schemata/mide_ide.xml')
         self.assertEqual(masterEl, self.element)
         
         sEbmlVer = self.element.parse()[0]
@@ -589,9 +589,9 @@ class testDocument(unittest.TestCase):
     
     
     def setUp(self):
-        """ Set up a Schema from mide.xml and create a Document from an IDE file. """
+        """ Set up a Schema from mide_ide.xml and create a Document from an IDE file. """
 
-        self.schema = loadSchema('./schemata/mide.xml')
+        self.schema = loadSchema('./schemata/mide_ide.xml')
         self.doc = self.schema.load('./tests/SSX46714-doesnot.IDE')
         
         self.stream = StringIO('test')
@@ -655,7 +655,7 @@ class testSchema(unittest.TestCase):
 
         import core
         core.SCHEMATA = {}
-        self.schema = loadSchema('./schemata/mide.xml')
+        self.schema = loadSchema('./schemata/mide_ide.xml')
         
         self.stream = StringIO('test')
     
