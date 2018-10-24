@@ -5,7 +5,7 @@ _ebmlite_ is a lightweight, "pure Python" library for parsing EBML (Extensible B
 
 _ebmlite_ is currently a work-in-progress. It is usable (we use it extensively), but does not (yet) implement the full EBML specification.
 
-Parts of _ebmlite_ were modeled after [python-ebml](https://github.com/jspiros/python-ebml), which we had previously been using, but is not a directly derivative work. _ebmlite_ can import _python-ebml_ schemata XML (to a limited extent), but that is the extent of its cross-compatibility.
+Parts of _ebmlite_ were modeled after [python-ebml](https://github.com/jspiros/python-ebml), which we had previously been using, but is not a directly derivative work. _ebmlite_ can import _python-ebml_ schemata XML (to a limited degree), but that is the extent of its cross-compatibility.
 
 EBML Overview (the short version)
 ---------------------------------
@@ -19,7 +19,7 @@ See the [official specification](http://matroska-org.github.io/libebml/specs.htm
 EBML Schemata
 -------------
 
-An EBML file is largely meaningless without a schema that defines its elements. The schema maps element IDs to names and data types; it also describes the structure (e.g. what elements can be children of other elements) and provides additional metadata. *Note: ebmlite does not currently enforce structure.*
+An EBML file is largely meaningless without a schema that defines its elements. The schema maps element IDs to names and data types; it also describes the structure (e.g. what elements can be children of other elements) and provides additional metadata. *Note: ebmlite currently uses the structure for decoding only, and does not stringently enforce it.*
 
 _ebmlite_ schemata are defined in XML. From these XML files, a `Schema` instance is created; within the `Schema` are `Element` subclasses for each element defined in the XML. Since the interpretation of an EBML file is almost entirely dependent on a schema, importing of EBML files is done through a `Schema` instance.
 
@@ -29,7 +29,7 @@ schema = loadSchema('mide_ide.xml')
 doc = schema.load('test_file.ebml')
 ```
 
-_ebmlite_ (currently) uses its own Schema definition syntax; it can also import python-ebml schemata. It does not use the [official schema format](https://github.com/Matroska-Org/ebml-specification/blob/master/specification.markdown#ebml-schema).
+_ebmlite_ uses its own Schema definition syntax; it can also import python-ebml schemata. It does not (currently) use the [official schema format](https://github.com/Matroska-Org/ebml-specification/blob/master/specification.markdown#ebml-schema).
 
 Here is an example of an _ebmlite_ schema, showing a simplified version of the definition of the standard EBML header elements:
 ```xml
