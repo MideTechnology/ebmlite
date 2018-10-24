@@ -3,7 +3,7 @@ _ebmlite_ README
 
 _ebmlite_ is a lightweight, "pure Python" library for parsing EBML (Extensible Binary Markup Language) data. It is designed to crawl through EBML files quickly and efficiently, and that's about it. _ebmlite_ can also do basic EBML encoding, but more advanced EBML manipulation (e.g. with a proper [DOM](https://en.wikipedia.org/wiki/Document_Object_Model)) are beyond its scope, and are better left to other libraries.
 
-_ebmlite_ is currently a work-in-progress. It is usable (we use it extensively), but does not (yet) implement the full EBML specification. It is not currently an `setuptools` package; to use it, it must be explicitly placed where it can be imported (e.g. in the `PYTHONPATH`).
+_ebmlite_ is currently a work-in-progress. It is usable (we use it extensively), but does not (yet) implement the full EBML specification.
 
 Parts of _ebmlite_ were modeled after [python-ebml](https://github.com/jspiros/python-ebml), which we had previously been using, but is not a directly derivative work. _ebmlite_ can import _python-ebml_ schemata XML (to a limited extent), but that is the extent of its cross-compatibility.
 
