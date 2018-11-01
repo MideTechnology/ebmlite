@@ -136,8 +136,17 @@ def encodeInt(val, length=None):
         @return: binary representation of val as a signed integer, left-padded with 00
         @raise ValueError: raised if val is longer than length.
     """
-    pad = b"\xff" if val < 0 else b"\x00"
-    packed = _struct_int64.pack(val).lstrip(pad)
+    if val == 0:
+        packed = ''
+    elif val > 0:
+        packed = _struct_int64.pack(val).lstrip('\x00')
+        if ord(packed[0]) & 0b10000000:
+            packed = '\x00' + packed
+    else:
+        packed = _struct_int64.pack(val).lstrip('\xff')
+        if not ord(packed[0]) & 0b10000000:
+            packed = '\xff' + packed
+
     if length is None:
         return packed
     if len(packed) > length:
