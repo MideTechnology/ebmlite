@@ -10,7 +10,7 @@ Parts of _ebmlite_ were modeled after [python-ebml](https://github.com/jspiros/p
 EBML Overview (the short version)
 ---------------------------------
 
-[EBML](http://matroska-org.github.io/libebml/)  (Extensible Binary Markup Language) is a hierarchical tagged binary format. It bears some functional similarity to XML, although the actual structure differs significantly.
+[EBML](http://matroska-org.github.io/libebml/)  (Extensible Binary Markup Language) is a hierarchical tagged binary format, originally created for the [Matroska](https://www.matroska.org/) project. The hierarchical structure of EBML bears some conceptual/functional similarity to XML, although the actual structure differs significantly.
 
 In the raw, EBML elements consist of a numeric ID, the size of the element, and a payload. It is space-efficient; the lengths of the ID and size descriptors are variable, using prefix bits to indicate their lengths, a system similar to UTF-8. The mapping of IDs to names and payload data types is done via an external schema.
 

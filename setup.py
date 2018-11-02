@@ -5,7 +5,7 @@ with open('README.md', 'r') as fh:
 
 setuptools.setup(
         name='ebmlite',
-        version='1.0.0',
+        version='1.0.1',
         author='Mide Technology',
         author_email='help@mide.com',
         description='A lightweight, "pure Python" library for parsing EBML (Extensible Binary Markup Language) data.',
@@ -16,7 +16,7 @@ setuptools.setup(
                      'License :: OSI Approved :: MIT License',
                      'Natural Language :: English',
                      'Programming Language :: Python :: 2.7'],
-        keywords='ebml binary',
+        keywords='ebml binary matroska webm',
         python_requires='~=2.7',
         packages=setuptools.find_packages(),
         package_dir={'': '.'},
