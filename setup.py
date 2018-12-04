@@ -10,6 +10,7 @@ setuptools.setup(
         author_email='help@mide.com',
         description='A lightweight, "pure Python" library for parsing EBML (Extensible Binary Markup Language) data.',
         long_description=long_description,
+        long_description_content_type='text/markdown',
         url='https://github.com/MideTechnology/ebmlite',
         license='MIT',
         classifiers=['Development Status :: 5 - Production/Stable',
