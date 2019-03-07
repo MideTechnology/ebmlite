@@ -6,6 +6,7 @@ Note: this module does not decode `Document`, `BinaryElement`, or
 and `MasterElement` objects are special cases, and `BinaryElement` objects do
 not require special decoding. 
 """
+from __future__ import division, absolute_import, print_function, unicode_literals
 
 __author__ = "dstokes"
 __copyright__ = "Copyright 2018 Mide Technology Corporation"
@@ -99,7 +100,7 @@ def readElementID(stream):
         raise IOError('Cannot decode element ID with length > 4.')
     if length > 1:
         eid = _struct_uint32_unpack((ch + stream.read(length-1)
-                                     ).rjust(4,'\x00'))[0]
+                                     ).rjust(4, b'\x00'))[0]
     return eid, length
 
 
@@ -115,7 +116,7 @@ def readElementSize(stream):
 
     if length > 1:
         size = _struct_uint64_unpack((chr(size) + stream.read(length-1)
-                                      ).rjust(8,'\x00'))[0]
+                                      ).rjust(8, b'\x00'))[0]
 
     # print("size = %x, length = %x" % (size, int(2**(7*length))))
 
@@ -137,7 +138,7 @@ def readUInt(stream, size):
         return 0
 
     data = stream.read(size)
-    return _struct_uint64_unpack_from(data.rjust(8,'\x00'))[0]
+    return _struct_uint64_unpack_from(data.rjust(8, b'\x00'))[0]
 
 
 def readInt(stream, size):
@@ -152,10 +153,10 @@ def readInt(stream, size):
 
     data = stream.read(size)
     if ord(data[0]) & 0b10000000:
-        pad = '\xff'
+        pad = b'\xff'
     else:
-        pad = '\x00'
-    return _struct_int64_unpack_from(data.rjust(8,pad))[0]
+        pad = b'\x00'
+    return _struct_int64_unpack_from(data.rjust(8, pad))[0]
 
 
 def readFloat(stream, size):
@@ -201,8 +202,12 @@ def readUnicode(stream, size):
         return u''
 
     data = stream.read(size)
-    data = data.partition('\x00')[0]
-    return unicode(data, 'utf_8')
+    try:
+        data = data.partition('\x00')[0]
+    except Exception as e:
+        data = bytearray(data).partition(b'\x00')[0].decode('utf-8')
+        pass
+    return data.encode('utf_8')
 
 
 def readDate(stream, size=8):

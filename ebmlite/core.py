@@ -35,6 +35,7 @@ EBML files quickly and efficiently, and that's about it.
     Eventually, recognize official schemata when loading, like the system
     currently handles legacy ``python-ebml`` schemata.
 '''
+from __future__ import division, absolute_import, print_function, unicode_literals
 
 __author__ = "David Randall Stokes"
 __copyright__ = "Copyright 2018 Mide Technology Corporation"
@@ -49,7 +50,7 @@ from collections import OrderedDict
 from datetime import datetime
 import errno
 import os.path
-from StringIO import StringIO
+from io import BytesIO as StringIO
 from xml.etree import ElementTree as ET
 
 from decoding import readElementID, readElementSize
@@ -125,7 +126,11 @@ class Element(object):
             It is assumed the file pointer is at the start of the payload.
         """
         # Document-wide caching could be implemented here.
-        return  bytearray(stream.read(size))
+        import sys
+        if size > sys.maxint:
+            pass
+        a = stream.read(size)
+        return bytearray(a)
 
 
     def __init__(self, stream=None, offset=0, size=0, payloadOffset=0):
@@ -441,7 +446,7 @@ class VoidElement(BinaryElement):
     def encodePayload(cls, data, length=0):
         """ Type-specific payload encoder for Void elements. """
         length = 0 if length is None else length
-        return bytearray('\xff' * length)
+        return bytearray('\xff' * length, 'utf-16')
 
 
 #===============================================================================
@@ -773,13 +778,14 @@ class Document(MasterElement):
         if size is None:
             # Note: this doesn't work for cStringIO!
             if isinstance(stream, StringIO):
-                self.size = stream.len
+                self.size = len(stream.getvalue())
             elif self.filename and os.path.exists(self.filename):
                 self.size = os.path.getsize(self.stream.name)
 
         self.info = {}
 
-        try:
+        #try:
+        if True:
             # Attempt to read the first element, which should be an EBML header.
             el, pos = self.parseElement(self.stream)
             if el.name == "EBML":
@@ -787,10 +793,12 @@ class Document(MasterElement):
                 self.info = el.dump()
                 if not headers:
                     self.payloadOffset = pos
-        except:
+                    """
+        except Exception as e:
+            print(e)
             # Failed to read the first element. Don't raise here; do that when
             # the Document is actually used.
-            pass
+            pass"""
 
 
     def __repr__(self):
@@ -1036,7 +1044,7 @@ class Schema(object):
         # type (it's technically binary). Use the special `VoidElement` type.
         if 'Void' in self.elementsByName:
             el = self.elementsByName['Void']
-            void = type('VoidElement', (VoidElement,),
+            void = type(b'VoidElement', (VoidElement,),
                         {'id':el.id, 'name':'Void', 'schema':self,
                          'mandatory': el.mandatory, 'multiple': el.multiple})
             self.elements[el.id] = void
@@ -1046,7 +1054,7 @@ class Schema(object):
         self.name = name or self.type
 
         # Create the schema's Document subclass.
-        self.document = type('%sDocument' % self.name.title(), (Document,),
+        self.document = type(b'%sDocument' % self.name.title(), (Document,),
                              {'schema': self, 'children':self.children})
 
 
@@ -1215,10 +1223,10 @@ class Schema(object):
                 isGlobal = _getInt(attribs, 'level', None) == -1
 
             # Create a new Element subclass
-            eclass = type('%sElement' % ename, (baseClass,),
+            eclass = type(b'%sElement' % ename, (baseClass,),
                           {'id':eid, 'name':ename, 'schema':self,
                            'mandatory': mandatory, 'multiple': multiple,
-                           'precache': precache, 'length':length,
+                           'precache': precache, 'length': length,
                            'children': dict(), '__doc__': docs})
 
             self.elements[eid] = eclass

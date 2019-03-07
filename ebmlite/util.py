@@ -10,7 +10,8 @@ Created on Aug 11, 2017
 @todo: Add other options to command-line utility for the other arguments of
     `toXml()` and `xml2ebml()`.
 '''
-from StringIO import StringIO
+from __future__ import division, absolute_import, print_function, unicode_literals
+from io import BytesIO as StringIO
 
 __author__ = "dstokes"
 __copyright__ = "Copyright 2017 Mide Technology Corporation"
@@ -59,7 +60,7 @@ def toXml(el, parent=None, offsets=True, sizes=True, types=True, ids=True):
         xmlEl.set('schemaName', str(el.schema.name))
         xmlEl.set('schemaFile', str(el.schema.filename))
     else:
-        if ids and isinstance(el.id, (int, long)):
+        if ids and isinstance(el.id, (int,)):
             xmlEl.set('id', "0x%X" % el.id)
         if types:
             xmlEl.set('type', el.dtype.__name__)
@@ -75,7 +76,14 @@ def toXml(el, parent=None, offsets=True, sizes=True, types=True, ids=True):
     elif isinstance(el, core.BinaryElement):
         xmlEl.text = b64encode(el.value)
     elif not isinstance(el, core.VoidElement):
-        xmlEl.set('value', unicode(el.value).encode('ascii', 'xmlcharrefreplace'))
+        try:
+            valString = bytes(el.value)
+            encString = valString.encode('utf-8', 'xmlcharrefreplace')
+            xmlEl.set('value', encString)
+        except Exception as e:
+            valString = bytearray(el.value)
+            encString = valString.decode('utf-8', 'xmlcharrefreplace')
+            xmlEl.set('value', encString)
 
     return xmlEl
 

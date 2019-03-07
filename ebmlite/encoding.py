@@ -4,6 +4,7 @@ Functions for encoding EBML elements and their values.
 Note: this module does not encode Document or MasterElement objects; they are
 special cases, handled in `core.py`.
 '''
+from __future__ import division, absolute_import, print_function, unicode_literals
 
 __author__ = "dstokes"
 __copyright__ = "Copyright 2018 Mide Technology Corporation"
@@ -57,11 +58,11 @@ def getLength(val):
         return 3
     elif val <= 268435454:
         return 4
-    elif val <= 34359738366L:
+    elif val <= 34359738366:
         return 5
-    elif val <= 4398046511102L:
+    elif val <= 4398046511102:
         return 6
-    elif val <= 562949953421310L:
+    elif val <= 562949953421310:
         return 7
     else:
         return 8
@@ -145,14 +146,14 @@ def encodeInt(val, length=None):
     """
     if val == 0:
         packed = ''
-        pad = '\x00'
+        pad = b'\x00'
     elif val > 0:
-        pad = '\x00'
+        pad = b'\x00'
         packed = _struct_int64.pack(val).lstrip(pad)
         if ord(packed[0]) & 0b10000000:
             packed = pad + packed
     else:
-        pad = '\xff'
+        pad = b'\xff'
         packed = _struct_int64.pack(val).lstrip(pad)
         if not ord(packed[0]) & 0b10000000:
             packed = pad + packed

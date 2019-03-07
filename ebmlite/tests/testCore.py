@@ -27,7 +27,7 @@ class testCoreElement(unittest.TestCase):
         #     data: 0111 0001  1110 1010
         self.mockStream = StringIO('\x4f\x56\x71\xea')
         
-        GenericElement = type('GenericElement', (Element,),
+        GenericElement = type(b'GenericElement', (Element,),
                               {'id':0x4343, 'name':'Generic Element',
                                'schema':loadSchema('./schemata/mide_ide.xml'),
                                'mandatory':False, 'multiple':False,
@@ -246,7 +246,7 @@ class testStringElements(unittest.TestCase):
             custom data (id: 0x4F40, value: 'bork').
         """
 
-        self.mockStream = StringIO('\x4f\x40bork\x4f\x40bork')
+        self.mockStream = StringIO(b'\x4f\x40bork\x4f\x40bork')
                 
         self.strEl1 = StringElement(stream=self.mockStream, offset=0, size=4,
                                      payloadOffset=2)
@@ -627,7 +627,7 @@ class testDocument(unittest.TestCase):
     def testType(self):
         """ Test getting the type of a Document. """
 
-        self.assertEqual(self.doc.type, 'mide')
+        self.assertEqual('mide', self.doc.type)
         self.doc.info['DocType'] = 'bork'
         self.assertEqual(self.doc.type, 'bork')
     

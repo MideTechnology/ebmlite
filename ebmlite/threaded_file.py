@@ -7,6 +7,7 @@ functionality is transparent.
 
 @author: dstokes
 '''
+from __future__ import division, absolute_import, print_function, unicode_literals
 
 import platform
 from threading import currentThread, Event
