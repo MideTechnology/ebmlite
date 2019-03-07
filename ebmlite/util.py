@@ -23,6 +23,8 @@ from xml.etree import ElementTree as ET
 
 import core, encoding
 
+__all__ = ['toXml', 'xml2ebml', 'loadXml', 'pprint']
+
 #===============================================================================
 #
 #===============================================================================
@@ -84,6 +86,7 @@ def toXml(el, parent=None, offsets=True, sizes=True, types=True, ids=True):
 #
 #===============================================================================
 
+
 def xmlElement2ebml(xmlEl, ebmlFile, schema, sizeLength=4, unknown=True):
     """ Convert an XML element to EBML, recursing if necessary. For converting
         an entire XML document, use `xml2ebml()`.
@@ -102,6 +105,10 @@ def xmlElement2ebml(xmlEl, ebmlFile, schema, sizeLength=4, unknown=True):
         @raise NameError: raised if an xml element is not present in the schema and unknown is False, OR if the xml
             element does not have an ID.
     """
+    if not isinstance(xmlEl.tag, basestring):
+        # (Probably) a comment; disregard.
+        return 0
+        
     try:
         cls = schema[xmlEl.tag]
         encId = encoding.encodeId(cls.id)
@@ -118,7 +125,7 @@ def xmlElement2ebml(xmlEl, ebmlFile, schema, sizeLength=4, unknown=True):
         cls = core.UnknownElement
         encId = encoding.encodeId(int(eid, 16))
         cls.id = int(eid, 16)
-
+        
     sl = int(xmlEl.get('sizeLength', sizeLength))
 
     if issubclass(cls, core.MasterElement):
