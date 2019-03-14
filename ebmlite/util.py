@@ -77,9 +77,9 @@ def toXml(el, parent=None, offsets=True, sizes=True, types=True, ids=True):
         xmlEl.text = b64encode(el.value)
     elif not isinstance(el, core.VoidElement):
         try:
-            valString = bytes(el.value)
+            valString = str(el.value)
             encString = valString.encode('utf-8', 'xmlcharrefreplace')
-            xmlEl.set('value', encString)
+            xmlEl.set('value', valString)
         except Exception as e:
             valString = bytearray(el.value)
             encString = valString.decode('utf-8', 'xmlcharrefreplace')
@@ -160,7 +160,7 @@ def xmlElement2ebml(xmlEl, ebmlFile, schema, sizeLength=4, unknown=True):
         sl = int(sl)
 
     encoded = cls.encode(val, size, lengthSize=sl)
-    ebmlFile.write(encoded)
+    ebmlFile.write(encoded.encode('latin-1'))
     return len(encoded)
 
 
@@ -189,7 +189,7 @@ def xml2ebml(xmlFile, ebmlFile, schema, sizeLength=4, headers=True,
         @return: the size of the ebml file in bytes.
         @raise NameError: raises if an xml element is not present in the schema.
     """
-    if isinstance(ebmlFile, basestring):
+    if isinstance(ebmlFile, str):
         ebmlFile = open(ebmlFile, 'wb')
         openedEbml = True
     else:

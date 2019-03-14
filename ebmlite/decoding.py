@@ -115,8 +115,9 @@ def readElementSize(stream):
     length, size = decodeIntLength(ord(ch))
 
     if length > 1:
-        size = _struct_uint64_unpack((chr(size) + stream.read(length-1)
-                                      ).rjust(8, b'\x00'))[0]
+        size = _struct_uint64_unpack((chr(size).encode() +
+                                      stream.read(length - 1)
+                                      ).rjust(8, '\x00'.encode()))[0]
 
     # print("size = %x, length = %x" % (size, int(2**(7*length))))
 
@@ -187,7 +188,7 @@ def readString(stream, size):
         return ''
 
     value = stream.read(size)
-    value = value.partition('\x00')[0]
+    value = value.partition('\x00'.encode())[0]
     return value
 
 

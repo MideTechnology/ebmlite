@@ -3,6 +3,7 @@ Created on Aug 14, 2017
 
 @author: dstokes
 '''
+import sys
 import unittest
 from xml.dom.minidom import parseString
 from xml.etree import ElementTree as ET
@@ -89,7 +90,11 @@ class Test(unittest.TestCase):
 
         # Save xml
         with open(xmlFile1, 'wt') as f:
-            f.write(xmlString1.replace('><', '>\r\n<'))
+            xmlString1 = xmlString1.decode('latin-1').replace('><', '>\r\n<')
+            if sys.version_info.major == 3:
+                f.write(xmlString1)
+            else:
+                f.write(bytearray(xmlString1, 'latin-1'))
 
         # Convert xml2ebml
         with open(ebmlFile2, 'wb') as out:
@@ -100,7 +105,10 @@ class Test(unittest.TestCase):
         mkvRoot2 = util.toXml(ebmlDoc2)
         xmlString2 = ET.tostring(mkvRoot2, encoding='UTF-8')
         with open(xmlFile2, 'wt') as f:
-            f.write(xmlString2.replace('><', '>\r\n<'))
+            a = xmlString2.replace(b'><', b'>\r\n<')
+            if sys.version_info.major == 3:
+                a = str(a)
+            f.write(a)
 
         # Load back the XML files in order to compare the two
         xmlDoc1 = util.loadXml(xmlFile1, schema)
@@ -152,11 +160,11 @@ class Test(unittest.TestCase):
         # Convert the MKV files into human-readable xml strings
         ebmlDoc1 = schema.load(ebmlFile1, headers=True)
         ebmlRoot1 = util.toXml(ebmlDoc1)
-        xmlString1 = ET.tostring(ebmlRoot1, encoding='UTF-8').replace('><', '>\r\n<')
+        xmlString1 = ET.tostring(ebmlRoot1, encoding='UTF-8').replace('><', ">\r\n<")
 
         ebmlDoc2 = schema.load(ebmlFile2, headers=True)
         ebmlRoot2 = util.toXml(ebmlDoc2)
-        xmlString2 = ET.tostring(ebmlRoot2, encoding='UTF-8').replace('><', '>\r\n<')
+        xmlString2 = ET.tostring(ebmlRoot2, encoding='UTF-8').replace('><', ">\r\n<")
 
         # Convert the xml strings into lists of lines to make comparison easier,
         # dropping the second line because that will reference different source

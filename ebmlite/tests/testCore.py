@@ -97,8 +97,7 @@ class testCoreElement(unittest.TestCase):
     def testEncode(self):
         """ Test encoding a full EBML element. """
 
-        self.assertEqual(self.element.encode('\x71\xea', 2), 'CC\x82\x71\xea')
-        pass
+        self.assertEqual(self.element.encode('\x71\xea', 2), u'CC\x82\x71\xea')
     
     
     
@@ -407,7 +406,7 @@ class testVoidElements(unittest.TestCase):
         """ Test encoding VoidElements. """
 
         self.assertEqual(self.voiEl.encodePayload(0x41424344, length=4),
-                         '\xff\xff\xff\xff')
+                         str('\xff\xff\xff\xff'))
     
     
     
@@ -570,7 +569,7 @@ class testMasterElements(unittest.TestCase):
     def testEncode(self):
         """ Test encoding MasterElements. """
 
-        self.assertEqual(self.element.encode({0x4286:16}),
+        self.assertEqual(bytearray(self.element.encode({0x4286: 16}), 'latin-1'),
                          bytearray('\x1A\x45\xDF\xA3\x84\x42\x86\x81\x10'))
     
     

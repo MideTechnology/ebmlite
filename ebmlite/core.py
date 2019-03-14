@@ -45,6 +45,8 @@ __all__ = ['BinaryElement', 'DateElement', 'Document', 'Element',
            'StringElement', 'UIntegerElement','UnicodeElement',
            'UnknownElement', 'VoidElement', 'loadSchema']
 
+import sys
+
 from ast import literal_eval
 from collections import OrderedDict
 from datetime import datetime
@@ -58,6 +60,11 @@ from decoding import readFloat, readInt, readUInt, readDate
 from decoding import readString, readUnicode
 import encoding
 import schemata
+
+if sys.version_info.major == 3:
+    from builtins import str as unicode
+    basestring = unicode
+    long = int
 
 #===============================================================================
 #
@@ -127,7 +134,7 @@ class Element(object):
         """
         # Document-wide caching could be implemented here.
         import sys
-        if size > sys.maxint:
+        if size > sys.maxsize:
             pass
         a = stream.read(size)
         return bytearray(a)
@@ -251,8 +258,14 @@ class Element(object):
         payload = cls.encodePayload(value, length=length)
         length = None if infinite else (length or len(payload))
         encId = encoding.encodeId(cls.id)
-        return encId + encoding.encodeSize(length, lengthSize) + payload
-
+        try:
+            a = encId.decode('latin-1')
+            b = encoding.encodeSize(length, lengthSize).decode('latin-1')
+            c = payload.decode('latin-1')
+            return a + b + c
+        except Exception as e:
+            print(e)
+            cls.encodePayload(value, length=length)
 
     def dump(self):
         """ Dump this element's value as nested dictionaries, keyed by
@@ -446,7 +459,7 @@ class VoidElement(BinaryElement):
     def encodePayload(cls, data, length=0):
         """ Type-specific payload encoder for Void elements. """
         length = 0 if length is None else length
-        return bytearray('\xff' * length, 'utf-16')
+        return ('\xff'*length).encode('latin-1')
 
 
 #===============================================================================
@@ -670,7 +683,7 @@ class MasterElement(Element):
             if k not in cls.schema:
                 raise TypeError("Element type %r not found in schema" % k)
             # TODO: Validation of hierarchy, multiplicity, mandate, etc.
-            result.extend(cls.schema[k].encode(v))
+            result += bytearray(cls.schema[k].encode(v), 'latin-1')
 
         return result
 
@@ -1044,7 +1057,7 @@ class Schema(object):
         # type (it's technically binary). Use the special `VoidElement` type.
         if 'Void' in self.elementsByName:
             el = self.elementsByName['Void']
-            void = type(b'VoidElement', (VoidElement,),
+            void = type(str('VoidElement'), (VoidElement,),
                         {'id':el.id, 'name':'Void', 'schema':self,
                          'mandatory': el.mandatory, 'multiple': el.multiple})
             self.elements[el.id] = void
@@ -1054,8 +1067,8 @@ class Schema(object):
         self.name = name or self.type
 
         # Create the schema's Document subclass.
-        self.document = type(b'%sDocument' % self.name.title(), (Document,),
-                             {'schema': self, 'children':self.children})
+        self.document = type(str('%sDocument' % self.name.title()), (Document,),
+                             {'schema': self, 'children': self.children})
 
 
     def _parseLegacySchema(self, schema):
@@ -1223,8 +1236,8 @@ class Schema(object):
                 isGlobal = _getInt(attribs, 'level', None) == -1
 
             # Create a new Element subclass
-            eclass = type(b'%sElement' % ename, (baseClass,),
-                          {'id':eid, 'name':ename, 'schema':self,
+            eclass = type(str('%sElement' % ename), (baseClass,),
+                          {'id': eid, 'name': ename, 'schema': self,
                            'mandatory': mandatory, 'multiple': multiple,
                            'precache': precache, 'length': length,
                            'children': dict(), '__doc__': docs})

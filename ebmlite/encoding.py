@@ -18,6 +18,9 @@ import sys
 from decoding import _struct_uint64, _struct_int64
 from decoding import _struct_float32, _struct_float64
 
+if sys.version_info.major == 3:
+    unicode = str
+
 #===============================================================================
 #
 #===============================================================================
@@ -178,12 +181,12 @@ def encodeFloat(val, length=None):
     """
     if length is None:
         if val is None or val == 0.0:
-            return ''
+            return b''
         else:
             length = DEFAULT_FLOAT_SIZE
 
     if length == 0:
-        return ''
+        return b''
     if length == 4:
         return _struct_float32.pack(val)
     elif length == 8:
