@@ -1,7 +1,7 @@
 import unittest
 from datetime import timedelta, datetime
 from math import ceil, floor, log
-from StringIO import StringIO
+from io import BytesIO as StringIO
 
 from decoding import decodeIDLength, decodeIntLength, readDate, readElementID, \
     readElementSize, readFloat, readInt, readString, readUInt, readUnicode
@@ -40,10 +40,10 @@ class testDecoding(unittest.TestCase):
     def testReadElID(self):
         """ Test reading the ID of an element. """
         
-        idBytes = ['\x80',
-                   '\x40\x41',
-                   '\x20\x41\x42',
-                   '\x10\x41\x42\x43']
+        idBytes = [b'\x80',
+                   b'\x40\x41',
+                   b'\x20\x41\x42',
+                   b'\x10\x41\x42\x43']
         eIDs = [128, 16449, 2113858, 272712259]
                            
         for id, i, eID in zip(idBytes, range(1, len(idBytes) + 1), eIDs):
@@ -57,14 +57,14 @@ class testDecoding(unittest.TestCase):
     def testReadElSize(self):
         """ Test reading the size of an element. """
         
-        idBytes = ['\x85',
-                   '\x45\x41',
-                   '\x25\x41\x42',
-                   '\x15\x41\x42\x43',
-                   '\x08\x41\x42\x43\x44',
-                   '\x04\x41\x42\x43\x44\x45',
-                   '\x02\x41\x42\x43\x44\x45\x46',
-                   '\x01\x41\x42\x43\x44\x45\x46\x47']
+        idBytes = [b'\x85',
+                   b'\x45\x41',
+                   b'\x25\x41\x42',
+                   b'\x15\x41\x42\x43',
+                   b'\x08\x41\x42\x43\x44',
+                   b'\x04\x41\x42\x43\x44\x45',
+                   b'\x02\x41\x42\x43\x44\x45\x46',
+                   b'\x01\x41\x42\x43\x44\x45\x46\x47']
         elSizes = [0x5,
                    0x541,
                    0x54142,
@@ -84,10 +84,10 @@ class testDecoding(unittest.TestCase):
     def testReadUInt(self):
         """ Test reading unsigned integers. """
         
-        idBytes = ['\x85',
-                   '\x45\x41',
-                   '\x25\x41\x42',
-                   '\x15\x41\x42\x43']
+        idBytes = [b'\x85',
+                   b'\x45\x41',
+                   b'\x25\x41\x42',
+                   b'\x15\x41\x42\x43']
         ints = [0x85, 0x4541, 0x254142, 0x15414243]
         
         for id, i, numOut in zip(idBytes, range(1, len(idBytes) + 1), ints):
@@ -102,10 +102,10 @@ class testDecoding(unittest.TestCase):
         """ Test reading signed integers. """
         
         # Positive ints
-        idBytes = ['\x75',
-                   '\x45\x41',
-                   '\x25\x41\x42',
-                   '\x15\x41\x42\x43']
+        idBytes = [b'\x75',
+                   b'\x45\x41',
+                   b'\x25\x41\x42',
+                   b'\x15\x41\x42\x43']
         ints = [0x75, 0x4541, 0x254142, 0x15414243]
         
         for id, i, numOut in zip(idBytes, range(1, len(idBytes) + 1), ints):
@@ -114,10 +114,10 @@ class testDecoding(unittest.TestCase):
             self.assertEquals(a, numOut)
             
         # Negative ints
-        idBytes = ['\xf5',
-                   '\xc5\x41',
-                   '\xb5\x41\x42',
-                   '\xa5\x41\x42\x43']
+        idBytes = [b'\xf5',
+                   b'\xc5\x41',
+                   b'\xb5\x41\x42',
+                   b'\xa5\x41\x42\x43']
         ints = [-1*(0xff ^ 0xf5) - 1,
                 -1*(0xffff ^ 0xc541) - 1,
                 -1*(0xffffff ^ 0xb54142) - 1,
@@ -135,41 +135,41 @@ class testDecoding(unittest.TestCase):
         
         # 0 length
         self.mockStream.seek(0)
-        self.mockStream = StringIO('')
+        self.mockStream = StringIO(b'')
         self.assertEqual(readFloat(self.mockStream, 0), 0.0)
         
         # 4-bit length
         self.mockStream.seek(0)
-        self.mockStream = StringIO('\x00\x00\x00\x00')
+        self.mockStream = StringIO(b'\x00\x00\x00\x00')
         self.assertEqual(readFloat(self.mockStream, 4), 0.0)
         
         self.mockStream.seek(0)
-        self.mockStream = StringIO('\x3f\x80\x00\x00')
+        self.mockStream = StringIO(b'\x3f\x80\x00\x00')
         self.assertEqual(readFloat(self.mockStream, 4), 1.0)
         
         self.mockStream.seek(0)
-        self.mockStream = StringIO('\xc0\x00\x00\x00')
+        self.mockStream = StringIO(b'\xc0\x00\x00\x00')
         self.assertEqual(readFloat(self.mockStream, 4), -2.0)
         
         self.mockStream.seek(0)
-        self.mockStream = StringIO('\x3e\xaa\xaa\xab')
+        self.mockStream = StringIO(b'\x3e\xaa\xaa\xab')
         self.assertAlmostEqual(readFloat(self.mockStream, 4), 1.0/3.0)
     
         # 8-bit length
         self.mockStream.seek(0)
-        self.mockStream = StringIO('\x00\x00\x00\x00\x00\x00\x00\x00')
+        self.mockStream = StringIO(b'\x00\x00\x00\x00\x00\x00\x00\x00')
         self.assertEqual(readFloat(self.mockStream, 8), 0.0)
         
         self.mockStream.seek(0)
-        self.mockStream = StringIO('\x3f\xf0\x00\x00\x00\x00\x00\x00')
+        self.mockStream = StringIO(b'\x3f\xf0\x00\x00\x00\x00\x00\x00')
         self.assertEqual(readFloat(self.mockStream, 8), 1.0)
         
         self.mockStream.seek(0)
-        self.mockStream = StringIO('\xc0\x00\x00\x00\x00\x00\x00\x00')
+        self.mockStream = StringIO(b'\xc0\x00\x00\x00\x00\x00\x00\x00')
         self.assertEqual(readFloat(self.mockStream, 8), -2.0)
         
         self.mockStream.seek(0)
-        self.mockStream = StringIO('\x3f\xd5\x55\x55\x55\x55\x55\x55')
+        self.mockStream = StringIO(b'\x3f\xd5\x55\x55\x55\x55\x55\x55')
         self.assertEqual(readFloat(self.mockStream, 8), 1.0/3.0)
     
     
@@ -177,31 +177,32 @@ class testDecoding(unittest.TestCase):
     def testReadString(self):
         """ Test reading strings. """
         
-        self.mockStream = StringIO('')
-        self.assertEqual(readString(self.mockStream, 0), '')
+        self.mockStream = StringIO(b'')
+        val = readString(self.mockStream, 0)
+        self.assertEqual(val, b'')
         
-        self.mockStream = StringIO('test')
-        self.assertEqual(readString(self.mockStream, len(self.mockStream.buf)),
-                         'test')
+        self.mockStream = StringIO(b'test')
+        val = readString(self.mockStream, 4)
+        self.assertEqual(val, b'test')
             
     
     
     def testReadUnicode(self):
         """ Test reading unicode strings. """
         
-        self.mockStream = StringIO(u'')
-        self.assertEqual(readUnicode(self.mockStream, 0), u'')
+        self.mockStream = StringIO(b'')
+        val = readUnicode(self.mockStream, 0)
+        self.assertEqual(val, u'')
         
-        self.mockStream = StringIO('TEST')
-        self.assertEqual(readUnicode(self.mockStream, len(self.mockStream.buf)),
-                         u'TEST')
+        self.mockStream = StringIO(b'TEST')
+        val = readUnicode(self.mockStream, 4)
+        self.assertEqual(val, u'TEST')
     
     
     
     def testReadDate(self):
         """ Test reading dates from bytes. """
         
-        self.mockStream = StringIO('\x00\x00\x00\x00ABCD')
-        a = readDate(self.mockStream)
+        a = readDate(StringIO(b'\x00\x00\x00\x00\x41\x42\x43\x44'))
         self.assertEqual(a, datetime(2001, 1, 1, tzinfo=None) + \
                             timedelta(microseconds=0x41424344//1000))

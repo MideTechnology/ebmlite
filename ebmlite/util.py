@@ -74,16 +74,22 @@ def toXml(el, parent=None, offsets=True, sizes=True, types=True, ids=True):
         for chEl in el:
             toXml(chEl, xmlEl, offsets, sizes, types)
     elif isinstance(el, core.BinaryElement):
-        xmlEl.text = b64encode(el.value)
+        xmlEl.text = b64encode(el.value).decode('latin-1')
     elif not isinstance(el, core.VoidElement):
-        try:
-            valString = str(el.value)
-            encString = valString.encode('utf-8', 'xmlcharrefreplace')
+        if sys.version_info.major == 3:
+            if isinstance(el.value, bytes):
+                valString = el.value.decode('latin-1')
+            else:
+                valString = str(el.value)
             xmlEl.set('value', valString)
-        except Exception as e:
-            valString = bytearray(el.value)
-            encString = valString.decode('utf-8', 'xmlcharrefreplace')
-            xmlEl.set('value', encString)
+        else:
+            if isinstance(el.value, unicode):
+                valString = el.value.encode('latin-1')
+            elif isinstance(el.value, str):
+                valString = el.value
+            else:
+                valString = str(el.value)
+            xmlEl.set('value', valString)
 
     return xmlEl
 

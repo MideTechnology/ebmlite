@@ -149,24 +149,32 @@ def encodeInt(val, length=None):
     """
     if val == 0:
         packed = ''
-        pad = b'\x00'
+        pad = '\x00'
     elif val > 0:
         pad = b'\x00'
-        packed = _struct_int64.pack(val).lstrip(pad)
-        if ord(packed[0]) & 0b10000000:
-            packed = pad + packed
+        packed = _struct_int64.pack(val)
+        packed = packed.lstrip(pad)
+        if isinstance(packed[0], int):
+            if packed[0] & 0b10000000:
+                packed = pad + packed
+        else:
+            if ord(packed[0]) & 0b10000000:
+                packed = pad + packed
+        pad = '\x00'
     else:
         pad = b'\xff'
         packed = _struct_int64.pack(val).lstrip(pad)
-        if not ord(packed[0]) & 0b10000000:
-            packed = pad + packed
+        pad = '\xff'
 
     if length is None:
         return packed
     if len(packed) > length:
         raise ValueError("Encoded length (%d) greater than specified length "
                          "(%d)" % (len(packed), length))
-    return packed.rjust(length, pad)
+    if (sys.version_info.major == 3) == isinstance(packed, str):
+        return packed.rjust(length, pad)
+    else:
+        return packed.decode('latin-1').rjust(length, pad)
 
 
 def encodeFloat(val, length=None):
@@ -208,7 +216,7 @@ def encodeBinary(val, length=None):
         @raise ValueError: raised if val is longer than length.
     """
     if isinstance(val, unicode):
-        val = val.encode('utf_8')
+        val = val.encode('latin-1')
     elif val is None:
         val = ''
 

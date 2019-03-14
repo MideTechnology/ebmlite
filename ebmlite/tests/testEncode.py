@@ -1,5 +1,6 @@
 import unittest
 from datetime import timedelta, datetime
+import sys
 
 from encoding import encodeBinary, encodeDate, encodeFloat, encodeInt, \
     encodeString, encodeUInt
@@ -12,51 +13,97 @@ class testEncoding(unittest.TestCase):
     
     def testUInt(self):
         """ Test converting unsigned ints to bytes. """
-        
-        # chars
-        for i in range(1, 255):
-            self.assertEqual(encodeUInt(i), chr(i),
-                             'Character %X not encoded properly' % i)
-            
-        # uint16
-        for i in range(1, 255):
-            self.assertEqual(encodeUInt((i<<8) + 0x41), chr(i) + 'A',
-                             'Character %X not encoded properly' % i)
-            
-        # uint32
-        for i in range(1, 255):
-            self.assertEqual(encodeUInt((i<<24) + 0x414141), chr(i) + 'AAA',
-                             "Character %X not encoded properly" % i)
-            
-        # uint64
-        for i in range(1, 255):
-            self.assertEqual(encodeUInt((i<<56) + 0x41414141414141), chr(i) + 'AAAAAAA',
-                             'Character %X not encoded properly' % i)
-            
+
+        if sys.version_info.major == 3:
+            # chars
+            for i in range(1, 255):
+                val = encodeUInt(i)
+                target = chr(i).encode('latin-1')
+                self.assertEqual(val, target,
+                                 'Character %X not encoded properly' % i)
+
+            # uint16
+            for i in range(1, 255):
+                self.assertEqual(encodeUInt((i<<8) + 0x41), chr(i).encode('latin-1') + b'A',
+                                 'Character %X not encoded properly' % i)
+
+            # uint32
+            for i in range(1, 255):
+                self.assertEqual(encodeUInt((i<<24) + 0x414141), chr(i).encode('latin-1') + b'AAA',
+                                 "Character %X not encoded properly" % i)
+
+            # uint64
+            for i in range(1, 255):
+                self.assertEqual(encodeUInt((i<<56) + 0x41414141414141), chr(i).encode('latin-1') + b'AAAAAAA',
+                                 'Character %X not encoded properly' % i)
+        else:
+            # chars
+            for i in range(1, 255):
+                val = encodeUInt(i)
+                target = chr(i)
+                self.assertEqual(val, target,
+                                 'Character %X not encoded properly' % i)
+
+            # uint16
+            for i in range(1, 255):
+                self.assertEqual(encodeUInt((i<<8) + 0x41), chr(i) + b'A',
+                                 'Character %X not encoded properly' % i)
+
+            # uint32
+            for i in range(1, 255):
+                self.assertEqual(encodeUInt((i<<24) + 0x414141), chr(i) + b'AAA',
+                                 "Character %X not encoded properly" % i)
+
+            # uint64
+            for i in range(1, 255):
+                self.assertEqual(encodeUInt((i<<56) + 0x41414141414141), chr(i) + b'AAAAAAA',
+                                 'Character %X not encoded properly' % i)
     
     
     def testInt(self):
         """ Test converting signed integers into bytes. """
-        
-        # chars
-        for i in range(-127, -1):
-            self.assertEqual(encodeInt(i), chr(255 + i + 1),
-                             'Character %X  not encoded properly' % (255 + i + 1))
-            
-        # int16
-        for i in range(-127, -1):
-            self.assertEqual(encodeInt((i<<8) + 0x41), chr(255 + i + 1) + 'A',
-                             'Character %X  not encoded properly' % (255 + i + 1))
-            
-        # int32
-        for i in range(-127, -1):
-            self.assertEqual(encodeInt((i<<24) + 0x414141), chr(255 + i + 1) + 'AAA',
-                             'Character %X  not encoded properly' % (255 + i + 1))
-            
-        # int64
-        for i in range(-127, -1):
-            self.assertEqual(encodeInt((i<<56) + 0x41414141414141), chr(255 + i + 1) + 'AAAAAAA',
-                             'Character %X  not encoded properly' % (255 + i + 1))
+
+        if sys.version_info.major == 3:
+            # chars
+            for i in range(-127, -1):
+                self.assertEqual(encodeInt(i), chr(255 + i + 1).encode('latin-1'),
+                                 'Character %X  not encoded properly' % (255 + i + 1))
+
+            # int16
+            for i in range(-127, -1):
+                self.assertEqual(encodeInt((i << 8) + 0x41), chr(255 + i + 1).encode('latin-1') + b'A',
+                                 'Character %X  not encoded properly' % (255 + i + 1))
+
+            # int32
+            for i in range(-127, -1):
+                self.assertEqual(encodeInt((i << 24) + 0x414141), chr(255 + i + 1).encode('latin-1') + b'AAA',
+                                 'Character %X  not encoded properly' % (255 + i + 1))
+
+            # int64
+            for i in range(-127, -1):
+                self.assertEqual(encodeInt((i << 56) + 0x41414141414141),
+                                 chr(255 + i + 1).encode('latin-1') + b'AAAAAAA',
+                                 'Character %X  not encoded properly' % (255 + i + 1))
+        else:
+            # chars
+            for i in range(-127, -1):
+                self.assertEqual(encodeInt(i), chr(255 + i + 1),
+                                 'Character %X  not encoded properly' % (255 + i + 1))
+
+            # int16
+            for i in range(-127, -1):
+                self.assertEqual(encodeInt((i<<8) + 0x41), chr(255 + i + 1) + b'A',
+                                 'Character %X  not encoded properly' % (255 + i + 1))
+
+            # int32
+            for i in range(-127, -1):
+                self.assertEqual(encodeInt((i<<24) + 0x414141), chr(255 + i + 1) + b'AAA',
+                                 'Character %X  not encoded properly' % (255 + i + 1))
+
+            # int64
+            for i in range(-127, -1):
+                self.assertEqual(encodeInt((i<<56) + 0x41414141414141), chr(255 + i + 1) + b'AAAAAAA',
+                                 'Character %X  not encoded properly' % (255 + i + 1))
         
            
      
@@ -64,7 +111,7 @@ class testEncoding(unittest.TestCase):
         """ Test converting floats into bytes. """
         
         # empty float
-        self.assertEqual(encodeFloat(10, length=0), '', 'Empty float did not return an empty string')
+        self.assertEqual(encodeFloat(10, length=0), b'', 'Empty float did not return an empty string')
         
         # four byte float
         fl1 = encodeFloat(0,            length=4)
@@ -73,11 +120,11 @@ class testEncoding(unittest.TestCase):
         fl4 = encodeFloat(1.0/3,        length=4)
         fl5 = encodeFloat(float('Inf'), length=4)
         
-        target1 = '\x00\x00\x00\x00'
-        target2 = '\x3f\x80\x00\x00'
-        target3 = '\xc0\x00\x00\x00'
-        target4 = '\x3e\xaa\xaa\xab'
-        target5 = '\x7f\x80\x00\x00'
+        target1 = b'\x00\x00\x00\x00'
+        target2 = b'\x3f\x80\x00\x00'
+        target3 = b'\xc0\x00\x00\x00'
+        target4 = b'\x3e\xaa\xaa\xab'
+        target5 = b'\x7f\x80\x00\x00'
         
         self.assertEqual(fl1, target1, '4-byte zero float not correct')        
         self.assertEqual(fl2, target2, '4-byte 1 float not correct')        
@@ -92,58 +139,59 @@ class testEncoding(unittest.TestCase):
         fl9  = encodeFloat(1.0/3,        length=8)
         fl10 = encodeFloat(float('Inf'), length=8)
         
-        target6 =  '\x00\x00\x00\x00\x00\x00\x00\x00'
-        target7 =  '\x3f\xf0\x00\x00\x00\x00\x00\x00'
-        target8 =  '\xc0\x00\x00\x00\x00\x00\x00\x00'
-        target9 =  '\x3f\xd5\x55\x55\x55\x55\x55\x55'
-        target10 = '\x7f\xf0\x00\x00\x00\x00\x00\x00'
+        target6 =  b'\x00\x00\x00\x00\x00\x00\x00\x00'
+        target7 =  b'\x3f\xf0\x00\x00\x00\x00\x00\x00'
+        target8 =  b'\xc0\x00\x00\x00\x00\x00\x00\x00'
+        target9 =  b'\x3f\xd5\x55\x55\x55\x55\x55\x55'
+        target10 = b'\x7f\xf0\x00\x00\x00\x00\x00\x00'
         
         self.assertEqual(fl6,  target6,  '8-byte zero float not correct')        
         self.assertEqual(fl7,  target7,  '8-byte 1 float not correct')        
         self.assertEqual(fl8,  target8,  '8-byte -2 float not correct')        
         self.assertEqual(fl9,  target9,  '8-byte 1/3 float not correct')        
         self.assertEqual(fl10, target10, '8-byte inf float not correct')
-        
 
-    
     def testBinary(self):
         """ Test converting bytes (strings) to bytes. """
         
         for s in ['', 'test', 'a']:
-            self.assertEqual(encodeBinary(s),          str(s))
-            self.assertEqual(encodeBinary(unicode(s)), str(s))
+            if sys.version_info.major == 3:
+                self.assertEqual(encodeBinary(s), s.encode('latin-1'))
+            else:
+                self.assertEqual(encodeBinary(s),          s)
+                self.assertEqual(encodeBinary(unicode(s)), s)
 
 
 
     def testString(self):
         """ Test converting strings to bytes. """
         
-        for s in ['', 'test', 'a']:
-            self.assertEqual(encodeString(s), str(s),
+        for s in [b'', b'test', b'a']:
+            self.assertEqual(encodeString(s), s,
                              'String not encoded as string correctly')
             
             if len(s) == 0:
-                self.assertEqual(encodeString(str(s), length=2), str(s + '\x00\x00'))
+                self.assertEqual(encodeString(s, length=2), s + b'\x00\x00')
             elif len(s) == 1:
-                self.assertEqual(encodeString(str(s), length=2), str(s + '\x00'))
+                self.assertEqual(encodeString(s, length=2), s + b'\x00')
             else:
-                self.assertEqual(encodeString(str(s), length=2), str(s[:2]))
+                self.assertEqual(encodeString(s, length=2), s[:2])
                 
                 
                 
     def testUnicode(self):
         """ Test converting unicode strings to bytes. """
-        
-        for s in ['', 'test', 'a']:
-            self.assertEqual(encodeString(unicode(s)), str(s),
+
+        for s in [u'', u'test', u'a']:
+            self.assertEqual(encodeString(s), s.encode('latin-1'),
                              'Unicode not encoded as string correctly')
-            
+
             if len(s) == 0:
-                self.assertEqual(encodeString(unicode(s), length=2), str(s + '\x00\x00'))
+                self.assertEqual(encodeString(s, length=2), (s + '\x00\x00').encode('latin-1'))
             elif len(s) == 1:
-                self.assertEqual(encodeString(unicode(s), length=2), str(s + '\x00'))
+                self.assertEqual(encodeString(s, length=2), (s + '\x00').encode('latin-1'))
             else:
-                self.assertEqual(encodeString(unicode(s), length=2), str(s[:2]))
+                self.assertEqual(encodeString(s, length=2), (s[:2]).encode('latin-1'))
                 
                 
     

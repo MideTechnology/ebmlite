@@ -153,10 +153,16 @@ def readInt(stream, size):
         return 0
 
     data = stream.read(size)
-    if ord(data[0]) & 0b10000000:
-        pad = b'\xff'
+    if isinstance(data[0], int):
+        if data[0] & 0b10000000:
+            pad = b'\xff'
+        else:
+            pad = b'\x00'
     else:
-        pad = b'\x00'
+        if ord(data[0]) & 0b10000000:
+            pad = b'\xff'
+        else:
+            pad = b'\x00'
     return _struct_int64_unpack_from(data.rjust(8, pad))[0]
 
 
@@ -185,7 +191,7 @@ def readString(stream, size):
         @return: The decoded value.
     """
     if size == 0:
-        return ''
+        return b''
 
     value = stream.read(size)
     value = value.partition('\x00'.encode())[0]
@@ -203,12 +209,10 @@ def readUnicode(stream, size):
         return u''
 
     data = stream.read(size)
-    try:
-        data = data.partition('\x00')[0]
-    except Exception as e:
-        data = bytearray(data).partition(b'\x00')[0].decode('utf-8')
-        pass
-    return data.encode('utf_8')
+    if isinstance(data, bytes):
+        data = data.decode('latin-1')
+
+    return data.partition(u'\x00')[0]
 
 
 def readDate(stream, size=8):

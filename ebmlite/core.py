@@ -258,14 +258,15 @@ class Element(object):
         payload = cls.encodePayload(value, length=length)
         length = None if infinite else (length or len(payload))
         encId = encoding.encodeId(cls.id)
-        try:
-            a = encId.decode('latin-1')
-            b = encoding.encodeSize(length, lengthSize).decode('latin-1')
-            c = payload.decode('latin-1')
-            return a + b + c
-        except Exception as e:
-            print(e)
-            cls.encodePayload(value, length=length)
+        id = encId.decode('latin-1')
+        size = encoding.encodeSize(length, lengthSize).decode('latin-1')
+        if isinstance(payload, bytearray):
+            payload = payload.decode('latin-1')
+        if (sys.version_info.major == 3) == isinstance(payload, str):
+            pl = payload
+        else:
+            pl = payload.decode('latin-1')
+        return id + size + pl
 
     def dump(self):
         """ Dump this element's value as nested dictionaries, keyed by

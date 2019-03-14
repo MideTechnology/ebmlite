@@ -33,11 +33,15 @@ class Test(unittest.TestCase):
         # Start with toXml
         ebmlDoc1 = schema.load(ebmlFile1, headers=True)
         ebmlRoot = util.toXml(ebmlDoc1)
-        xmlString1 = ET.tostring(ebmlRoot, encoding='UTF-8')
+        xmlString1 = ET.tostring(ebmlRoot, encoding='latin-1')
 
         # Save xml
         with open(xmlFile1, 'wt') as f:
-            f.write(xmlString1)
+            xmlString1 = xmlString1.decode('latin-1').replace('><', '>\r\n<')
+            if sys.version_info.major == 3:
+                f.write(xmlString1)
+            else:
+                f.write(bytearray(xmlString1, 'latin-1'))
 
         # Convert xml2ebml
         with open(ebmlFile2, 'wb') as out:
@@ -46,10 +50,14 @@ class Test(unittest.TestCase):
         # write the second xml file
         ebmlDoc2 = schema.load(ebmlFile2, headers=True)
         mkvRoot2 = util.toXml(ebmlDoc2)
-        xmlString2 = ET.tostring(mkvRoot2, encoding='UTF-8')
+        xmlString2 = ET.tostring(mkvRoot2, encoding='latin-1')
         # self.assertEqual(xmlString1, xmlString2, "xml strings aren't matching up")
         with open(xmlFile2, 'wt') as f:
-            f.write(xmlString2)
+            xmlString2 = xmlString2.decode('latin-1').replace('><', '>\r\n<')
+            if sys.version_info.major == 3:
+                f.write(xmlString2)
+            else:
+                f.write(bytearray(xmlString2, 'latin-1'))
 
         # Load back the XML files in order to compare the two
         xmlDoc1 = util.loadXml(xmlFile1, schema)
@@ -86,14 +94,16 @@ class Test(unittest.TestCase):
         # Start with toXml
         ebmlDoc1 = schema.load(ebmlFile1, headers=True)
         ebmlRoot = util.toXml(ebmlDoc1)
-        xmlString1 = ET.tostring(ebmlRoot, encoding='UTF-8')
+        xmlString1 = ET.tostring(ebmlRoot, encoding='latin-1')
 
         # Save xml
-        with open(xmlFile1, 'wt') as f:
-            xmlString1 = xmlString1.decode('latin-1').replace('><', '>\r\n<')
-            if sys.version_info.major == 3:
+        if sys.version_info.major == 3:
+            with open(xmlFile1, 'wt', encoding='latin-1') as f:
+                xmlString1 = xmlString1.decode('latin-1').replace('><', '>\r\n<')
                 f.write(xmlString1)
-            else:
+        else:
+            with open(xmlFile1, 'wt') as f:
+                xmlString1 = xmlString1.decode('latin-1').replace('><', '>\r\n<')
                 f.write(bytearray(xmlString1, 'latin-1'))
 
         # Convert xml2ebml
@@ -103,12 +113,16 @@ class Test(unittest.TestCase):
         # write the second xml file
         ebmlDoc2 = schema.load(ebmlFile2, headers=True)
         mkvRoot2 = util.toXml(ebmlDoc2)
-        xmlString2 = ET.tostring(mkvRoot2, encoding='UTF-8')
-        with open(xmlFile2, 'wt') as f:
-            a = xmlString2.replace(b'><', b'>\r\n<')
-            if sys.version_info.major == 3:
-                a = str(a)
-            f.write(a)
+        xmlString2 = ET.tostring(mkvRoot2, encoding='latin-1')
+        if sys.version_info.major == 3:
+            with open(xmlFile2, 'wt', encoding='latin-1') as f:
+                a = xmlString2.replace(b'><', b'>\r\n<')
+                a = a.decode('latin-1')
+                f.write(a)
+        else:
+            with open(xmlFile2, 'wt') as f:
+                a = xmlString2.replace(b'><', b'>\r\n<')
+                f.write(a)
 
         # Load back the XML files in order to compare the two
         xmlDoc1 = util.loadXml(xmlFile1, schema)
@@ -144,7 +158,7 @@ class Test(unittest.TestCase):
             parseString(xmlString).writexml(prettyXmlFile,
                                             addindent='\t',
                                             newl='\n',
-                                            encoding='utf-8')
+                                            encoding='latin-1')
         except Exception as e:
             pass
 
@@ -160,19 +174,21 @@ class Test(unittest.TestCase):
         # Convert the MKV files into human-readable xml strings
         ebmlDoc1 = schema.load(ebmlFile1, headers=True)
         ebmlRoot1 = util.toXml(ebmlDoc1)
-        xmlString1 = ET.tostring(ebmlRoot1, encoding='UTF-8').replace('><', ">\r\n<")
+        xmlString1 = ET.tostring(ebmlRoot1, encoding='latin-1')
+        xmlString1 = xmlString1.replace('><'.encode('latin-1'), '>\r\n<'.encode('latin-1'))
 
         ebmlDoc2 = schema.load(ebmlFile2, headers=True)
         ebmlRoot2 = util.toXml(ebmlDoc2)
-        xmlString2 = ET.tostring(ebmlRoot2, encoding='UTF-8').replace('><', ">\r\n<")
+        xmlString2 = ET.tostring(ebmlRoot2, encoding='latin-1')
+        xmlString2 = xmlString2.replace('><'.encode('latin-1'), '>\r\n<'.encode('latin-1'))
 
         # Convert the xml strings into lists of lines to make comparison easier,
         # dropping the second line because that will reference different source
         # file names
         xmlLines1 = xmlString1.splitlines()
-        xmlLines1 = [xmlLines1[0]] + xmlLines1[2:]
+        xmlLines1 = xmlLines1[2:]
         xmlLines2 = xmlString2.splitlines()
-        xmlLines2 = [xmlLines2[0]] + xmlLines2[2:]
+        xmlLines2 = xmlLines2[2:]
 
         # Compare as lists to narrow the location of any differences
         self.assertListEqual(xmlLines1, xmlLines2,
