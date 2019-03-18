@@ -93,8 +93,8 @@ class testDecoding(unittest.TestCase):
         for id, i, numOut in zip(idBytes, range(1, len(idBytes) + 1), ints):
             self.mockStream = StringIO(id)
             self.mockStream.seek(0)
-            a = readUInt(self.mockStream, i)
-            self.assertEquals(a, numOut)
+            val = readUInt(self.mockStream, i)
+            self.assertEquals(val, numOut)
        
 
     
@@ -110,8 +110,8 @@ class testDecoding(unittest.TestCase):
         
         for id, i, numOut in zip(idBytes, range(1, len(idBytes) + 1), ints):
             self.mockStream = StringIO(id)
-            a = readInt(self.mockStream, i)
-            self.assertEquals(a, numOut)
+            val = readInt(self.mockStream, i)
+            self.assertEquals(val, numOut)
             
         # Negative ints
         idBytes = [b'\xf5',
@@ -125,8 +125,8 @@ class testDecoding(unittest.TestCase):
         
         for id, i, numOut in zip(idBytes, range(1, len(idBytes) + 1), ints):
             self.mockStream = StringIO(id)
-            a = readInt(self.mockStream, i)
-            self.assertEquals(a, numOut)
+            val = readInt(self.mockStream, i)
+            self.assertEquals(val, numOut)
             
         
             
@@ -179,11 +179,11 @@ class testDecoding(unittest.TestCase):
         
         self.mockStream = StringIO(b'')
         val = readString(self.mockStream, 0)
-        self.assertEqual(val, b'')
+        self.assertEqual(val, u'')
         
         self.mockStream = StringIO(b'test')
         val = readString(self.mockStream, 4)
-        self.assertEqual(val, b'test')
+        self.assertEqual(val, u'test')
             
     
     

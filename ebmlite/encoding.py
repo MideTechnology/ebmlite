@@ -85,12 +85,12 @@ def encodeSize(val, length=None):
     if val is None:
         # 'unknown' size: all bits 1.
         length = 1 if length is None else length
-        return b'\xff' * length
+        return u'\xff' * length
 
     length = getLength(val) if length is None else length
     try:
         prefix = LENGTH_PREFIXES[length]
-        return encodeUInt(val|prefix, length)
+        return encodeUInt(val | prefix, length)
     except (IndexError, TypeError):
         raise ValueError("Cannot encode element size %s" % length)
 
@@ -127,13 +127,13 @@ def encodeUInt(val, length=None):
             left-padded with ``0x00`` if `length` is not `None`.
         @raise ValueError: raised if val is longer than length.
     """
-    packed = _struct_uint64.pack(val).lstrip(b'\x00')
+    packed = _struct_uint64.pack(val).decode('latin-1').lstrip(u'\x00')
     if length is None:
         return packed
     if len(packed) > length:
         raise ValueError("Encoded length (%d) greater than specified length "
                          "(%d)" % (len(packed), length))
-    return packed.rjust(length, b'\x00')
+    return packed.rjust(length, u'\x00')
 
 
 def encodeInt(val, length=None):
@@ -148,11 +148,11 @@ def encodeInt(val, length=None):
         @raise ValueError: raised if val is longer than length.
     """
     if val == 0:
-        packed = ''
-        pad = '\x00'
+        packed = u''
+        pad = u'\x00'
     elif val > 0:
-        pad = b'\x00'
-        packed = _struct_int64.pack(val)
+        pad = u'\x00'
+        packed = _struct_int64.pack(val).decode('latin-1')
         packed = packed.lstrip(pad)
         if isinstance(packed[0], int):
             if packed[0] & 0b10000000:
@@ -160,21 +160,16 @@ def encodeInt(val, length=None):
         else:
             if ord(packed[0]) & 0b10000000:
                 packed = pad + packed
-        pad = '\x00'
     else:
-        pad = b'\xff'
-        packed = _struct_int64.pack(val).lstrip(pad)
-        pad = '\xff'
+        pad = u'\xff'
+        packed = _struct_int64.pack(val).decode('latin-1').lstrip(pad)
 
     if length is None:
         return packed
     if len(packed) > length:
         raise ValueError("Encoded length (%d) greater than specified length "
                          "(%d)" % (len(packed), length))
-    if (sys.version_info.major == 3) == isinstance(packed, str):
-        return packed.rjust(length, pad)
-    else:
-        return packed.decode('latin-1').rjust(length, pad)
+    return packed.rjust(length, pad)
 
 
 def encodeFloat(val, length=None):
@@ -189,16 +184,16 @@ def encodeFloat(val, length=None):
     """
     if length is None:
         if val is None or val == 0.0:
-            return b''
+            return u''
         else:
             length = DEFAULT_FLOAT_SIZE
 
     if length == 0:
-        return b''
+        return u''
     if length == 4:
-        return _struct_float32.pack(val)
+        return _struct_float32.pack(val).decode('latin-1')
     elif length == 8:
-        return _struct_float64.pack(val)
+        return _struct_float64.pack(val).decode('latin-1')
     else:
         raise ValueError("Cannot encode float of length %d; only 0, 4, or 8" %
                          length)
@@ -215,15 +210,15 @@ def encodeBinary(val, length=None):
             with ``0x00`` if `length` is not `None`.
         @raise ValueError: raised if val is longer than length.
     """
-    if isinstance(val, unicode):
-        val = val.encode('latin-1')
+    if not isinstance(val, unicode):
+        val = val.decode('latin-1')
     elif val is None:
-        val = ''
+        val = u''
 
     if length is None:
         return val
     elif len(val) <= length:
-        return val.ljust(length, b'\x00')
+        return val.ljust(length, u'\x00')
     else:
         raise ValueError("Length of data (%d) exceeds specified length (%d)" %
                          (len(val), length))

@@ -43,7 +43,7 @@ class testCoreElement(unittest.TestCase):
     def testParse(self):
         """ Test parsing a generic element as a bytestring. """
         
-        self.assertEqual(self.element.parse(self.mockStream, 4), b'\x4f\x56\x71\xea')
+        self.assertEqual(self.element.parse(self.mockStream, 4), u'\x4f\x56\x71\xea')
     
     
     
@@ -51,11 +51,11 @@ class testCoreElement(unittest.TestCase):
         """ Test getting a value from a generic element as a bytestring. """
         
         # Test first parse
-        self.assertEqual(self.element.value, b'\x71\xea')
+        self.assertEqual(self.element.value, u'\x71\xea')
         
         # Test that mockstring is empty and that the value has been cached
         self.assertEqual(len(self.mockStream.getvalue()) - len(self.mockStream.read()), 4)
-        self.assertEqual(self.element.value, b'\x71\xea')
+        self.assertEqual(self.element.value, u'\x71\xea')
     
     
     
@@ -80,7 +80,7 @@ class testCoreElement(unittest.TestCase):
         self.assertEqual(self.element.gc(), 0)
 
         self.element.value
-        self.assertEqual(self.element._value, b'\x71\xea')
+        self.assertEqual(self.element._value, u'\x71\xea')
         
         self.assertEqual(self.element.gc(), 1)
         self.assertEqual(self.element._value, None)
@@ -91,7 +91,7 @@ class testCoreElement(unittest.TestCase):
         """ Test encoding a payload. """
         
         self.assertEqual(self.element.encodePayload('\x4f\x56\x71\xea', length=4),
-                         b'\x4f\x56\x71\xea')
+                         u'\x4f\x56\x71\xea')
 
     
     
@@ -105,7 +105,7 @@ class testCoreElement(unittest.TestCase):
     def testDump(self):
         """Test dumping an element to a dict"""
         
-        self.assertEqual(self.element.dump(), b'\x71\xea')
+        self.assertEqual(self.element.dump(), u'\x71\xea')
         
         
         
@@ -145,14 +145,10 @@ class testIntElements(unittest.TestCase):
         """ Test encoding an IntegerElement. """
 
         val1 = self.intEl1.encodePayload(0x4242, 2)
+        self.assertEqual(val1, u'BB')
 
         val2 = self.intEl1.encodePayload(-1000, 2)
-        if sys.version_info.major == 3:
-            self.assertEqual(val1, 'BB')
-            self.assertEqual(val2, '\xfc\x18')
-        else:
-            self.assertEqual(val1.encode('latin-1'), b'BB')
-            self.assertEqual(val2.encode('latin-1'), b'\xfc\x18')
+        self.assertEqual(val2, u'\xfc\x18')
     
     
     
@@ -197,7 +193,7 @@ class testIntElements(unittest.TestCase):
     def testUintEncode(self):
         """ Test encoding UIntegerElements. """
 
-        self.assertEqual(self.uintEl1.encodePayload(0x4142), b'AB')
+        self.assertEqual(self.uintEl1.encodePayload(0x4142), u'AB')
         
 
 
@@ -239,7 +235,7 @@ class testFloatElements(unittest.TestCase):
         """ Test encoding FloatElements. """
 
         self.assertEqual(self.floatEl.encodePayload(1.0/3.0, length=4),
-                         b'\x3e\xaa\xaa\xab')
+                         u'\x3e\xaa\xaa\xab')
         
 
 
@@ -295,14 +291,14 @@ class testStringElements(unittest.TestCase):
         """ Test parsing StringElements. """
 
         self.mockStream.seek(2)
-        self.assertEqual(self.strEl1.parse(self.mockStream, 4), b'bork')
+        self.assertEqual(self.strEl1.parse(self.mockStream, 4), u'bork')
     
     
     
     def testStringEncode(self):
         """ Test encoding StringElements. """
 
-        self.assertEqual(self.strEl1.encodePayload(b'bork'), b'bork')
+        self.assertEqual(self.strEl1.encodePayload(u'bork'), u'bork')
 
     
     
@@ -317,14 +313,14 @@ class testStringElements(unittest.TestCase):
         """ Test parsing UnicodeElements. """
 
         self.mockStream.seek(2)
-        self.assertEqual(self.uniEl.parse(self.mockStream, 4), 'bork')
+        self.assertEqual(self.uniEl.parse(self.mockStream, 4), u'bork')
     
     
     
     def testUnicodeEncode(self):
         """ Test encoding UnicodeElements. """
 
-        self.assertEqual(self.strEl1.encodePayload('bork'), b'bork')
+        self.assertEqual(self.strEl1.encodePayload('bork'), u'bork')
         
         
         
@@ -357,10 +353,7 @@ class testDateElements(unittest.TestCase):
     def testDateEncode(self):
         """ Test encoding DateElements. """
         val = self.datEl.encodePayload(datetime.datetime(2018, 1, 1))
-        if sys.version_info.major == 3:
-            self.assertEqual(val, '\x07\x71\xe1\x58\x4d\x0f\x00\x00')
-        else:
-            self.assertEqual(val.encode('latin-1'), '\x07\x71\xe1\x58\x4d\x0f\x00\x00')
+        self.assertEqual(val, u'\x07\x71\xe1\x58\x4d\x0f\x00\x00')
     
     
 
@@ -417,7 +410,7 @@ class testVoidElements(unittest.TestCase):
         """ Test encoding VoidElements. """
 
         self.assertEqual(self.voiEl.encodePayload(0x41424344, length=4),
-                         b'\xff\xff\xff\xff')
+                         u'\xff\xff\xff\xff')
     
     
     
@@ -433,7 +426,7 @@ class testUnknownElements(unittest.TestCase):
                 
         self.mockStream = StringIO()
 
-        self.mockStream.string = '\x00\x00\x00A'
+        self.mockStream.string = u'\x00\x00\x00A'
                 
         self.unkEl1 = VoidElement(stream=self.mockStream, offset=1, size=4,
                                      payloadOffset=1)
@@ -573,15 +566,15 @@ class testMasterElements(unittest.TestCase):
         """ Test encoding the payload of a MasterElement. """
 
         self.assertEqual(self.element.encodePayload({0x4286:16}),
-                         bytearray(b'\x42\x86\x81\x10'))
+                         u'\x42\x86\x81\x10')
     
     
     
     def testEncode(self):
         """ Test encoding MasterElements. """
 
-        self.assertEqual(bytearray(self.element.encode({0x4286: 16}), 'latin-1'),
-                         bytearray(b'\x1A\x45\xDF\xA3\x84\x42\x86\x81\x10'))
+        self.assertEqual(self.element.encode({0x4286: 16}),
+                         u'\x1A\x45\xDF\xA3\x84\x42\x86\x81\x10')
     
     
     
@@ -637,7 +630,7 @@ class testDocument(unittest.TestCase):
     def testType(self):
         """ Test getting the type of a Document. """
 
-        self.assertEqual(b'mide', self.doc.type)
+        self.assertEqual(u'mide', self.doc.type)
         self.doc.info['DocType'] = 'bork'
         self.assertEqual(self.doc.type, 'bork')
     
@@ -701,7 +694,7 @@ class testSchema(unittest.TestCase):
                          {'DocTypeVersion': 2, 'EBMLVersion': 1,
                           'EBMLMaxIDLength': 4, 'EBMLReadVersion': 1,
                           'EBMLMaxSizeLength': 8, 'DocTypeReadVersion': 2,
-                          'DocType': b'mide'})
+                          'DocType': u'mide'})
     
     
     
@@ -715,7 +708,7 @@ class testSchema(unittest.TestCase):
                          {'DocTypeVersion': 2, 'EBMLVersion': 1,
                           'EBMLMaxIDLength': 4, 'EBMLReadVersion': 1,
                           'EBMLMaxSizeLength': 8, 'DocTypeReadVersion': 2,
-                          'DocType': b'mide'})
+                          'DocType': u'mide'})
     
     
     

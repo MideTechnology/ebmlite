@@ -56,9 +56,9 @@ def toXml(el, parent=None, offsets=True, sizes=True, types=True, ids=True):
     else:
         xmlEl = ET.SubElement(parent, elname)
     if isinstance(el, core.Document):
-        xmlEl.set('source', str(el.filename))
-        xmlEl.set('schemaName', str(el.schema.name))
-        xmlEl.set('schemaFile', str(el.schema.filename))
+        xmlEl.set('source', el.filename)
+        xmlEl.set('schemaName', el.schema.name)
+        xmlEl.set('schemaFile', el.schema.filename)
     else:
         if ids and isinstance(el.id, (int,)):
             xmlEl.set('id', "0x%X" % el.id)
@@ -68,23 +68,23 @@ def toXml(el, parent=None, offsets=True, sizes=True, types=True, ids=True):
     if offsets:
         xmlEl.set('offset', str(el.offset))
     if sizes:
-        xmlEl.set('size', str(el.size).strip('L'))
+        xmlEl.set('size', str(el.size).strip(u'L'))
 
     if isinstance(el, core.MasterElement):
         for chEl in el:
             toXml(chEl, xmlEl, offsets, sizes, types)
     elif isinstance(el, core.BinaryElement):
-        xmlEl.text = b64encode(el.value).decode('latin-1')
+        xmlEl.text = el.value
     elif not isinstance(el, core.VoidElement):
         if sys.version_info.major == 3:
             if isinstance(el.value, bytes):
-                valString = el.value.decode('latin-1')
+                valString = el.value.decode('ascii')
             else:
                 valString = str(el.value)
             xmlEl.set('value', valString)
         else:
             if isinstance(el.value, unicode):
-                valString = el.value.encode('latin-1')
+                valString = el.value.encode('ascii', 'replace')
             elif isinstance(el.value, str):
                 valString = el.value
             else:
@@ -166,7 +166,7 @@ def xmlElement2ebml(xmlEl, ebmlFile, schema, sizeLength=4, unknown=True):
         sl = int(sl)
 
     encoded = cls.encode(val, size, lengthSize=sl)
-    ebmlFile.write(encoded.encode('latin-1'))
+    ebmlFile.write(encoded)
     return len(encoded)
 
 
@@ -271,7 +271,7 @@ def loadXml(xmlFile, schema, ebmlFile=None):
 #
 #===============================================================================
 
-def pprint(el, values=True, out=sys.stdout, indent="  ", _depth=0):
+def pprint(el, values=True, out=sys.stdout, indent=u"  ", _depth=0):
     """ Test function to recursively crawl an EBML document or element and
         print its structure, with child elements shown indented.
 
@@ -285,27 +285,28 @@ def pprint(el, values=True, out=sys.stdout, indent="  ", _depth=0):
 
     if _depth == 0:
         if values:
-            out.write("Offset Size   Element (ID): Value\n")
+            out.write(b"Offset Size   Element (ID): Value\n")
         else:
-            out.write("Offset Size   Element (ID)\n")
-        out.write("====== ====== =================================\n")
+            out.write(b"Offset Size   Element (ID)\n")
+        out.write(b"====== ====== =================================\n")
 
     if isinstance(el, core.Document):
-        out.write("%06s %06s %s %s (Document, type %s)\n" % (el.offset, el.size, tab, el.name, el.type))
+        print(str(el.offset), str(el.size), tab, str(el.name), el.type)
+        out.write(("%06s %06s %s %s (Document, type %s)\n" % (str(el.offset), str(el.size), tab, str(el.name), el.type)).encode('latin-1'))
         for i in el:
             pprint(i, values, out, indent, _depth+1)
     else:
-        out.write("%06s %06s %s %s (ID 0x%0X)" % (el.offset, el.size, tab, el.name, el.id))
+        out.write(("%06s %06s %s %s (ID 0x%0X)" % (str(el.offset), str(el.size), tab, str(el.name), el.id)).encode('latin-1'))
         if isinstance(el, core.MasterElement):
-            out.write(": (master) %d subelements\n" % len(el.value))
+            out.write(b": (master) %d subelements\n" % len(el.value))
             for i in el:
                 pprint(i, values, out, indent, _depth+1)
         else:
-            out.write(": (%s)" % el.dtype.__name__)
+            out.write((": (%s)" % el.dtype.__name__).encode('latin-1'))
             if values and not isinstance(el, core.BinaryElement):
-                out.write(" %r\n" % (el.value))
+                out.write(b" %r\n" % (el.value))
             else:
-                out.write("\n")
+                out.write(b"\n")
 
     out.flush()
 

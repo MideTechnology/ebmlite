@@ -36,10 +36,10 @@ class Test(unittest.TestCase):
         xmlString1 = ET.tostring(ebmlRoot, encoding='latin-1')
 
         # Save xml
-        with open(xmlFile1, 'wt') as f:
+        with open(xmlFile1, 'wb') as f:
             xmlString1 = xmlString1.decode('latin-1').replace('><', '>\r\n<')
             if sys.version_info.major == 3:
-                f.write(xmlString1)
+                f.write(xmlString1.encode('latin-1'))
             else:
                 f.write(bytearray(xmlString1, 'latin-1'))
 
@@ -83,28 +83,22 @@ class Test(unittest.TestCase):
             good IDE file (a derivative of EBML) back and forth, then compare
             the results.
         """
-        schemaFile = './schemata/mide_ide.xml'
-        ebmlFile1 = './tests/SSX46714-doesnot.IDE'
-        ebmlFile2 = './tests/SSX46714-new.IDE'
-        xmlFile1 = './tests/ssx-1.xml'
-        xmlFile2 = './tests/ssx-2.xml'
+        schemaFile = u'./schemata/mide_ide.xml'
+        ebmlFile1 = u'./tests/SSX46714-doesnot.IDE'
+        ebmlFile2 = u'./tests/SSX46714-new.IDE'
+        xmlFile1 = u'./tests/ssx-1.xml'
+        xmlFile2 = u'./tests/ssx-2.xml'
 
         schema = core.loadSchema(schemaFile)
 
         # Start with toXml
         ebmlDoc1 = schema.load(ebmlFile1, headers=True)
         ebmlRoot = util.toXml(ebmlDoc1)
-        xmlString1 = ET.tostring(ebmlRoot, encoding='latin-1')
+        xmlString1 = ET.tostring(ebmlRoot, encoding='utf-8')
 
         # Save xml
-        if sys.version_info.major == 3:
-            with open(xmlFile1, 'wt', encoding='latin-1') as f:
-                xmlString1 = xmlString1.decode('latin-1').replace('><', '>\r\n<')
-                f.write(xmlString1)
-        else:
-            with open(xmlFile1, 'wt') as f:
-                xmlString1 = xmlString1.decode('latin-1').replace('><', '>\r\n<')
-                f.write(bytearray(xmlString1, 'latin-1'))
+        with open(xmlFile1, 'wb') as f:
+            f.write(xmlString1)
 
         # Convert xml2ebml
         with open(ebmlFile2, 'wb') as out:
@@ -114,15 +108,8 @@ class Test(unittest.TestCase):
         ebmlDoc2 = schema.load(ebmlFile2, headers=True)
         mkvRoot2 = util.toXml(ebmlDoc2)
         xmlString2 = ET.tostring(mkvRoot2, encoding='latin-1')
-        if sys.version_info.major == 3:
-            with open(xmlFile2, 'wt', encoding='latin-1') as f:
-                a = xmlString2.replace(b'><', b'>\r\n<')
-                a = a.decode('latin-1')
-                f.write(a)
-        else:
-            with open(xmlFile2, 'wt') as f:
-                a = xmlString2.replace(b'><', b'>\r\n<')
-                f.write(a)
+        with open(xmlFile2, 'wb') as f:
+            f.write(xmlString2)
 
         # Load back the XML files in order to compare the two
         xmlDoc1 = util.loadXml(xmlFile1, schema)
@@ -151,16 +138,18 @@ class Test(unittest.TestCase):
 
         ebmlDoc = schema.load('./tests/SSX46714-doesnot.IDE', headers=True)
 
-        util.pprint(ebmlDoc, out=open('./tests/IDE-Pretty.txt', 'wt'))
+        with open('./tests/IDE-Pretty.txt', 'wb') as f:
+            util.pprint(ebmlDoc, out=f)
+
         xmlString = ET.tostring(util.toXml(ebmlDoc))
-        prettyXmlFile = open('./tests/IDE-Pretty.xml', 'wt')
-        try:
-            parseString(xmlString).writexml(prettyXmlFile,
-                                            addindent='\t',
-                                            newl='\n',
-                                            encoding='latin-1')
-        except Exception as e:
-            pass
+        with open('./tests/IDE-Pretty.xml', 'wb') as prettyXmlFile:
+            try:
+                parseString(xmlString).writexml(prettyXmlFile,
+                                                addindent='\t',
+                                                newl='\n',
+                                                encoding='latin-1')
+            except Exception as e:
+                pass
 
 
     def testInfiniteElement(self):

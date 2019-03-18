@@ -132,6 +132,7 @@ def readUInt(stream, size):
     """ Read an unsigned integer from a file (or file-like stream).
 
         @param stream: The source file-like object.
+        @param size: The number of bytes to read from the stream.
         @return: The decoded value.
     """
 
@@ -146,6 +147,7 @@ def readInt(stream, size):
     """ Read a signed integer from a file (or file-like stream).
 
         @param stream: The source file-like object.
+        @param size: The number of bytes to read from the stream.
         @return: The decoded value.
     """
 
@@ -154,15 +156,15 @@ def readInt(stream, size):
 
     data = stream.read(size)
     if isinstance(data[0], int):
-        if data[0] & 0b10000000:
-            pad = b'\xff'
-        else:
-            pad = b'\x00'
+        val = data[0]
     else:
-        if ord(data[0]) & 0b10000000:
-            pad = b'\xff'
-        else:
-            pad = b'\x00'
+        val = ord(data[0])
+
+    if val & 0b10000000:
+        pad = b'\xff'
+    else:
+        pad = b'\x00'
+
     return _struct_int64_unpack_from(data.rjust(8, pad))[0]
 
 
@@ -170,6 +172,7 @@ def readFloat(stream, size):
     """ Read an floating point value from a file (or file-like stream).
 
         @param stream: The source file-like object.
+        @param size: The number of bytes to read from the stream.
         @return: The decoded value.
         @raise IOError: raised if the length of this floating point number is not valid (0, 4, 8 bytes)
     """
@@ -188,13 +191,14 @@ def readString(stream, size):
     """ Read an ASCII string from a file (or file-like stream).
 
         @param stream: The source file-like object.
+        @param size: The number of bytes to read from the stream.
         @return: The decoded value.
     """
     if size == 0:
-        return b''
+        return u''
 
     value = stream.read(size)
-    value = value.partition('\x00'.encode())[0]
+    value = value.decode('latin-1').partition(u'\x00')[0]
     return value
 
 
@@ -202,6 +206,7 @@ def readUnicode(stream, size):
     """ Read an UTF-8 encoded string from a file (or file-like stream).
 
         @param stream: The source file-like object.
+        @param size: The number of bytes to read from the stream.
         @return: The decoded value.
     """
 
@@ -210,7 +215,7 @@ def readUnicode(stream, size):
 
     data = stream.read(size)
     if isinstance(data, bytes):
-        data = data.decode('latin-1')
+        data = data.decode('utf-8')
 
     return data.partition(u'\x00')[0]
 
@@ -220,6 +225,7 @@ def readDate(stream, size=8):
         from a file (or file-like stream).
 
         @param stream: The source file-like object.
+        @param size: The number of bytes to read from the stream.
         @return: The decoded value (as `datetime.datetime`).
         @raise IOError: raised if the length of the date is not 8 bytes.
     """

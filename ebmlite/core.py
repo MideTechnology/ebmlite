@@ -133,11 +133,10 @@ class Element(object):
             It is assumed the file pointer is at the start of the payload.
         """
         # Document-wide caching could be implemented here.
-        import sys
         if size > sys.maxsize:
             pass
         a = stream.read(size)
-        return bytearray(a)
+        return a.decode('latin-1')
 
 
     def __init__(self, stream=None, offset=0, size=0, payloadOffset=0):
@@ -258,14 +257,12 @@ class Element(object):
         payload = cls.encodePayload(value, length=length)
         length = None if infinite else (length or len(payload))
         encId = encoding.encodeId(cls.id)
-        id = encId.decode('latin-1')
-        size = encoding.encodeSize(length, lengthSize).decode('latin-1')
-        if isinstance(payload, bytearray):
-            payload = payload.decode('latin-1')
-        if (sys.version_info.major == 3) == isinstance(payload, str):
+        id = encId
+        size = encoding.encodeSize(length, lengthSize)
+        if (sys.version_info.major == 3) and isinstance(payload, str):
             pl = payload
         else:
-            pl = payload.decode('latin-1')
+            pl = payload.encode('latin-1')
         return id + size + pl
 
     def dump(self):
@@ -460,7 +457,7 @@ class VoidElement(BinaryElement):
     def encodePayload(cls, data, length=0):
         """ Type-specific payload encoder for Void elements. """
         length = 0 if length is None else length
-        return ('\xff'*length).encode('latin-1')
+        return u'\xff' * length
 
 
 #===============================================================================
@@ -672,7 +669,7 @@ class MasterElement(Element):
     def encodePayload(cls, data, length=None):
         """ Type-specific payload encoder for 'master' elements.
         """
-        result = bytearray()
+        result = u''
         if data is None:
             return result
         elif isinstance(data, dict):
@@ -680,11 +677,12 @@ class MasterElement(Element):
         elif not isinstance(data, (list, tuple)):
             raise TypeError("wrong type for %s payload: %s" % (cls.name,
                                                                type(data)))
-        for k,v in data:
+        for k, v in data:
             if k not in cls.schema:
                 raise TypeError("Element type %r not found in schema" % k)
             # TODO: Validation of hierarchy, multiplicity, mandate, etc.
-            result += bytearray(cls.schema[k].encode(v), 'latin-1')
+            print(cls, cls.schema, cls.schema[k], v)
+            result += cls.schema[k].encode(v)
 
         return result
 
@@ -966,7 +964,7 @@ class Document(MasterElement):
                 for v in data:
                     stream.write(cls.encodePayload(v))
         else:
-            stream.write(cls.encodePayload(data))
+            stream.write(cls.encodePayload(data).encode('latin-1'))
 
 
 #===============================================================================
