@@ -8,6 +8,8 @@ import unittest
 from xml.dom.minidom import parseString
 from xml.etree import ElementTree as ET
 
+import numpy as np
+
 import core
 import util
 
@@ -77,6 +79,8 @@ class Test(unittest.TestCase):
                 if issubclass(x, core.Element):
                     xmlEls2.append(x)
 
+        np.testing.assert_array_equal(xmlString1, xmlString2)
+
 
     def testIde(self):
         """ Test the functionality of the ebmlite library by converting a known
@@ -98,18 +102,18 @@ class Test(unittest.TestCase):
 
         # Save xml
         with open(xmlFile1, 'wb') as f:
-            f.write(xmlString1)
+            f.write(xmlString1.replace(b'><', b'>\r\n<'))
 
         # Convert xml2ebml
-        with open(ebmlFile2, 'wb') as out:
-            util.xml2ebml(xmlFile1, out, schema)
+        with open(ebmlFile2, 'wt') as out:
+            util.xml2ebml(xmlFile1, out, schema, sizeLength=4)
 
         # write the second xml file
         ebmlDoc2 = schema.load(ebmlFile2, headers=True)
         mkvRoot2 = util.toXml(ebmlDoc2)
         xmlString2 = ET.tostring(mkvRoot2, encoding='latin-1')
         with open(xmlFile2, 'wb') as f:
-            f.write(xmlString2)
+            f.write(xmlString2.replace(b'><',b'>\r\n<'))
 
         # Load back the XML files in order to compare the two
         xmlDoc1 = util.loadXml(xmlFile1, schema)
@@ -129,6 +133,8 @@ class Test(unittest.TestCase):
                 if issubclass(x, core.Element):
                     xmlEls2.append(x)
 
+        np.testing.assert_array_equal(xmlString1, xmlString2)
+
 
 
     def testPPrint(self):
@@ -143,13 +149,10 @@ class Test(unittest.TestCase):
 
         xmlString = ET.tostring(util.toXml(ebmlDoc))
         with open('./tests/IDE-Pretty.xml', 'wb') as prettyXmlFile:
-            try:
-                parseString(xmlString).writexml(prettyXmlFile,
-                                                addindent='\t',
-                                                newl='\n',
-                                                encoding='latin-1')
-            except Exception as e:
-                pass
+            parseString(xmlString).writexml(prettyXmlFile,
+                                            addindent='\t',
+                                            newl='\n',
+                                            encoding='latin-1')
 
 
     def testInfiniteElement(self):
@@ -182,6 +185,8 @@ class Test(unittest.TestCase):
         # Compare as lists to narrow the location of any differences
         self.assertListEqual(xmlLines1, xmlLines2,
                              'One or more lines are different in the xml documents')
+
+        np.testing.assert_array_equal(xmlString1, xmlString2)
 
 
 if __name__ == "__main__":

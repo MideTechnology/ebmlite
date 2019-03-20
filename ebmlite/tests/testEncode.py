@@ -41,22 +41,22 @@ class testEncoding(unittest.TestCase):
             for i in range(1, 255):
                 val = encodeUInt(i)
                 target = chr(i)
-                self.assertEqual(val, target,
-                                 'Character %X not encoded properly' % i)
+                self.assertEqual(val, unicode(target, 'latin-1'),
+                                 b'Character %X not encoded properly' % i)
 
             # uint16
             for i in range(1, 255):
-                self.assertEqual(encodeUInt((i<<8) + 0x41), chr(i) + b'A',
+                self.assertEqual(encodeUInt((i<<8) + 0x41), unicode(chr(i) + b'A', 'latin-1'),
                                  'Character %X not encoded properly' % i)
 
             # uint32
             for i in range(1, 255):
-                self.assertEqual(encodeUInt((i<<24) + 0x414141), chr(i) + b'AAA',
+                self.assertEqual(encodeUInt((i<<24) + 0x414141), unicode(chr(i) + b'AAA', 'latin-1'),
                                  "Character %X not encoded properly" % i)
 
             # uint64
             for i in range(1, 255):
-                self.assertEqual(encodeUInt((i<<56) + 0x41414141414141), chr(i) + b'AAAAAAA',
+                self.assertEqual(encodeUInt((i<<56) + 0x41414141414141), unicode(chr(i) + b'AAAAAAA', 'latin-1'),
                                  'Character %X not encoded properly' % i)
     
     
@@ -87,22 +87,22 @@ class testEncoding(unittest.TestCase):
         else:
             # chars
             for i in range(-127, -1):
-                self.assertEqual(encodeInt(i), chr(255 + i + 1),
+                self.assertEqual(encodeInt(i), unicode(chr(255 + i + 1), 'latin-1'),
                                  'Character %X  not encoded properly' % (255 + i + 1))
 
             # int16
             for i in range(-127, -1):
-                self.assertEqual(encodeInt((i<<8) + 0x41), chr(255 + i + 1) + b'A',
+                self.assertEqual(encodeInt((i<<8) + 0x41), unicode(chr(255 + i + 1) + b'A', 'latin-1'),
                                  'Character %X  not encoded properly' % (255 + i + 1))
 
             # int32
             for i in range(-127, -1):
-                self.assertEqual(encodeInt((i<<24) + 0x414141), chr(255 + i + 1) + b'AAA',
+                self.assertEqual(encodeInt((i<<24) + 0x414141), unicode(chr(255 + i + 1) + b'AAA', 'latin-1'),
                                  'Character %X  not encoded properly' % (255 + i + 1))
 
             # int64
             for i in range(-127, -1):
-                self.assertEqual(encodeInt((i<<56) + 0x41414141414141), chr(255 + i + 1) + b'AAAAAAA',
+                self.assertEqual(encodeInt((i<<56) + 0x41414141414141), unicode(chr(255 + i + 1) + b'AAAAAAA', 'latin-1'),
                                  'Character %X  not encoded properly' % (255 + i + 1))
         
            

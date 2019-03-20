@@ -74,7 +74,17 @@ def toXml(el, parent=None, offsets=True, sizes=True, types=True, ids=True):
         for chEl in el:
             toXml(chEl, xmlEl, offsets, sizes, types)
     elif isinstance(el, core.BinaryElement):
-        xmlEl.text = el.value
+        pass
+        # xmlEl.set('value', xmlEl.value)
+        try:
+            if isinstance(el.value, bytes):
+                xmlEl.text = bytes(bytearray(el.value, 'utf-8'))
+            elif isinstance(el.value, bytearray):
+                xmlEl.text = bytes(el.value)
+            else:
+                xmlEl.text = el.value.encode('ascii', 'ignore')
+        except Exception as e:
+            pass
     elif not isinstance(el, core.VoidElement):
         if sys.version_info.major == 3:
             if isinstance(el.value, bytes):
@@ -97,6 +107,17 @@ def toXml(el, parent=None, offsets=True, sizes=True, types=True, ids=True):
 #===============================================================================
 #
 #===============================================================================
+
+def recurseSize(el):
+    size = 0
+    if len(el.getchildren()) > 0:
+        for sEl in el:
+            size += recurseSize(sEl)
+    else:
+        size = int(el.get('size', 0))
+
+    return encoding.getLength(size) + encoding.getLength(int(el.get('id'), base=16)) + size
+
 
 def xmlElement2ebml(xmlEl, ebmlFile, schema, sizeLength=4, unknown=True):
     """ Convert an XML element to EBML, recursing if necessary. For converting
@@ -132,19 +153,30 @@ def xmlElement2ebml(xmlEl, ebmlFile, schema, sizeLength=4, unknown=True):
         cls = core.UnknownElement
         encId = encoding.encodeId(int(eid, 16))
         cls.id = int(eid, 16)
-
+    n = recurseSize(xmlEl)
+    sizeLength = encoding.getLength(n) if sizeLength is None else sizeLength
+    sizeLength = encoding.getLength(n)
     sl = int(xmlEl.get('sizeLength', sizeLength))
 
     if issubclass(cls, core.MasterElement):
-        ebmlFile.write(encId)
-        sizePos = ebmlFile.tell()
-        ebmlFile.write(encoding.encodeSize(None, sl))
+        if sys.version_info.major == 3:
+            ebmlFile.write(bytes(encId, 'latin-1'))
+            sizePos = ebmlFile.tell()
+            ebmlFile.write(bytes(encoding.encodeSize(None, sl), 'latin-1'))
+        else:
+            ebmlFile.write(bytearray(encId, 'latin-1'))
+            sizePos = ebmlFile.tell()
+            ebmlFile.write(bytearray(encoding.encodeSize(None, sl), 'latin-1'))
+
         size = 0
         for chEl in xmlEl:
             size += xmlElement2ebml(chEl, ebmlFile, schema, sl)
         endPos = ebmlFile.tell()
         ebmlFile.seek(sizePos)
-        ebmlFile.write(encoding.encodeSize(size, sl))
+        if sys.version_info.major == 3:
+            ebmlFile.write(bytes(encoding.encodeSize(size, sl), 'latin-1'))
+        else:
+            ebmlFile.write(bytearray(encoding.encodeSize(size, sl), 'latin-1'))
         ebmlFile.seek(endPos)
         return len(encId) + (endPos - sizePos)
 
@@ -166,7 +198,10 @@ def xmlElement2ebml(xmlEl, ebmlFile, schema, sizeLength=4, unknown=True):
         sl = int(sl)
 
     encoded = cls.encode(val, size, lengthSize=sl)
-    ebmlFile.write(encoded)
+    if sys.version_info.major == 3:
+        ebmlFile.write(bytes(encoded, 'latin-1'))
+    else:
+        ebmlFile.write(bytearray(encoded, 'latin-1'))
     return len(encoded)
 
 

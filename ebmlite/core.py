@@ -259,10 +259,10 @@ class Element(object):
         encId = encoding.encodeId(cls.id)
         id = encId
         size = encoding.encodeSize(length, lengthSize)
-        if (sys.version_info.major == 3) and isinstance(payload, str):
+        if sys.version_info.major == 3:
             pl = payload
         else:
-            pl = payload.encode('latin-1')
+            pl = unicode(payload)
         return id + size + pl
 
     def dump(self):

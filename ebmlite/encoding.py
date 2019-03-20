@@ -84,10 +84,10 @@ def encodeSize(val, length=None):
     """
     if val is None:
         # 'unknown' size: all bits 1.
-        length = 1 if length is None else length
+        length = 1 if (length is None or length == -1) else length
         return u'\xff' * length
 
-    length = getLength(val) if length is None else length
+    length = getLength(val) if (length is None or length == -1) else length
     try:
         prefix = LENGTH_PREFIXES[length]
         return encodeUInt(val | prefix, length)
