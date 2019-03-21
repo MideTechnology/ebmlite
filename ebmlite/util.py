@@ -78,7 +78,10 @@ def toXml(el, parent=None, offsets=True, sizes=True, types=True, ids=True):
     elif isinstance(el, core.BinaryElement):
         pass
         # xmlEl.set('value', xmlEl.value)
-        xmlEl.text = b64encode(el.value)
+        if sys.version_info.major == 3:
+            xmlEl.text = b64encode(el.value).decode()
+        else:
+            xmlEl.text = b64encode(el.value)
     elif not isinstance(el, core.VoidElement):
         if sys.version_info.major == 3:
             if isinstance(el.value, bytes):

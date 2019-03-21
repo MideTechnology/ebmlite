@@ -148,11 +148,11 @@ class Test(unittest.TestCase):
             util.pprint(ebmlDoc, out=f)
 
         xmlString = ET.tostring(util.toXml(ebmlDoc))
-        with open('./tests/IDE-Pretty.xml', 'wb') as prettyXmlFile:
+        with open('./tests/IDE-Pretty.xml', 'wt') as prettyXmlFile:
             parseString(xmlString).writexml(prettyXmlFile,
-                                            addindent='\t',
-                                            newl='\n',
-                                            encoding='latin-1')
+                                            addindent=u'\t',
+                                            newl=u'\n',
+                                            encoding=u'latin-1')
 
 
     def testInfiniteElement(self):
