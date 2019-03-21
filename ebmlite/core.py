@@ -42,7 +42,7 @@ __copyright__ = "Copyright 2018 Mide Technology Corporation"
 
 __all__ = ['BinaryElement', 'DateElement', 'Document', 'Element',
            'FloatElement', 'IntegerElement', 'MasterElement', 'Schema',
-           'StringElement', 'UIntegerElement','UnicodeElement',
+           'StringElement', 'UIntegerElement', 'UnicodeElement',
            'UnknownElement', 'VoidElement', 'loadSchema']
 
 import sys
@@ -135,8 +135,8 @@ class Element(object):
         # Document-wide caching could be implemented here.
         if size > sys.maxsize:
             pass
-        a = stream.read(size)
-        return self.dtype(a)
+        out = stream.read(size)
+        return self.dtype(out)
 
 
     def __init__(self, stream=None, offset=0, size=0, payloadOffset=0):
@@ -208,6 +208,7 @@ class Element(object):
     # Caching (experimental)
     #===========================================================================
 
+
     def gc(self, recurse=False):
         """ Clear any cached values. To save memory and/or force values to be
             re-read from the file. Returns the number of cached values cleared.
@@ -222,6 +223,7 @@ class Element(object):
     #===========================================================================
     # Encoding
     #===========================================================================
+
 
     @classmethod
     def encodePayload(cls, data, length=None):
@@ -265,10 +267,7 @@ class Element(object):
             if isinstance(payload, unicode):
                 pl = payload
             else:
-                try:
-                    pl = unicode(payload, 'latin-1')
-                except Exception as e:
-                    pass
+                pl = unicode(payload, 'latin-1')
         return id + size + pl
 
     def dump(self):
@@ -395,7 +394,7 @@ class UnicodeElement(StringElement):
     """ Base class for an EBML UTF-8 string element. Schema-specific subclasses
         are generated when a `Schema` is loaded.
     """
-    dtype = unicode
+        dtype = unicode
 
     def __len__(self):
         # Value may be multiple bytes per character
@@ -687,7 +686,6 @@ class MasterElement(Element):
             if k not in cls.schema:
                 raise TypeError("Element type %r not found in schema" % k)
             # TODO: Validation of hierarchy, multiplicity, mandate, etc.
-            print(cls, cls.schema, cls.schema[k], v)
             result += cls.schema[k].encode(v)
 
         return result

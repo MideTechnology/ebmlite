@@ -317,7 +317,6 @@ def pprint(el, values=True, out=sys.stdout, indent=u"  ", _depth=0):
         out.write(b"====== ====== =================================\n")
 
     if isinstance(el, core.Document):
-        print(str(el.offset), str(el.size), tab, str(el.name), el.type)
         out.write(("%06s %06s %s %s (Document, type %s)\n" % (str(el.offset), str(el.size), tab, str(el.name), el.type)).encode('latin-1'))
         for i in el:
             pprint(i, values, out, indent, _depth+1)
