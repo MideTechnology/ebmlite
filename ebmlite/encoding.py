@@ -17,6 +17,7 @@ import sys
 
 from decoding import _struct_uint64, _struct_int64
 from decoding import _struct_float32, _struct_float64
+import base64
 
 if sys.version_info.major == 3:
     unicode = str
@@ -214,14 +215,27 @@ def encodeBinary(val, length=None):
         val = val.decode('latin-1')
     elif val is None:
         val = u''
-
-    if length is None:
-        return val
-    elif len(val) <= length:
-        return val.ljust(length, u'\x00')
-    else:
-        raise ValueError("Length of data (%d) exceeds specified length (%d)" %
-                         (len(val), length))
+    try:
+        if length is None:
+            return val
+        elif len(val) <= length:
+            return val.ljust(length, u'\x00')
+        else:
+            raise ValueError("Length of data (%d) exceeds specified length (%d)" %
+                             (len(val), length))
+    except ValueError as e:
+        import base64
+        if sys.version_info.major == 3:
+            val = base64.b64decode(val)
+        else:
+            val = base64.b64decode(val)
+        if length is None:
+            return val
+        elif len(val) <= length:
+            return val.ljust(length, b'\x00')
+        else:
+            raise ValueError("Length of data (%d) exceeds specified length (%d)" %
+                             (len(val), length))
 
 
 def encodeString(val, length=None):
@@ -236,7 +250,7 @@ def encodeString(val, length=None):
             left-padded with ``0x00`` if `length` is not `None`.
     """
     if isinstance(val, unicode):
-        val = val.encode('ascii', 'replace')
+        val = val.encode('latin-1', 'replace')
 
     if length is not None:
         val = val[:length]

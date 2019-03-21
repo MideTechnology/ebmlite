@@ -136,7 +136,7 @@ class Element(object):
         if size > sys.maxsize:
             pass
         a = stream.read(size)
-        return a.decode('latin-1')
+        return self.dtype(a)
 
 
     def __init__(self, stream=None, offset=0, size=0, payloadOffset=0):
@@ -262,7 +262,13 @@ class Element(object):
         if sys.version_info.major == 3:
             pl = payload
         else:
-            pl = unicode(payload)
+            if isinstance(payload, unicode):
+                pl = payload
+            else:
+                try:
+                    pl = unicode(payload, 'latin-1')
+                except Exception as e:
+                    pass
         return id + size + pl
 
     def dump(self):

@@ -198,7 +198,7 @@ def readString(stream, size):
         return u''
 
     value = stream.read(size)
-    value = value.decode('latin-1').partition(u'\x00')[0]
+    value = value.decode('ascii').partition(u'\x00')[0]
     return value
 
 

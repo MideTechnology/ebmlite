@@ -43,7 +43,7 @@ class testCoreElement(unittest.TestCase):
     def testParse(self):
         """ Test parsing a generic element as a bytestring. """
         
-        self.assertEqual(self.element.parse(self.mockStream, 4), u'\x4f\x56\x71\xea')
+        self.assertEqual(self.element.parse(self.mockStream, 4), bytearray(u'\x4f\x56\x71\xea', 'latin-1'))
     
     
     
@@ -51,11 +51,11 @@ class testCoreElement(unittest.TestCase):
         """ Test getting a value from a generic element as a bytestring. """
         
         # Test first parse
-        self.assertEqual(self.element.value, u'\x71\xea')
+        self.assertEqual(self.element.value, bytearray(u'\x71\xea', 'latin-1'))
         
         # Test that mockstring is empty and that the value has been cached
         self.assertEqual(len(self.mockStream.getvalue()) - len(self.mockStream.read()), 4)
-        self.assertEqual(self.element.value, u'\x71\xea')
+        self.assertEqual(self.element.value, bytearray(u'\x71\xea', 'latin-1'))
     
     
     
@@ -80,7 +80,7 @@ class testCoreElement(unittest.TestCase):
         self.assertEqual(self.element.gc(), 0)
 
         self.element.value
-        self.assertEqual(self.element._value, u'\x71\xea')
+        self.assertEqual(self.element._value, bytearray(u'\x71\xea', 'latin-1'))
         
         self.assertEqual(self.element.gc(), 1)
         self.assertEqual(self.element._value, None)
@@ -105,7 +105,7 @@ class testCoreElement(unittest.TestCase):
     def testDump(self):
         """Test dumping an element to a dict"""
         
-        self.assertEqual(self.element.dump(), u'\x71\xea')
+        self.assertEqual(self.element.dump(), bytearray(u'\x71\xea', 'latin-1'))
         
         
         

@@ -105,7 +105,7 @@ class Test(unittest.TestCase):
             f.write(xmlString1.replace(b'><', b'>\r\n<'))
 
         # Convert xml2ebml
-        with open(ebmlFile2, 'wt') as out:
+        with open(ebmlFile2, 'wb') as out:
             util.xml2ebml(xmlFile1, out, schema, sizeLength=4)
 
         # write the second xml file
@@ -113,7 +113,7 @@ class Test(unittest.TestCase):
         mkvRoot2 = util.toXml(ebmlDoc2)
         xmlString2 = ET.tostring(mkvRoot2, encoding='latin-1')
         with open(xmlFile2, 'wb') as f:
-            f.write(xmlString2.replace(b'><',b'>\r\n<'))
+            f.write(xmlString2.replace(b'><', b'>\r\n<'))
 
         # Load back the XML files in order to compare the two
         xmlDoc1 = util.loadXml(xmlFile1, schema)
@@ -183,8 +183,8 @@ class Test(unittest.TestCase):
         xmlLines2 = xmlLines2[2:]
 
         # Compare as lists to narrow the location of any differences
-        self.assertListEqual(xmlLines1, xmlLines2,
-                             'One or more lines are different in the xml documents')
+        #self.assertListEqual(xmlLines1, xmlLines2,
+        #                     'One or more lines are different in the xml documents')
 
         np.testing.assert_array_equal(xmlString1, xmlString2)
 

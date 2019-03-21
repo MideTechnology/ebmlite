@@ -24,6 +24,8 @@ from xml.etree import ElementTree as ET
 
 import core, encoding
 
+from base64 import b64encode
+
 #===============================================================================
 #
 #===============================================================================
@@ -76,15 +78,7 @@ def toXml(el, parent=None, offsets=True, sizes=True, types=True, ids=True):
     elif isinstance(el, core.BinaryElement):
         pass
         # xmlEl.set('value', xmlEl.value)
-        try:
-            if isinstance(el.value, bytes):
-                xmlEl.text = bytes(bytearray(el.value, 'utf-8'))
-            elif isinstance(el.value, bytearray):
-                xmlEl.text = bytes(el.value)
-            else:
-                xmlEl.text = el.value.encode('ascii', 'ignore')
-        except Exception as e:
-            pass
+        xmlEl.text = b64encode(el.value)
     elif not isinstance(el, core.VoidElement):
         if sys.version_info.major == 3:
             if isinstance(el.value, bytes):
@@ -93,13 +87,7 @@ def toXml(el, parent=None, offsets=True, sizes=True, types=True, ids=True):
                 valString = str(el.value)
             xmlEl.set('value', valString)
         else:
-            if isinstance(el.value, unicode):
-                valString = el.value.encode('ascii', 'replace')
-            elif isinstance(el.value, str):
-                valString = el.value
-            else:
-                valString = str(el.value)
-            xmlEl.set('value', valString)
+            xmlEl.set('value', unicode(el.value).encode('ascii', 'xmlcharrefreplace'))
 
     return xmlEl
 
