@@ -394,7 +394,7 @@ class UnicodeElement(StringElement):
     """ Base class for an EBML UTF-8 string element. Schema-specific subclasses
         are generated when a `Schema` is loaded.
     """
-        dtype = unicode
+    dtype = unicode
 
     def __len__(self):
         # Value may be multiple bytes per character
