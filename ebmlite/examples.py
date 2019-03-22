@@ -96,4 +96,4 @@ recInfo = recProp['RecorderInfo']
 
 # extract recorder serial number from recording properties
 recSerial = recInfo['RecorderSerial']
-print 'recorder serial number: %d' % recSerial
+print('recorder serial number: %d' % recSerial)
