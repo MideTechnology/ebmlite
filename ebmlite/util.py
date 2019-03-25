@@ -84,7 +84,7 @@ def toXml(el, parent=None, offsets=True, sizes=True, types=True, ids=True):
 #
 #===============================================================================
 
-def xmlElement2ebml(xmlEl, ebmlFile, schema, sizeLength=4, unknown=True):
+def xmlElement2ebml(xmlEl, ebmlFile, schema, sizeLength=None, unknown=True):
     """ Convert an XML element to EBML, recursing if necessary. For converting
         an entire XML document, use `xml2ebml()`.
 
@@ -119,7 +119,20 @@ def xmlElement2ebml(xmlEl, ebmlFile, schema, sizeLength=4, unknown=True):
         encId = encoding.encodeId(int(eid, 16))
         cls.id = int(eid, 16)
 
-    sl = int(xmlEl.get('sizeLength', sizeLength))
+    if sizeLength is None:
+        sl = xmlEl.get('sizeLength', None)
+        if sl is None:
+            s = xmlEl.get('size', None)
+            if s is not None:
+                sl = encoding.getLength(int(s))
+            else:
+                sl = 4
+        else:
+            sl = int(sl)
+    else:
+        sl = sizeLength
+
+
 
     if issubclass(cls, core.MasterElement):
         ebmlFile.write(encId)
@@ -156,7 +169,7 @@ def xmlElement2ebml(xmlEl, ebmlFile, schema, sizeLength=4, unknown=True):
     return len(encoded)
 
 
-def xml2ebml(xmlFile, ebmlFile, schema, sizeLength=4, headers=True,
+def xml2ebml(xmlFile, ebmlFile, schema, sizeLength=None, headers=True,
              unknown=True):
     """ Convert an XML file to EBML.
 
