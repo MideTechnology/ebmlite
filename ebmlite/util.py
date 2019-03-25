@@ -130,9 +130,7 @@ def xmlElement2ebml(xmlEl, ebmlFile, schema, sizeLength=None, unknown=True):
         else:
             sl = int(sl)
     else:
-        sl = sizeLength
-
-
+        sl = xmlEl.get('sizeLength', sizeLength)
 
     if issubclass(cls, core.MasterElement):
         ebmlFile.write(encId)
