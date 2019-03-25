@@ -100,17 +100,20 @@ def toXml(el, parent=None, offsets=True, sizes=True, types=True, ids=True):
 #===============================================================================
 
 def recurseSize(el):
-    size = 0
-    if len(el.getchildren()) > 0:
-        for sEl in el:
-            size += recurseSize(sEl)
-    else:
+    if el.get('size') is not None:
         size = int(el.get('size', 0))
+    else:
+        size = 0
+        if len(el.getchildren()) > 0:
+            for sEl in el:
+                size += recurseSize(sEl)
+        else:
+            size = int(el.get('size', 0))
 
     return encoding.getLength(size) + encoding.getLength(int(el.get('id'), base=16)) + size
 
 
-def xmlElement2ebml(xmlEl, ebmlFile, schema, sizeLength=4, unknown=True):
+def xmlElement2ebml(xmlEl, ebmlFile, schema, sizeLength=None, unknown=True):
     """ Convert an XML element to EBML, recursing if necessary. For converting
         an entire XML document, use `xml2ebml()`.
 
@@ -144,9 +147,8 @@ def xmlElement2ebml(xmlEl, ebmlFile, schema, sizeLength=4, unknown=True):
         cls = core.UnknownElement
         encId = encoding.encodeId(int(eid, 16))
         cls.id = int(eid, 16)
-    n = recurseSize(xmlEl)
-    sizeLength = encoding.getLength(n) if sizeLength is None else sizeLength
-    sizeLength = encoding.getLength(n)
+    if sizeLength is None:
+        sizeLength = encoding.getLength(recurseSize(xmlEl))
     sl = int(xmlEl.get('sizeLength', sizeLength))
 
     if issubclass(cls, core.MasterElement):
@@ -196,7 +198,7 @@ def xmlElement2ebml(xmlEl, ebmlFile, schema, sizeLength=4, unknown=True):
     return len(encoded)
 
 
-def xml2ebml(xmlFile, ebmlFile, schema, sizeLength=4, headers=True,
+def xml2ebml(xmlFile, ebmlFile, schema, sizeLength=None, headers=True,
              unknown=True):
     """ Convert an XML file to EBML.
 
