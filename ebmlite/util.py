@@ -76,8 +76,7 @@ def toXml(el, parent=None, offsets=True, sizes=True, types=True, ids=True):
         for chEl in el:
             toXml(chEl, xmlEl, offsets, sizes, types)
     elif isinstance(el, core.BinaryElement):
-        pass
-        # xmlEl.set('value', xmlEl.value)
+       
         if sys.version_info.major == 3:
             xmlEl.text = b64encode(el.value).decode()
         else:
@@ -147,9 +146,19 @@ def xmlElement2ebml(xmlEl, ebmlFile, schema, sizeLength=None, unknown=True):
         cls = core.UnknownElement
         encId = encoding.encodeId(int(eid, 16))
         cls.id = int(eid, 16)
+
     if sizeLength is None:
-        sizeLength = encoding.getLength(recurseSize(xmlEl))
-    sl = int(xmlEl.get('sizeLength', sizeLength))
+        sl = xmlEl.get('sizeLength', None)
+        if sl is None:
+            s = xmlEl.get('size', None)
+            if s is not None:
+                sl = encoding.getLength(int(s))
+            else:
+                sl = 4
+        else:
+            sl = int(sl)
+    else:
+        sl = xmlEl.get('sizeLength', sizeLength)
 
     if issubclass(cls, core.MasterElement):
         if sys.version_info.major == 3:
