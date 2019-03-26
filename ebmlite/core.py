@@ -133,8 +133,6 @@ class Element(object):
             It is assumed the file pointer is at the start of the payload.
         """
         # Document-wide caching could be implemented here.
-        if size > sys.maxsize:
-            pass
         out = stream.read(size)
         return self.dtype(out)
 
@@ -800,21 +798,13 @@ class Document(MasterElement):
 
         self.info = {}
 
-        #try:
-        if True:
-            # Attempt to read the first element, which should be an EBML header.
-            el, pos = self.parseElement(self.stream)
-            if el.name == "EBML":
-                # Load 'header' info from the file
-                self.info = el.dump()
-                if not headers:
-                    self.payloadOffset = pos
-                    """
-        except Exception as e:
-            print(e)
-            # Failed to read the first element. Don't raise here; do that when
-            # the Document is actually used.
-            pass"""
+        # Attempt to read the first element, which should be an EBML header.
+        el, pos = self.parseElement(self.stream)
+        if el.name == "EBML":
+            # Load 'header' info from the file
+            self.info = el.dump()
+            if not headers:
+                self.payloadOffset = pos
 
 
     def __repr__(self):

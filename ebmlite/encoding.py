@@ -224,10 +224,8 @@ def encodeBinary(val, length=None):
             raise ValueError("Length of data (%d) exceeds specified length (%d)" %
                              (len(val), length))
     except ValueError as e:
-        if sys.version_info.major == 3:
-            val = base64.b64decode(val)
-        else:
-            val = base64.b64decode(val)
+        val = base64.b64decode(val)
+
         if length is None:
             return val
         elif len(val) <= length:
