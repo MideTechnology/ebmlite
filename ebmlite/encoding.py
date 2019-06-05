@@ -155,6 +155,7 @@ def encodeInt(val, length=None):
         # Special case for -1 to avoid stripping data with padding below
         # 2's complement of -1 is 0xFF, shortened to one byte is this value:
         packed = u'\xff'
+        pad = u'\xff'
     else:
         pad = '\xff'
         packed = _struct_int64.pack(val).lstrip(pad)
