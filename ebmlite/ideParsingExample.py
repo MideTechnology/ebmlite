@@ -54,7 +54,7 @@ chIdType = schema[0xB0]
 dataBlocks = [block for block in dataBlocks if getTypeMatch(block, chIdType).value == chId]
 
 # Get the raw data from each ChannelDataBlock, and convert to an array.
-rawData = ''
+rawData = b''
 payloadType = schema[0xB2]
 for block in dataBlocks:
     rawData += block.dump()['ChannelDataPayload']
