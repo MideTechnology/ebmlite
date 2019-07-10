@@ -1,6 +1,8 @@
+from __future__ import division, absolute_import, print_function#, unicode_literals
+
 # Imports from EBMLite
-import core
-from util import toXml, loadXml, xml2ebml, pprint
+import ebmlite.core as core
+from .util import toXml, loadXml, xml2ebml, pprint
 
 # imports from python's built in xml library
 from xml.etree import ElementTree as ET

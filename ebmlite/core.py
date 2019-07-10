@@ -55,11 +55,11 @@ import os.path
 from io import BytesIO as StringIO
 from xml.etree import ElementTree as ET
 
-from decoding import readElementID, readElementSize
-from decoding import readFloat, readInt, readUInt, readDate
-from decoding import readString, readUnicode
-import encoding
-import schemata
+from .decoding import readElementID, readElementSize
+from .decoding import readFloat, readInt, readUInt, readDate
+from .decoding import readString, readUnicode
+import ebmlite.encoding as encoding
+import ebmlite.schemata as schemata
 
 if sys.version_info.major == 3:
     from builtins import str as unicode

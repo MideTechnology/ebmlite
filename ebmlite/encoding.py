@@ -15,8 +15,8 @@ __all__ = ['encodeBinary', 'encodeDate', 'encodeFloat', 'encodeId', 'encodeInt',
 import datetime
 import sys
 
-from decoding import _struct_uint64, _struct_int64
-from decoding import _struct_float32, _struct_float64
+from .decoding import _struct_uint64, _struct_int64
+from .decoding import _struct_float32, _struct_float64
 import base64
 
 if sys.version_info.major == 3:

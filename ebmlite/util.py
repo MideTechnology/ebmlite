@@ -22,7 +22,8 @@ import sys
 import tempfile
 from xml.etree import ElementTree as ET
 
-import core, encoding
+import ebmlite.core as core
+import ebmlite.encoding as encoding
 
 from base64 import b64encode
 

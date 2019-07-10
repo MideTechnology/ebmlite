@@ -1,7 +1,9 @@
+from __future__ import absolute_import, print_function
+
 import numpy as np
 import matplotlib.pyplot as plt
 
-import core
+import ebmlite.core as core
 
 
 def getTypeMatch(el, elType):
