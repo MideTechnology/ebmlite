@@ -113,7 +113,7 @@ def recurseSize(el):
         size = int(el.get('size', 0))
     else:
         size = 0
-        if len(el.getchildren()) > 0:
+        if len(el) > 0:
             for sEl in el:
                 size += recurseSize(sEl)
         else:
