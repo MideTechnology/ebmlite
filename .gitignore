@@ -15,12 +15,9 @@
 
 build/*
 dist/*
-<<<<<<< HEAD
-venv*/*
+env
+env?
+venv
+venv?
 */.*
-=======
 *.egg*
-
-env2/
-env3/
->>>>>>> master
