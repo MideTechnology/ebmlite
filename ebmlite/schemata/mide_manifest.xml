@@ -121,6 +121,8 @@
 		<!-- Digital inertial sensors (accelerometer, gyro, IMU, etc.) -->
 		<MasterElement name="DigitalSensorADXL362" id="0x4D90" mandatory="0" multiple="0" minver="1">Indicates the presence of an ADXL362 accelerometer on the SPI bus.</MasterElement>
 		<MasterElement name="DigitalSensorADXL345" id="0x4D91" mandatory="0" multiple="0" minver="1">Indicates the presence of an ADXL345 accelerometer on the SPI bus.</MasterElement>
+    <MasterElement name="DigitalSensorADXL355" id="0x4DD4" mandatory="0" multiple="0" minver="1">Indicates the presence of an ADXL355 accelerometer on the SPI bus.</MasterElement>
+    <MasterElement name="DigitalSensorADXL357" id="0x4DD5" mandatory="0" multiple="0" minver="1">Indicates the presence of an ADXL357 accelerometer on the SPI bus.</MasterElement>
 		<MasterElement name="DigitalSensorADXL375" id="0x4D92" mandatory="0" multiple="0" minver="1">Indicates the presence of an ADXL375 accelerometer on the SPI bus.</MasterElement>
 		<MasterElement name="DigitalSensorBNO055" id="0x4D93" mandatory="0" multiple="0" minver="1">Indicates the presence of a BNO055 IMU on the I2C0 bus.</MasterElement>
 
