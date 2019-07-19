@@ -89,7 +89,7 @@
             <StringElement name="FwCustomStr" id="0x521B" multiple="0" minver="1">Custom firmware build. Firmware is a custom build if present. Name should match FW branch/tag name as applicable for identification purposes, but is mainly present so FW updater can generate a warning if a custom build will be replaced by a standard one.</StringElement>
             <StringElement name="FwRevStr" id="0x521C" multiple="0" minver="1">Firmware revision string.</StringElement>
             <UIntegerElement name="UniqueChipID" id="0x521D" multiple="0" minver="1">The device CPU's factory-set unique ID.</UIntegerElement>
-            <UIntegerElement name="McuType" id="0x521E" multiple="0" minver="1">Code indicating the type of CPU.</UIntegerElement>
+            <StringElement name="McuType" id="0x521E" multiple="0" minver="1">Code indicating the type of CPU.</StringElement>
             <StringElement name="BootloaderRevStr" id="0x521F" multiple="0" minver="1">Bootloader revision string.</StringElement>
             <UIntegerElement name="BootloaderRev" id="0x5220" multiple="0" minver="1">Incrementing bootloader revision level</UIntegerElement>
         </MasterElement>
@@ -151,7 +151,8 @@
                     <!-- Elements unique to Plot -->
                     <StringElement name="SubChannelAxisName" id="0x5302" multiple="0" minver="2">Text name of the axis(?).</StringElement>
                     <UIntegerElement name="SubChannelAxisXRef" id="0x5303" multiple="0" minver="2">Reference to an Axis.</UIntegerElement>
-
+                    <StringElement name="SubChannelUnitsName" id="0x5304" multiple="0" minver="2">Text name of the sensor output units.</StringElement>
+                    <UIntegerElement name="SubChannelUnitsXRef" id="0x5305" multiple="0" minver="2">Reference to a numbered, standardized SI unit.</UIntegerElement>
                     <MasterElement name="PlotSource" id="0x5320" multiple="1" minver="2">List of channels/subchannels used by this Plot
                         <IntegerElement name="PlotChannelRef" id="0x5221" multiple="0" minver="2">SubChannelID</IntegerElement>
                         <IntegerElement name="PlotSubChannelRef" id="0x5222" multiple="0" minver="2">SubChannelID</IntegerElement>
