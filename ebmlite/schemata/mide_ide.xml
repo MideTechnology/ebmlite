@@ -88,6 +88,10 @@
             <StringElement name="HwCustomStr" id="0x521A" multiple="0" minver="1">Custom hardware identifier. Hardware is a custom version if present.</StringElement>
             <StringElement name="FwCustomStr" id="0x521B" multiple="0" minver="1">Custom firmware build. Firmware is a custom build if present. Name should match FW branch/tag name as applicable for identification purposes, but is mainly present so FW updater can generate a warning if a custom build will be replaced by a standard one.</StringElement>
             <StringElement name="FwRevStr" id="0x521C" multiple="0" minver="1">Firmware revision string.</StringElement>
+            <UIntegerElement name="UniqueChipID" id="0x521D" multiple="0" minver="1">The device CPU's factory-set unique ID.</UIntegerElement>
+            <StringElement name="McuType" id="0x521E" multiple="0" minver="1">Code indicating the type of CPU.</StringElement>
+            <StringElement name="BootloaderRevStr" id="0x521F" multiple="0" minver="1">Bootloader revision string.</StringElement>
+            <UIntegerElement name="BootloaderRev" id="0x5220" multiple="0" minver="1">Incrementing bootloader revision level</UIntegerElement>
         </MasterElement>
         <!-- SensorList and PlotList are optional; there are defaults that will be used. The use of defaults is all-or-nothing; the file should define all sensors or have no SensorList at all. -->
         <MasterElement name="SensorList" id="0x5240" multiple="0" minver="2">Master element for the SensorList items
@@ -125,6 +129,9 @@
                     <UIntegerElement name="SubChannelSensorRef" id="0x52A9" multiple="0" minver="2">Reference to a Sensor ID. Allows the association between SubChannels and a physical sensor to be expressed.</UIntegerElement>
                     <UIntegerElement name="SubChannelWarningRef" id="0x52AA" multiple="1" minver="2">Reference to a warning range, i.e. another sensor measuring something that affects the results of this one.</UIntegerElement>
                     <IntegerElement name="SubChannelVisibility" id="0x52AB" multiple="0" minver="2">Allow data channels to specify a visibility level; could have different visibility levels for e.g. 'advanced', 'on request' (channels which are not normally useful on their own, e.g. IRIG stream), 'hidden' (internal diagnostic or other dirty laundry).</IntegerElement>
+                    <BinaryElement name="SubChannelPlotColor" id="0x52AC" multiple="0" minver="2">The RGB values of the default plotting color (3 bytes).</BinaryElement>
+                    <StringElement name="SubChannelUnitsName" id="0x5304" multiple="0" minver="2">Text name of the sensor output units.</StringElement>
+                    <UIntegerElement name="SubChannelUnitsXRef" id="0x5305" multiple="0" minver="2">Reference to a numbered, standardized SI unit.</UIntegerElement>
                 </MasterElement>
             </MasterElement>
             <MasterElement name="PlotList" id="0x5300" multiple="0" minver="2">Master element for the PlotList items. It works like a virtual Channel, with Plots being its Subchannels.
@@ -136,14 +143,14 @@
                     <UIntegerElement name="SubChannelRangeMin" id="0x52A7" multiple="0" minver="2">Minimum valid sensor value.</UIntegerElement>
                     <UIntegerElement name="SubChannelRangeMax" id="0x52A8" multiple="0" minver="2">Maximum valid sensor value.</UIntegerElement>
                     <UIntegerElement name="SubChannelWarningRef" id="0x52AA" multiple="1" minver="2">Reference to a warning range, i.e. another sensor measuring something that affects the results of this one</UIntegerElement>
-                    <!--SubChannelVisibility applicable here? -->
+                    <IntegerElement name="SubChannelVisibility" id="0x52AB" multiple="0" minver="2">Allow data channels to specify a visibility level; could have different visibility levels for e.g. 'advanced', 'on request' (channels which are not normally useful on their own, e.g. IRIG stream), 'hidden' (internal diagnostic or other dirty laundry).</IntegerElement>
+                    <BinaryElement name="SubChannelPlotColor" id="0x52AC" multiple="0" minver="2">The RGB values of the default plotting color (3 bytes).</BinaryElement>
+                    <StringElement name="SubChannelUnitsName" id="0x5304" multiple="0" minver="2">Text name of the sensor output units.</StringElement>
+                    <UIntegerElement name="SubChannelUnitsXRef" id="0x5305" multiple="0" minver="2">Reference to a numbered, standardized SI unit.</UIntegerElement>
                     <!--SubChannelBwLimitIDRef applicable here? -->
                     <!-- Elements unique to Plot -->
                     <StringElement name="SubChannelAxisName" id="0x5302" multiple="0" minver="2">Text name of the axis(?).</StringElement>
                     <UIntegerElement name="SubChannelAxisXRef" id="0x5303" multiple="0" minver="2">Reference to an Axis.</UIntegerElement>
-                    <StringElement name="SubChannelUnitsName" id="0x5304" multiple="0" minver="2">Text name of the sensor output units.</StringElement>
-                    <UIntegerElement name="SubChannelUnitsXRef" id="0x5305" multiple="0" minver="2">Reference to a numbered, standardized SI unit.</UIntegerElement>
-
                     <MasterElement name="PlotSource" id="0x5320" multiple="1" minver="2">List of channels/subchannels used by this Plot
                         <IntegerElement name="PlotChannelRef" id="0x5221" multiple="0" minver="2">SubChannelID</IntegerElement>
                         <IntegerElement name="PlotSubChannelRef" id="0x5222" multiple="0" minver="2">SubChannelID</IntegerElement>
