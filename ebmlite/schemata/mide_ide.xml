@@ -151,8 +151,6 @@
                     <!-- Elements unique to Plot -->
                     <StringElement name="SubChannelAxisName" id="0x5302" multiple="0" minver="2">Text name of the axis(?).</StringElement>
                     <UIntegerElement name="SubChannelAxisXRef" id="0x5303" multiple="0" minver="2">Reference to an Axis.</UIntegerElement>
-                    <StringElement name="SubChannelUnitsName" id="0x5304" multiple="0" minver="2">Text name of the sensor output units.</StringElement>
-                    <UIntegerElement name="SubChannelUnitsXRef" id="0x5305" multiple="0" minver="2">Reference to a numbered, standardized SI unit.</UIntegerElement>
                     <MasterElement name="PlotSource" id="0x5320" multiple="1" minver="2">List of channels/subchannels used by this Plot
                         <IntegerElement name="PlotChannelRef" id="0x5221" multiple="0" minver="2">SubChannelID</IntegerElement>
                         <IntegerElement name="PlotSubChannelRef" id="0x5222" multiple="0" minver="2">SubChannelID</IntegerElement>
