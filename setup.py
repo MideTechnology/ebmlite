@@ -23,5 +23,7 @@ setuptools.setup(
         package_dir={'': '.'},
         package_data={
             '': ['schemata/*', 'tests/*.ide', 'tests/*.mkv']
-        }
+        },
+        tests_require=['pytest', 'numpy==1.16'],
+        setup_requires=['pytest-runner'],
 )
