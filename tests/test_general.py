@@ -23,9 +23,9 @@ class Test(unittest.TestCase):
         """
         schemaFile = './ebmlite/schemata/matroska.xml'
         ebmlFile1 = './tests/video-1.mkv'
-        ebmlFile2 = './tests/video-2.mkv'
+        ebmlFile2 = './tests/video-1-copy.mkv'
         xmlFile1 = './tests/video-1.xml'
-        xmlFile2 = './tests/video-2.xml'
+        xmlFile2 = './tests/video-1-copy.xml'
 
         schema = core.loadSchema(schemaFile)
 
