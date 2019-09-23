@@ -1,7 +1,7 @@
 import unittest
 from datetime import timedelta, datetime
 
-from encoding import encodeBinary, encodeDate, encodeFloat, encodeInt, \
+from ebmlite.encoding import encodeBinary, encodeDate, encodeFloat, encodeInt, \
     encodeString, encodeUInt
 
 

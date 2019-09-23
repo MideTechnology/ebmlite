@@ -7,8 +7,8 @@ import unittest
 from xml.dom.minidom import parseString
 from xml.etree import ElementTree as ET
 
-import core
-import util
+from ebmlite import core
+from ebmlite import util
 
 
 class Test(unittest.TestCase):
@@ -21,7 +21,7 @@ class Test(unittest.TestCase):
             good MKV file (a derivative of EBML) back and forth, then compare
             the results.
         """
-        schemaFile = './schemata/matroska.xml'
+        schemaFile = './ebmlite/schemata/matroska.xml'
         ebmlFile1 = './tests/video-1.mkv'
         ebmlFile2 = './tests/video-2.mkv'
         xmlFile1 = './tests/video-1.xml'
@@ -74,7 +74,7 @@ class Test(unittest.TestCase):
             good IDE file (a derivative of EBML) back and forth, then compare
             the results.
         """
-        schemaFile = './schemata/mide_ide.xml'
+        schemaFile = './ebmlite/schemata/mide_ide.xml'
         ebmlFile1 = './tests/SSX46714-doesnot.IDE'
         ebmlFile2 = './tests/SSX46714-new.IDE'
         xmlFile1 = './tests/ssx-1.xml'
@@ -124,7 +124,7 @@ class Test(unittest.TestCase):
 
     def testPPrint(self):
         """ Test pretty-printing EBML files. """
-        schemaFile = './schemata/mide_ide.xml'
+        schemaFile = './ebmlite/schemata/mide_ide.xml'
         schema = core.loadSchema(schemaFile)
 
         ebmlDoc = schema.load('./tests/SSX46714-doesnot.IDE', headers=True)
@@ -140,7 +140,7 @@ class Test(unittest.TestCase):
 
     def testInfiniteElement(self):
         """ Test parsing an EBML file with an infinite-length element. """
-        schemaFile = './schemata/matroska.xml'
+        schemaFile = './ebmlite/schemata/matroska.xml'
         ebmlFile1 = './tests/video-2.mkv'
         ebmlFile2 = './tests/video-3.mkv'
 

@@ -3,7 +3,7 @@ from datetime import timedelta, datetime
 from math import ceil, floor, log
 from StringIO import StringIO
 
-from decoding import decodeIDLength, decodeIntLength, readDate, readElementID, \
+from ebmlite.decoding import decodeIDLength, decodeIntLength, readDate, readElementID, \
     readElementSize, readFloat, readInt, readString, readUInt, readUnicode
 
 

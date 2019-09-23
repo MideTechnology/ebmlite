@@ -4,7 +4,7 @@ import types
 import unittest
 from StringIO import StringIO
 
-from core import loadSchema, BinaryElement, DateElement, Element, FloatElement, \
+from ebmlite.core import loadSchema, BinaryElement, DateElement, Element, FloatElement, \
         IntegerElement, MasterElement, StringElement, UIntegerElement, \
         UnicodeElement, VoidElement
 
@@ -29,7 +29,7 @@ class testCoreElement(unittest.TestCase):
         
         GenericElement = type('GenericElement', (Element,),
                               {'id':0x4343, 'name':'Generic Element',
-                               'schema':loadSchema('./schemata/mide_ide.xml'),
+                               'schema':loadSchema('./ebmlite/schemata/mide_ide.xml'),
                                'mandatory':False, 'multiple':False,
                                'precache':False, 'length':4, 'children':dict(),
                                '__doc__':'no'})
@@ -458,7 +458,7 @@ class testMasterElements(unittest.TestCase):
     def setUp(self):
         """ Set up a MasterElement with a single UIntegerElement child. """
         
-        schema = loadSchema('./schemata/mide_ide.xml')
+        schema = loadSchema('./ebmlite/schemata/mide_ide.xml')
 
         """ Master Element:   ID: 0x1A45DFA3
                             Size: 0x84
@@ -473,7 +473,7 @@ class testMasterElements(unittest.TestCase):
                                                    offset=0,
                                                    size=4,
                                                    payloadOffset=5)
-        self.element.schema = loadSchema('./schemata/mide_ide.xml')
+        self.element.schema = loadSchema('./ebmlite/schemata/mide_ide.xml')
         self.element.id = 0x1A45DFA3
     
     
@@ -484,7 +484,7 @@ class testMasterElements(unittest.TestCase):
         masterEl = MasterElement()
         masterEl.id = 0x1A45DFA3
         masterEl.size = 4
-        masterEl.schema = loadSchema('./schemata/mide_ide.xml')
+        masterEl.schema = loadSchema('./ebmlite/schemata/mide_ide.xml')
         self.assertEqual(masterEl, self.element)
         
         sEbmlVer = self.element.parse()[0]
@@ -591,7 +591,7 @@ class testDocument(unittest.TestCase):
     def setUp(self):
         """ Set up a Schema from mide_ide.xml and create a Document from an IDE file. """
 
-        self.schema = loadSchema('./schemata/mide_ide.xml')
+        self.schema = loadSchema('./ebmlite/schemata/mide_ide.xml')
         self.doc = self.schema.load('./tests/SSX46714-doesnot.IDE')
         
         self.stream = StringIO('test')
@@ -653,9 +653,9 @@ class testSchema(unittest.TestCase):
             properly run tests.
         """
 
-        import core
+        from ebmlite import core
         core.SCHEMATA = {}
-        self.schema = loadSchema('./schemata/mide_ide.xml')
+        self.schema = loadSchema('./ebmlite/schemata/mide_ide.xml')
         
         self.stream = StringIO('test')
     
