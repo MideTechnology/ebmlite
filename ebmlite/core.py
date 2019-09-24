@@ -461,7 +461,8 @@ class UnknownElement(BinaryElement):
         present in a schema. Unlike other elements, each instance has its own
         ID.
     """
-    __slots__ = ("stream", "offset", "size", "payloadOffset", "_value", "id", "schema")
+    __slots__ = ("stream", "offset", "size", "payloadOffset", "_value", "id",
+                 "schema")
     name = "UnknownElement"
     precache = False
 
@@ -483,7 +484,8 @@ class UnknownElement(BinaryElement):
                 explicitly because `UnknownElement`s are not part of any
                 schema.
         """
-        super(UnknownElement, self).__init__(stream, offset, size, payloadOffset)
+        super(UnknownElement, self).__init__(stream, offset, size,
+                                             payloadOffset)
         self.id = eid
         self.schema = schema
 
@@ -509,7 +511,8 @@ class MasterElement(Element):
     """ Base class for an EBML 'master' element, a container for other
         elements.
     """
-    __slots__ = ("stream", "offset", "size", "payloadOffset", "_value")
+    __slots__ = ("stream", "offset", "size", "payloadOffset", "_value",
+                 "_size", "_length")
     dtype = list
 
     def parse(self):
