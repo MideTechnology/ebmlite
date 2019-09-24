@@ -23,5 +23,6 @@ setuptools.setup(
         package_dir={'': '.'},
         package_data={
             '': ['schemata/*', 'tests/*.ide', 'tests/*.mkv']
-        }
+        },
+        test_suite='tests',
 )
