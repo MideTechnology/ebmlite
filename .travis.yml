@@ -1,7 +1,7 @@
 # Linux, which just cooperates well
 os: linux
 language: python
-python: "2.7"
+python: 2.7
 #   - "3.4"
 #   - "3.5"
 #   - "3.6"
