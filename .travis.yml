@@ -1,18 +1,43 @@
-language: python
+install: pip install .
+script: python -m pytest
 
-python:
-  - "2.7"
-  - "3.4"
-  - "3.5"
-  - "3.6"
-  - "3.7"
+matrix:
+  include:
+    # Linux, which just cooperates well
+    - os: linux
+      language: python
+      python:
+        - "2.7"
+        - "3.4"
+        - "3.5"
+        - "3.6"
+        - "3.7"
+      install: pip install .
+      script: pytest
 
-os:
-  - windows
-  - linux
+    # Windows, which does not cooperate well, and needs separate cases for
+    # python 2.7 and 3.7, and I'm not sure how to support more 3.x versions
+    # just yet, but ¯\_(ツ)_/¯
+    - os: windows
+      language: shell
+      env: PATH=/c/Python27:/c/Python27/Scripts:$PATH
+      before_install:
+        - choco install python2
+        - python -m pip install virtualenv
+        - virtualenv $HOME/venv
+        - source $HOME/venv/Scripts/activate
+        - pip install pytest
+      install: pip install .
+      script: python -m pytest
 
-install:
-  - pip install .
-
-script:
-  - pytest
+    - os: windows
+      language: shell
+      env: PATH=/c/Python37:/c/Python37/Scripts:$PATH
+      before_install:
+        - choco install python
+        - python -m pip install virtualenv
+        - virtualenv $HOME/venv
+        - source $HOME/venv/Scripts/activate
+        - pip install pytest
+      install: pip install .
+      script: python -m pytest
