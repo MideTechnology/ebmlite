@@ -473,6 +473,29 @@ class UnknownElement(BinaryElement):
     name = "UnknownElement"
     precache = False
 
+    def __init__(self, stream=None, offset=0, size=0, payloadOffset=0, eid=None,
+                 schema=None):
+        """ Constructor. Instantiate a new `UnknownElement` from a file. In
+            most cases, elements should be created when a `Document` is loaded,
+            rather than instantiated explicitly.
+
+            @keyword stream: A file-like object containing EBML data.
+            @keyword offset: The element's starting location in the file.
+            @keyword size: The size of the whole element.
+            @keyword payloadOffset: The starting location of the element's
+                payload (i.e. immediately after the element's header).
+            @keyword id: The unknown element's ID. Unlike 'normal' elements,
+                in which ID is a class attribute, each UnknownElement instance
+                explicitly defines this.
+            @keyword schema: The schema used to load the element. Specified
+                explicitly because `UnknownElement`s are not part of any
+                schema.
+        """
+        super(UnknownElement, self).__init__(stream, offset, size, payloadOffset)
+        self.id = eid
+        self.schema = schema
+
+
     def __eq__(self, other):
         """ Equality check. Unknown elements are considered equal if they have
             the same ID and value. Note that this differs from the criteria
@@ -526,9 +549,8 @@ class MasterElement(Element):
             etype = self.schema.elements[eid]
             el = etype(stream, offset, esize, payloadOffset)
         except KeyError:
-            el = UnknownElement(stream, offset, esize, payloadOffset)
-            el.id = eid
-            el.schema = getattr(self, "schema", None)
+            el = self.schema.UNKNOWN(stream, offset, esize, payloadOffset,
+                                     eid=eid, schema=self.schema)
 
         if el.precache and not nocache:
             # Read the value now, avoiding a seek later.
@@ -979,6 +1001,11 @@ class Schema(object):
             attribute data. It may have additional items not present in the
             created element class' attributes.
 
+        @ivar UNKNOWN: A class/function that handles unknown element IDs. By
+            default, this is the `UnknownElement` class. Special-case handling
+            can be done by substituting a different class, or an
+            element-producing factory function.
+
         @ivar source: The source from which the Schema was loaded; either a
             filename or a file-like stream.
         @ivar filename: The absolute path of the source file, if the source
@@ -1009,6 +1036,11 @@ class Schema(object):
         'master': MasterElement,
     }
 
+    # The handler for unknown element IDs. By default, this is just the
+    # `UnknownElement` class. Special-case handling of unknown elements can
+    # be done by substituting a different class, or an element-producing
+    # factory function.
+    UNKNOWN = UnknownElement
 
     def __init__(self, source, name=None):
         """ Constructor. Creates a new Schema from a schema description XML.
@@ -1137,7 +1169,6 @@ class Schema(object):
 
             @param eid: The element's EBML ID.
             @param ename: The element's name.
-            @param etype: The element's type (string, see `ELEMENT_TYPES`)
             @keyword multiple: If `True`, an EBML document can contain more
                 than one of this element. Not currently enforced.
             @keyword mandatory: If `True`, a valid EBML document requires one

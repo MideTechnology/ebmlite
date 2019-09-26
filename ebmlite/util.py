@@ -27,6 +27,8 @@ import ebmlite.encoding as encoding
 
 from base64 import b64encode
 
+__all__ = ['toXml', 'xml2ebml', 'loadXml', 'pprint']
+
 #===============================================================================
 #
 #===============================================================================
@@ -131,6 +133,10 @@ def xmlElement2ebml(xmlEl, ebmlFile, schema, sizeLength=None, unknown=True):
         @raise NameError: raised if an xml element is not present in the schema and unknown is False, OR if the xml
             element does not have an ID.
     """
+    if not isinstance(xmlEl.tag, basestring):
+        # (Probably) a comment; disregard.
+        return 0
+        
     try:
         cls = schema[xmlEl.tag]
         encId = encoding.encodeId(cls.id)

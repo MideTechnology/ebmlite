@@ -1,6 +1,7 @@
 .project
 .pydevproject
 .idea
+*.sublime-*
 
 *.7z
 *.bak
@@ -14,5 +15,12 @@
 
 build/*
 dist/*
+<<<<<<< HEAD
 venv/*
 */.*
+=======
+*.egg*
+
+env2/
+env3/
+>>>>>>> master

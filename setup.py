@@ -5,7 +5,7 @@ with open('README.md', 'r') as fh:
 
 setuptools.setup(
         name='ebmlite',
-        version='1.0.1',
+        version='1.0.2',
         author='Mide Technology',
         author_email='help@mide.com',
         description='A lightweight, "pure Python" library for parsing EBML (Extensible Binary Markup Language) data.',
@@ -22,5 +22,6 @@ setuptools.setup(
         package_dir={'': '.'},
         package_data={
             '': ['schemata/*', 'tests/*.ide', 'tests/*.mkv']
-        }
+        },
+        test_suite='tests',
 )
