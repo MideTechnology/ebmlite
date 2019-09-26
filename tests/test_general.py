@@ -79,7 +79,7 @@ class Test(unittest.TestCase):
                 if issubclass(x, core.Element):
                     xmlEls2.append(x)
 
-        np.testing.assert_array_equal(xmlString1, xmlString2)
+        self.assertTrue(xmlString1 == xmlString2, 'Difference in MKV files, too large to print')
 
 
     def testIde(self):
@@ -133,7 +133,7 @@ class Test(unittest.TestCase):
                 if issubclass(x, core.Element):
                     xmlEls2.append(x)
 
-        np.testing.assert_array_equal(xmlString1, xmlString2)
+        self.assertTrue(xmlString1 == xmlString2, 'Difference in IDE files, too large to print')
 
 
 
@@ -174,19 +174,7 @@ class Test(unittest.TestCase):
         xmlString2 = ET.tostring(ebmlRoot2, encoding='latin-1')
         xmlString2 = xmlString2.replace('><'.encode('latin-1'), '>\r\n<'.encode('latin-1'))
 
-        # Convert the xml strings into lists of lines to make comparison easier,
-        # dropping the second line because that will reference different source
-        # file names
-        xmlLines1 = xmlString1.splitlines()
-        xmlLines1 = xmlLines1[2:]
-        xmlLines2 = xmlString2.splitlines()
-        xmlLines2 = xmlLines2[2:]
-
-        # Compare as lists to narrow the location of any differences
-        #self.assertListEqual(xmlLines1, xmlLines2,
-        #                     'One or more lines are different in the xml documents')
-
-        np.testing.assert_array_equal(xmlString1, xmlString2)
+        self.assertTrue(xmlString1 == xmlString2, 'Difference in infinite element, too large to print')
 
 
 if __name__ == "__main__":

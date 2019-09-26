@@ -4,10 +4,10 @@ language: python
 python:
   - "2.7.14"
   - "2.7.15"
-#   - "3.4"
-#   - "3.5"
-#   - "3.6"
-#   - "3.7"
+  - "3.4"
+  - "3.5"
+  - "3.6"
+  - "3.7"
 install: pip install .
 script: python -m pytest
 
@@ -26,13 +26,15 @@ matrix:
         - virtualenv $HOME/venv
         - source $HOME/venv/Scripts/activate
         - pip install pytest
+        - pip install numpy
 
-    # - os: windows
-    #   language: shell
-    #   env: PATH=/c/Python37:/c/Python37/Scripts:$PATH
-    #   before_install:
-    #     - choco install python
-    #     - python -m pip install virtualenv
-    #     - virtualenv $HOME/venv
-    #     - source $HOME/venv/Scripts/activate
-    #     - pip install pytest
+    - os: windows
+      language: shell
+      env: PATH=/c/Python37:/c/Python37/Scripts:$PATH
+      before_install:
+        - choco install python
+        - python -m pip install virtualenv
+        - virtualenv $HOME/venv
+        - source $HOME/venv/Scripts/activate
+        - pip install pytest
+          - pip install numpy

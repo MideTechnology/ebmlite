@@ -27,6 +27,11 @@ import ebmlite.encoding as encoding
 
 from base64 import b64encode
 
+if sys.version_info.major == 3:
+    from builtins import str as unicode
+    basestring = unicode
+    long = int
+
 __all__ = ['toXml', 'xml2ebml', 'loadXml', 'pprint']
 
 #===============================================================================
