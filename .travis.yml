@@ -37,4 +37,5 @@ matrix:
         - virtualenv $HOME/venv
         - source $HOME/venv/Scripts/activate
         - pip install pytest
-          - pip install numpy
+        - pip install numpy
+
