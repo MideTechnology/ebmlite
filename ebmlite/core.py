@@ -551,7 +551,7 @@ class MasterElement(Element):
         except KeyError:
             el = self.schema.UNKNOWN(stream, offset, esize, payloadOffset,
                                      eid=eid, schema=self.schema)
-
+        el.sizeLength = sizelen
         if el.precache and not nocache:
             # Read the value now, avoiding a seek later.
             el._value = el.parse(stream, el.size)

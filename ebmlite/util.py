@@ -79,6 +79,8 @@ def toXml(el, parent=None, offsets=True, sizes=True, types=True, ids=True):
         xmlEl.set('offset', str(el.offset))
     if sizes:
         xmlEl.set('size', str(el.size).strip(u'L'))
+        if hasattr(el, 'sizeLength'):
+            xmlEl.set('sizeLength', str(el.sizeLength))
 
     if isinstance(el, core.MasterElement):
         for chEl in el:
@@ -184,7 +186,7 @@ def xmlElement2ebml(xmlEl, ebmlFile, schema, sizeLength=None, unknown=True):
 
         size = 0
         for chEl in xmlEl:
-            size += xmlElement2ebml(chEl, ebmlFile, schema, sl)
+            size += xmlElement2ebml(chEl, ebmlFile, schema)
         endPos = ebmlFile.tell()
         ebmlFile.seek(sizePos)
         if sys.version_info.major == 3:
