@@ -552,7 +552,10 @@ class MasterElement(Element):
             # Read the value now, avoiding a seek later.
             el._value = el.parse(stream, el.size)
 
-        return el, payloadOffset + el.size
+        try:
+            return el, payloadOffset + el.size
+        except TypeError:
+            return el, payloadOffset
 
 
     @classmethod
@@ -623,7 +626,10 @@ class MasterElement(Element):
         # TODO: Better support for 'infinite' elements (getting the size of
         # an infinite element iterates over it, so there's duplicated effort.)
         pos = self.payloadOffset
-        payloadEnd = pos + self.size
+        try:
+            payloadEnd = pos + self.size
+        except TypeError:
+            raise StopIteration()
         while pos < payloadEnd:
             self.stream.seek(pos)
             try:
