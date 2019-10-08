@@ -511,7 +511,7 @@ class MasterElement(Element):
     """ Base class for an EBML 'master' element, a container for other
         elements.
     """
-    __slots__ = ("stream", "offset", "size", "payloadOffset", "_value",
+    __slots__ = ("stream", "offset", "payloadOffset", "_value",
                  "_size", "_length")
     dtype = list
 
@@ -552,10 +552,7 @@ class MasterElement(Element):
             # Read the value now, avoiding a seek later.
             el._value = el.parse(stream, el.size)
 
-        try:
-            return el, payloadOffset + el.size
-        except TypeError:
-            return el, payloadOffset
+        return el, payloadOffset + el.size
 
 
     @classmethod
@@ -626,10 +623,8 @@ class MasterElement(Element):
         # TODO: Better support for 'infinite' elements (getting the size of
         # an infinite element iterates over it, so there's duplicated effort.)
         pos = self.payloadOffset
-        try:
-            payloadEnd = pos + self.size
-        except TypeError:
-            raise StopIteration()
+        payloadEnd = pos + self.size
+
         while pos < payloadEnd:
             self.stream.seek(pos)
             try:
