@@ -16,7 +16,7 @@
 build/*
 dist/*
 <<<<<<< HEAD
-venv/*
+venv*/*
 */.*
 =======
 *.egg*
