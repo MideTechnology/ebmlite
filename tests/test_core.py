@@ -499,8 +499,12 @@ class testMasterElements(unittest.TestCase):
     def testParse(self):
         """ Test parsing MasterElements. """
 
-        masterEl = MasterElement()
-        masterEl.size = 4
+        eclass1 = type('MasterEl1Element', (MasterElement,),
+                      {'id':0x1A45DFA3, 'name':'MasterEl1',
+                      'schema':self.element.schema,
+                       '__slots__': MasterElement.__slots__})
+
+        masterEl = eclass1(self.mockStream, offset=0, size=4, payloadOffset=5)
         self.assertEqual(masterEl, self.element)
 
         sEbmlVer = self.element.parse()[0]
