@@ -39,22 +39,22 @@ class testEncoding(unittest.TestCase):
         """ Test converting signed integers into bytes. """
         
         # chars
-        for i in range(-127, -1):
+        for i in range(-127, 0):
             self.assertEqual(encodeInt(i), chr(255 + i + 1),
                              'Character %X  not encoded properly' % (255 + i + 1))
             
         # int16
-        for i in range(-127, -1):
+        for i in range(-127, 0):
             self.assertEqual(encodeInt((i<<8) + 0x41), chr(255 + i + 1) + 'A',
                              'Character %X  not encoded properly' % (255 + i + 1))
             
         # int32
-        for i in range(-127, -1):
+        for i in range(-127, 0):
             self.assertEqual(encodeInt((i<<24) + 0x414141), chr(255 + i + 1) + 'AAA',
                              'Character %X  not encoded properly' % (255 + i + 1))
             
         # int64
-        for i in range(-127, -1):
+        for i in range(-127, 0):
             self.assertEqual(encodeInt((i<<56) + 0x41414141414141), chr(255 + i + 1) + 'AAAAAAA',
                              'Character %X  not encoded properly' % (255 + i + 1))
         
