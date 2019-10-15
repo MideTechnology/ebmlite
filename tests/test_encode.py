@@ -40,23 +40,23 @@ class testEncoding(unittest.TestCase):
         
         # chars
         for i in range(-128, 128):
-            self.assertEqual(encodeInt(i), chr(255 + i + 1),
-                             'Character %X  not encoded properly' % (255 + i + 1))
+            self.assertEqual(encodeInt(i), chr(i % 256),
+                             'Character %X  not encoded properly' % (i % 256))
             
         # int16
         for i in range(-128, 128):
-            self.assertEqual(encodeInt((i<<8) + 0x41), chr(255 + i + 1) + 'A',
-                             'Character %X  not encoded properly' % (255 + i + 1))
+            self.assertEqual(encodeInt((i<<8) + 0x41), chr(i % 256) + 'A',
+                             'Character %X  not encoded properly' % (i % 256))
             
         # int32
         for i in range(-128, 128):
-            self.assertEqual(encodeInt((i<<24) + 0x414141), chr(255 + i + 1) + 'AAA',
-                             'Character %X  not encoded properly' % (255 + i + 1))
+            self.assertEqual(encodeInt((i<<24) + 0x414141), chr(i % 256) + 'AAA',
+                             'Character %X  not encoded properly' % (i % 256))
             
         # int64
         for i in range(-128, 128):
-            self.assertEqual(encodeInt((i<<56) + 0x41414141414141), chr(255 + i + 1) + 'AAAAAAA',
-                             'Character %X  not encoded properly' % (255 + i + 1))
+            self.assertEqual(encodeInt((i<<56) + 0x41414141414141), chr(i % 256) + 'AAAAAAA',
+                             'Character %X  not encoded properly' % (i % 256))
         
            
      
