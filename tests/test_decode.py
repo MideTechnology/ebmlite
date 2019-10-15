@@ -21,7 +21,7 @@ class testDecoding(unittest.TestCase):
             byte of the size.
         """
         
-        for i in range(1, 255):
+        for i in range(1, 256):
             self.assertEqual(decodeIntLength(i),
                              (ceil(8 - log(i, 2)), i - 2**floor(log(i, 2)) ))
             
@@ -32,7 +32,7 @@ class testDecoding(unittest.TestCase):
             the ID.
         """
         
-        for i in range(16, 255):
+        for i in range(16, 256):
             self.assertEqual((ceil(8-log(i, 2)), i), decodeIDLength(i))
 
 
