@@ -123,7 +123,7 @@ def encodeUInt(val, length=None):
             left-padded with ``0x00`` if `length` is not `None`.
         @raise ValueError: raised if val is longer than length.
     """
-    pad = '\x00'
+    pad = b'\x00'
     packed = _struct_uint64.pack(val).lstrip(pad)
 
     if length is None:
@@ -146,15 +146,15 @@ def encodeInt(val, length=None):
         @raise ValueError: raised if val is longer than length.
     """
     if val == 0:
-        packed = ''
-        pad = '\x00'
+        packed = b''
+        pad = b'\x00'
     elif val > 0:
-        pad = '\x00'
+        pad = b'\x00'
         packed = _struct_int64.pack(val).lstrip(pad)
         if ord(packed[0]) & 0b10000000:
             packed = pad + packed
     else:
-        pad = '\xff'
+        pad = b'\xff'
         packed = _struct_int64.pack(val).lstrip(pad) or pad
         if not ord(packed[0]) & 0b10000000:
             packed = pad + packed
