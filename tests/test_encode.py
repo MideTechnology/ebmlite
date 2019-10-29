@@ -12,54 +12,87 @@ class testEncoding(unittest.TestCase):
     
     def testUInt(self):
         """ Test converting unsigned ints to bytes. """
-        
-        # chars
-        for i in range(1, 255):
-            self.assertEqual(encodeUInt(i), chr(i),
+
+        # General cases
+        #   chars
+        for i in range(0, 256):
+            self.assertEqual(encodeUInt(i, length=1), chr(i),
                              'Character %X not encoded properly' % i)
             
-        # uint16
-        for i in range(1, 255):
-            self.assertEqual(encodeUInt((i<<8) + 0x41), chr(i) + 'A',
+        #   uint16
+        for i in range(0, 256):
+            self.assertEqual(encodeUInt((i<<8) + 0x41, length=2), chr(i) + 'A',
                              'Character %X not encoded properly' % i)
             
-        # uint32
-        for i in range(1, 255):
-            self.assertEqual(encodeUInt((i<<24) + 0x414141), chr(i) + 'AAA',
+        #   uint32
+        for i in range(0, 256):
+            self.assertEqual(encodeUInt((i<<24) + 0x414141, length=4), chr(i) + 'AAA',
                              "Character %X not encoded properly" % i)
             
-        # uint64
-        for i in range(1, 255):
-            self.assertEqual(encodeUInt((i<<56) + 0x41414141414141), chr(i) + 'AAAAAAA',
+        #   uint64
+        for i in range(0, 256):
+            self.assertEqual(encodeUInt((i<<56) + 0x41414141414141, length=8), chr(i) + 'AAAAAAA',
                              'Character %X not encoded properly' % i)
-            
-    
-    
+
+        # Length paramater behavior
+        #   unspecified length calls should truncate to smallest length possible
+        self.assertEqual(encodeUInt(0x123), '\x01\x23')
+        #   which for zero is an empty string
+        self.assertEqual(encodeUInt(0), '')
+        
+        #   specified length should pad to given length for all values
+        self.assertEqual(encodeUInt(0x123, length=3), '\x00\x01\x23')
+        #   and specifying a length that's too small should result in a ValueError
+        with self.assertRaises(ValueError):
+            encodeUInt(0x123, length=1)
+
+
+
     def testInt(self):
         """ Test converting signed integers into bytes. """
+
+        # General cases
+        #   chars
+        for i in range(-128, 128):
+            self.assertEqual(encodeInt(i, length=1), chr(i % 256),
+                             'Character %X  not encoded properly' % (i % 256))
+            
+        #   int16
+        for i in range(-128, 128):
+            self.assertEqual(encodeInt((i<<8) + 0x41, length=2), chr(i % 256) + 'A',
+                             'Character %X  not encoded properly' % (i % 256))
+            
+        #   int32
+        for i in range(-128, 128):
+            self.assertEqual(encodeInt((i<<24) + 0x414141, length=4), chr(i % 256) + 'AAA',
+                             'Character %X  not encoded properly' % (i % 256))
+            
+        #   int64
+        for i in range(-128, 128):
+            self.assertEqual(encodeInt((i<<56) + 0x41414141414141, length=8), chr(i % 256) + 'AAAAAAA',
+                             'Character %X  not encoded properly' % (i % 256))
+
+        # Length paramater behavior
+        #   unspecified length calls should truncate to smallest length possible
+        self.assertEqual(encodeInt(0x123), '\x01\x23')
+        self.assertEqual(encodeInt(-0x123), '\xfe\xdd')
+        #   which for zero is an empty string
+        self.assertEqual(encodeInt(0), '')
+        self.assertEqual(encodeInt(-1), '\xff')
         
-        # chars
-        for i in range(-127, 0):
-            self.assertEqual(encodeInt(i), chr(255 + i + 1),
-                             'Character %X  not encoded properly' % (255 + i + 1))
-            
-        # int16
-        for i in range(-127, 0):
-            self.assertEqual(encodeInt((i<<8) + 0x41), chr(255 + i + 1) + 'A',
-                             'Character %X  not encoded properly' % (255 + i + 1))
-            
-        # int32
-        for i in range(-127, 0):
-            self.assertEqual(encodeInt((i<<24) + 0x414141), chr(255 + i + 1) + 'AAA',
-                             'Character %X  not encoded properly' % (255 + i + 1))
-            
-        # int64
-        for i in range(-127, 0):
-            self.assertEqual(encodeInt((i<<56) + 0x41414141414141), chr(255 + i + 1) + 'AAAAAAA',
-                             'Character %X  not encoded properly' % (255 + i + 1))
-        
-           
-     
+        #   specified length should pad to given length for all values
+        self.assertEqual(encodeInt(0x123, length=3), '\x00\x01\x23')
+        self.assertEqual(encodeInt(-0x123, length=3), '\xff\xfe\xdd')
+        #   and specifying a length that's too small should result in a ValueError
+        with self.assertRaises(ValueError):
+            encodeInt(0x123, length=1)
+        with self.assertRaises(ValueError):
+            encodeInt(-0x123, length=1)
+        with self.assertRaises(ValueError):
+            encodeInt(-1, length=0)
+
+
+
     def testFloat(self):
         """ Test converting floats into bytes. """
         
