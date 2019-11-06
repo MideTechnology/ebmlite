@@ -20,21 +20,19 @@ matrix:
       language: shell
       env: PATH=/c/Python27:/c/Python27/Scripts:$PATH
       before_install:
-        - choco install python2
+        - choco install python2 --version=2.7.17
         - python -m pip install virtualenv
         - virtualenv $HOME/venv
         - source $HOME/venv/Scripts/activate
-        - pip install pytest
-        - pip install numpy
+        - pip install pytest numpy
 
     - os: windows
       language: shell
       env: PATH=/c/Python37:/c/Python37/Scripts:$PATH
       before_install:
-        - choco install python
+        - choco install python --version=3.7.4
         - python -m pip install virtualenv
         - virtualenv $HOME/venv
         - source $HOME/venv/Scripts/activate
-        - pip install pytest
-        - pip install numpy
+        - pip install pytest numpy
 
