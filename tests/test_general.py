@@ -8,8 +8,6 @@ import unittest
 from xml.dom.minidom import parseString
 from xml.etree import ElementTree as ET
 
-import numpy as np
-
 from ebmlite import core
 from ebmlite import util
 
