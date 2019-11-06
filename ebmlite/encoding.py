@@ -128,13 +128,15 @@ def encodeUInt(val, length=None):
             left-padded with ``0x00`` if `length` is not `None`.
         @raise ValueError: raised if val is longer than length.
     """
-    packed = _struct_uint64.pack(val).decode('latin-1').lstrip(u'\x00')
+    pad = u'\x00'
+    packed = _struct_uint64.pack(val).decode('latin-1').lstrip(pad)
+
     if length is None:
         return packed
     if len(packed) > length:
         raise ValueError("Encoded length (%d) greater than specified length "
                          "(%d)" % (len(packed), length))
-    return packed.rjust(length, u'\x00')
+    return packed.rjust(length, pad)
 
 
 def encodeInt(val, length=None):
@@ -153,19 +155,18 @@ def encodeInt(val, length=None):
         pad = u'\x00'
     elif val > 0:
         pad = u'\x00'
-        packed = _struct_int64.pack(val).decode('latin-1')
-        packed = packed.lstrip(pad)
+        packed = _struct_int64.pack(val).decode('latin-1').lstrip(pad)
         if isinstance(packed[0], int):
             if packed[0] & 0b10000000:
                 packed = pad + packed
         else:
             if ord(packed[0]) & 0b10000000:
                 packed = pad + packed
-        # Special case for -1 to avoid stripping data with padding below
-        # 2's complement of -1 is 0xFF, shortened to one byte is this value:
     else:
         pad = u'\xff'
-        packed = _struct_int64.pack(val).decode('latin-1').lstrip(pad)
+        packed = _struct_int64.pack(val).decode('latin-1').lstrip(pad) or pad
+        if not ord(packed[0]) & 0b10000000:
+            packed = pad + packed
 
     if length is None:
         return packed

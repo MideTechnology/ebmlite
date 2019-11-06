@@ -129,18 +129,25 @@
 		<!-- Digital pressure/other sensors -->
 		<MasterElement name="DigitalSensorMPL3115A2" id="0x4DA0" mandatory="0" multiple="0" minver="1">Indicates the presence of an MPL3115A2 P/T sensor on the I2C0 bus.</MasterElement>
 		<MasterElement name="DigitalSensorMS8607" id="0x4DA1" mandatory="0" multiple="0" minver="1">Indicates the presence of an MS8607 P/T/H sensor on the I2C1 bus.</MasterElement>
-    <MasterElement name="DigitalSensorMS5637" id="0x4DA2" mandatory="0" multiple="0" minver="1">Indicates the presence of an MS8607 P/T/H sensor on the I2C1 bus.</MasterElement>
-    <MasterElement name="DigitalSensorHTU21D" id="0x4DA3" mandatory="0" multiple="0" minver="1">Indicates the presence of an MS8607 P/T/H sensor on the I2C1 bus.</MasterElement>
+        <MasterElement name="DigitalSensorMS5637" id="0x4DA2" mandatory="0" multiple="0" minver="1">Indicates the presence of an MS5637 pressure sensor on the I2C1 bus.</MasterElement>
+        <MasterElement name="DigitalSensorHTU21D" id="0x4DA3" mandatory="0" multiple="0" minver="1">Indicates the presence of an HTU21D humidity sensor on the I2C1 bus.</MasterElement>
 
 		<!-- Timing/Sync inputs -->
 		<MasterElement name="DigitalSensorIR" id="0x4DB0" mandatory="0" multiple="0" minver="1">Indicates the presence of a digital IR sensor.</MasterElement>
 
 		<!-- GPS/Sync inputs -->
 		<MasterElement name="DigitalSensorGPS_UART" id="0x4DC0" mandatory="0" multiple="0" minver="1">Indicates the presence of a GPS with full data (location) broken out on UART.</MasterElement>
+        <MasterElement name="DigitalSensorGPS_CAMM8" id="0x4DC1" mandatory="0" multiple="0" minver="1">Indicates the presence of a GPS with full data (location) broken out on UART.</MasterElement>
+
+        <!-- Battery charger ICs -->
+        <MasterElement name="ChargerMCP73837" id="0x4D60" mandatory="0" multiple="0" minver="1">Indicates the presence of a MCP73837 battery charger.</MasterElement>
+        <MasterElement name="ChargerMAX14747" id="0x4D61" mandatory="0" multiple="0" minver="1">Indicates the presence of a MAX14747 battery charger.</MasterElement>
+
+        <!-- Communication -->
+        <MasterElement name="CommunicationWiFi_ESP32" id="0x4D70" mandatory="0" multiple="0" minver="1">Indicates the presence of an ESP32 Wi-Fi module.</MasterElement>
 
 		<!-- Misc. -->
-
-		<MasterElement name="DigitalSensorBHI160" id="0x4D94" mandatory="0" multiple="0" minver="1">Indicates the presence of a BNO055 IMU on the I2C0 bus.</MasterElement>
+        <MasterElement name="DigitalSensorBHI160" id="0x4D94" mandatory="0" multiple="0" minver="1">Indicates the presence of a Bosch BHI160 IMU on the I2C0 bus.</MasterElement>
 		<MasterElement name="DigitalSensorReset" id="0x4DD0" mandatory="0" multiple="0" minver="1">Indicates the presence of a hardware pushbutton reset controller.</MasterElement>
 		<MasterElement name="DigitalPowerMAX77801" id="0x4DD1" mandatory="0" multiple="0" minver="1">Indicates the presence of a MAX77801 power management IC on the I2C1 bus.</MasterElement>
 		<MasterElement name="DigitalLedThree" id="0x4DD2" mandatory="0" multiple="0" minver="1">Indicates that the membrane has a 3rd LED driven by the MCU.</MasterElement>

@@ -1127,7 +1127,7 @@ class Schema(object):
         """ Recursively crawl a schema XML definition file.
         """
         if el.tag == "Schema":
-            for chEl in el.getchildren():
+            for chEl in el:
                 self._parseSchema(chEl, self)
             return
 
@@ -1153,7 +1153,7 @@ class Schema(object):
         cls = self.addElement(eid, ename, baseClass, attribs, parent, docs)
 
         if baseClass is MasterElement:
-            for chEl in el.getchildren():
+            for chEl in el:
                 self._parseSchema(chEl, cls)
 
 

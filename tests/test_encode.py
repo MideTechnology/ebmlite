@@ -6,6 +6,12 @@ from ebmlite.encoding import encodeBinary, encodeDate, encodeFloat, encodeInt, \
     encodeString, encodeUInt
 
 
+def as_unicode(s):
+    if sys.version_info.major >= 3:
+        return s
+    else:
+        return unicode(s, 'latin-1')
+
 
 class testEncoding(unittest.TestCase):
     """ Unit tests for ebmlite.encoding"""
@@ -14,99 +20,85 @@ class testEncoding(unittest.TestCase):
     def testUInt(self):
         """ Test converting unsigned ints to bytes. """
 
-        if sys.version_info.major == 3:
-            # chars
-            for i in range(1, 255):
-                val = encodeUInt(i)
-                target = chr(i)
-                self.assertEqual(val, target,
-                                 'Character %X not encoded properly' % i)
+        # General cases
+        #   chars
+        for i in range(0, 256):
+            self.assertEqual(encodeUInt(i, length=1), as_unicode(chr(i)),
+                             'Character %X not encoded properly' % i)
+            
+        #   uint16
+        for i in range(0, 256):
+            self.assertEqual(encodeUInt((i<<8) + 0x41, length=2), as_unicode(chr(i) + 'A'),
+                             'Character %X not encoded properly' % i)
+            
+        #   uint32
+        for i in range(0, 256):
+            self.assertEqual(encodeUInt((i<<24) + 0x414141, length=4), as_unicode(chr(i) + 'AAA'),
+                             "Character %X not encoded properly" % i)
+            
+        #   uint64
+        for i in range(0, 256):
+            self.assertEqual(encodeUInt((i<<56) + 0x41414141414141, length=8), as_unicode(chr(i) + 'AAAAAAA'),
+                             'Character %X not encoded properly' % i)
 
-            # uint16
-            for i in range(1, 255):
-                self.assertEqual(encodeUInt((i<<8) + 0x41), chr(i) + u'A',
-                                 'Character %X not encoded properly' % i)
+        # Length paramater behavior
+        #   unspecified length calls should truncate to smallest length possible
+        self.assertEqual(encodeUInt(0x123), u'\x01\x23')
+        #   which for zero is an empty string
+        self.assertEqual(encodeUInt(0), u'')
+        
+        #   specified length should pad to given length for all values
+        self.assertEqual(encodeUInt(0x123, length=3), u'\x00\x01\x23')
+        #   and specifying a length that's too small should result in a ValueError
+        with self.assertRaises(ValueError):
+            encodeUInt(0x123, length=1)
 
-            # uint32
-            for i in range(1, 255):
-                self.assertEqual(encodeUInt((i<<24) + 0x414141), chr(i) + u'AAA',
-                                 "Character %X not encoded properly" % i)
 
-            # uint64
-            for i in range(1, 255):
-                self.assertEqual(encodeUInt((i<<56) + 0x41414141414141), chr(i) + u'AAAAAAA',
-                                 'Character %X not encoded properly' % i)
-        else:
-            # chars
-            for i in range(1, 255):
-                val = encodeUInt(i)
-                target = chr(i)
-                self.assertEqual(val, unicode(target, 'latin-1'),
-                                 b'Character %X not encoded properly' % i)
 
-            # uint16
-            for i in range(1, 255):
-                self.assertEqual(encodeUInt((i<<8) + 0x41), unicode(chr(i) + b'A', 'latin-1'),
-                                 'Character %X not encoded properly' % i)
-
-            # uint32
-            for i in range(1, 255):
-                self.assertEqual(encodeUInt((i<<24) + 0x414141), unicode(chr(i) + b'AAA', 'latin-1'),
-                                 "Character %X not encoded properly" % i)
-
-            # uint64
-            for i in range(1, 255):
-                self.assertEqual(encodeUInt((i<<56) + 0x41414141414141), unicode(chr(i) + b'AAAAAAA', 'latin-1'),
-                                 'Character %X not encoded properly' % i)
-    
-    
     def testInt(self):
         """ Test converting signed integers into bytes. """
 
-        if sys.version_info.major == 3:
-            # chars
-            for i in range(-127, -1):
-                self.assertEqual(encodeInt(i), chr(255 + i + 1),
-                                 'Character %X  not encoded properly' % (255 + i + 1))
+        # General cases
+        #   chars
+        for i in range(-128, 128):
+            self.assertEqual(encodeInt(i, length=1), as_unicode(chr(i % 256)),
+                             'Character %X  not encoded properly' % (i % 256))
+            
+        #   int16
+        for i in range(-128, 128):
+            self.assertEqual(encodeInt((i<<8) + 0x41, length=2), as_unicode(chr(i % 256) + 'A'),
+                             'Character %X  not encoded properly' % (i % 256))
+            
+        #   int32
+        for i in range(-128, 128):
+            self.assertEqual(encodeInt((i<<24) + 0x414141, length=4), as_unicode(chr(i % 256) + 'AAA'),
+                             'Character %X  not encoded properly' % (i % 256))
+            
+        #   int64
+        for i in range(-128, 128):
+            self.assertEqual(encodeInt((i<<56) + 0x41414141414141, length=8), as_unicode(chr(i % 256) + 'AAAAAAA'),
+                             'Character %X  not encoded properly' % (i % 256))
 
-            # int16
-            for i in range(-127, -1):
-                self.assertEqual(encodeInt((i << 8) + 0x41), chr(255 + i + 1) + u'A',
-                                 'Character %X  not encoded properly' % (255 + i + 1))
-
-            # int32
-            for i in range(-127, -1):
-                self.assertEqual(encodeInt((i << 24) + 0x414141), chr(255 + i + 1) + u'AAA',
-                                 'Character %X  not encoded properly' % (255 + i + 1))
-
-            # int64
-            for i in range(-127, -1):
-                self.assertEqual(encodeInt((i << 56) + 0x41414141414141),
-                                 chr(255 + i + 1) + u'AAAAAAA',
-                                 'Character %X  not encoded properly' % (255 + i + 1))
-        else:
-            # chars
-            for i in range(-127, -1):
-                self.assertEqual(encodeInt(i), unicode(chr(255 + i + 1), 'latin-1'),
-                                 'Character %X  not encoded properly' % (255 + i + 1))
-
-            # int16
-            for i in range(-127, -1):
-                self.assertEqual(encodeInt((i<<8) + 0x41), unicode(chr(255 + i + 1) + b'A', 'latin-1'),
-                                 'Character %X  not encoded properly' % (255 + i + 1))
-
-            # int32
-            for i in range(-127, -1):
-                self.assertEqual(encodeInt((i<<24) + 0x414141), unicode(chr(255 + i + 1) + b'AAA', 'latin-1'),
-                                 'Character %X  not encoded properly' % (255 + i + 1))
-
-            # int64
-            for i in range(-127, -1):
-                self.assertEqual(encodeInt((i<<56) + 0x41414141414141), unicode(chr(255 + i + 1) + b'AAAAAAA', 'latin-1'),
-                                 'Character %X  not encoded properly' % (255 + i + 1))
+        # Length paramater behavior
+        #   unspecified length calls should truncate to smallest length possible
+        self.assertEqual(encodeInt(0x123), u'\x01\x23')
+        self.assertEqual(encodeInt(-0x123), u'\xfe\xdd')
+        #   which for zero is an empty string
+        self.assertEqual(encodeInt(0), u'')
+        self.assertEqual(encodeInt(-1), u'\xff')
         
-           
-     
+        #   specified length should pad to given length for all values
+        self.assertEqual(encodeInt(0x123, length=3), u'\x00\x01\x23')
+        self.assertEqual(encodeInt(-0x123, length=3), u'\xff\xfe\xdd')
+        #   and specifying a length that's too small should result in a ValueError
+        with self.assertRaises(ValueError):
+            encodeInt(0x123, length=1)
+        with self.assertRaises(ValueError):
+            encodeInt(-0x123, length=1)
+        with self.assertRaises(ValueError):
+            encodeInt(-1, length=0)
+
+
     def testFloat(self):
         """ Test converting floats into bytes. """
         
