@@ -7,7 +7,7 @@ import sys
 
 from ebmlite.core import loadSchema, BinaryElement, DateElement, Element, FloatElement, \
         IntegerElement, MasterElement, StringElement, UIntegerElement, \
-        UnicodeElement, VoidElement
+        UnicodeElement, VoidElement, UnknownElement
 
            
                             
@@ -123,14 +123,20 @@ class testIntElements(unittest.TestCase):
         # 0b1111 1100  0001 1000 =>
         # 0xfc18
         self.mockStream = StringIO(b'\xfc\x18')
-                
-        self.intEl1 = IntegerElement(stream=self.mockStream, offset=0, size=4,
-                                     payloadOffset=2)
-        self.intEl1.id = 0x7c        
-        self.intEl1.schema = 'mide_ide.xml'
-        
-        self.uintEl1 = UIntegerElement(stream=self.mockStream, offset=0, size=4,
-                                       payloadOffset=2)
+
+        mide_schema = loadSchema('mide_ide.xml')
+        eclass1 = type('IntEl1Element', (IntegerElement,),
+                      {'id':0x7c, 'name':'IntEl1', 'schema':mide_schema,
+                       '__slots__': IntegerElement.__slots__})
+
+        eclass2 = type('UIntEl1Element', (UIntegerElement,),
+                      {'id':0x7c, 'name':'UIntEl1', 'schema':mide_schema,
+                       '__slots__': UIntegerElement.__slots__})
+
+        self.intEl1 = eclass1(stream=self.mockStream, offset=0, size=4,
+                              payloadOffset=2)
+        self.uintEl1 = eclass2(stream=self.mockStream, offset=0, size=4,
+                               payloadOffset=2)
 
     
     
@@ -161,17 +167,20 @@ class testIntElements(unittest.TestCase):
         m3 = StringIO(b'\x4f\x56\x71\xea')
 
         # Create IntegerElements
-        intEl1 = IntegerElement(stream=m1, offset=0, size=4, payloadOffset=2)
-        intEl1.id = 0x7c
-        intEl1.schema = 'mide_ide.xml'
-        
-        intEl2 = IntegerElement(stream=m2, offset=0, size=4, payloadOffset=2)
-        intEl2.id = 0x7c
-        intEl2.schema = 'mide_ide.xml'
-        
-        intEl3 = IntegerElement(stream=m3, offset=0, size=4, payloadOffset=2)
-        intEl3.id = 0x7c
-        intEl3.schema = 'mide_ide.xml'
+        mide_schema = loadSchema('mide_ide.xml')
+        eclass1 = type('IntEl1Element', (IntegerElement,),
+                      {'id':0x7c, 'name':'IntEl1', 'schema':mide_schema,
+                       '__slots__': IntegerElement.__slots__})
+        eclass2 = type('IntEl2Element', (IntegerElement,),
+                      {'id':0x7c, 'name':'IntEl2', 'schema':mide_schema,
+                       '__slots__': IntegerElement.__slots__})
+        eclass3 = type('IntEl3Element', (IntegerElement,),
+                      {'id':0x7c, 'name':'IntEl3', 'schema':mide_schema,
+                       '__slots__': IntegerElement.__slots__})
+
+        intEl1 = eclass1(stream=m1, offset=0, size=4, payloadOffset=2)
+        intEl2 = eclass2(stream=m2, offset=0, size=4, payloadOffset=2)
+        intEl3 = eclass3(stream=m3, offset=0, size=4, payloadOffset=2)
 
         # Assert that the first two elements are not equal
         self.assertNotEqual(intEl1, intEl2)
@@ -208,14 +217,17 @@ class testFloatElements(unittest.TestCase):
         """
 
         self.mockStream = StringIO(b'\x4f\x56\x3e\xaa\xaa\xab')
-                
-        self.floatEl = FloatElement(stream=self.mockStream, offset=0, size=4,
-                                     payloadOffset=2)
-        self.floatEl.id = 0x7c        
-        self.floatEl.schema = 'mide_ide.xml'
-    
-    
-    
+
+        mide_schema = loadSchema('mide_ide.xml')
+        eclass1 = type('FloatEl1Element', (FloatElement,),
+                      {'id':0x7c, 'name':'FloatEl1', 'schema':mide_schema,
+                       '__slots__': FloatElement.__slots__})
+
+        self.floatEl = eclass1(stream=self.mockStream, offset=0, size=4,
+                               payloadOffset=2)
+
+
+
     def testFloatEq(self):
         """ Test equality of FloatElements with floats. """
 
@@ -250,43 +262,53 @@ class testStringElements(unittest.TestCase):
         """
 
         self.mockStream = StringIO(b'\x4f\x40bork\x4f\x40bork')
-                
-        self.strEl1 = StringElement(stream=self.mockStream, offset=0, size=4,
+
+        mide_schema = loadSchema('mide_ide.xml')
+        matroska_schema = loadSchema('matroska.xml')
+
+        eclass1 = type('StrEl1Element', (StringElement,),
+                      {'id':0x7c, 'name':'StrEl1', 'schema':mide_schema,
+                       '__slots__': StringElement.__slots__})
+
+        eclass2 = type('StrEl2Element', (StringElement,),
+                      {'id':0x7c, 'name':'StrEl2', 'schema':mide_schema,
+                       '__slots__': StringElement.__slots__})
+
+        eclass3 = type('StrEl3Element', (StringElement,),
+                      {'id':0x5e, 'name':'StrEl3', 'schema':matroska_schema,
+                       '__slots__': StringElement.__slots__})
+
+        self.strEl1 = eclass1(stream=self.mockStream, offset=0, size=4,
+                            payloadOffset=2)
+
+        self.strEl2 = eclass2(stream=self.mockStream, offset=0, size=4,
                                      payloadOffset=2)
-        self.strEl1.id = 0x7c        
-        self.strEl1.schema = 'mide_ide.xml'
-                
-        self.strEl2 = StringElement(stream=self.mockStream, offset=0, size=4,
+
+        self.strEl3 = eclass3(stream=self.mockStream, offset=0, size=8,
                                      payloadOffset=2)
-        self.strEl2.id = 0x7c        
-        self.strEl2.schema = 'mide_ide.xml'
-                
-        self.strEl3 = StringElement(stream=self.mockStream, offset=0, size=8,
-                                     payloadOffset=2)
-        self.strEl3.id = 0x5e        
-        self.strEl3.schema = 'matroska.xml'
-        
+
+
         self.uniEl = UnicodeElement(stream=self.mockStream, offset=0, size=4,
                                     payloadOffset=2)
-    
-    
-    
+
+
+
     def testStringEq(self):
         """ Test equality for StringElements. """
 
         self.assertEqual(self.strEl1, self.strEl2)
         self.assertNotEqual(self.strEl2, self.strEl3)
-    
-    
-    
+
+
+
     def testStringLen(self):
         """ Test checking the length of StringElements. """
 
         self.assertEqual(len(self.strEl1), 4)
         self.assertEqual(len(self.strEl3), 8)
-    
-    
-    
+
+
+
     def testStringParse(self):
         """ Test parsing StringElements. """
 
@@ -300,56 +322,56 @@ class testStringElements(unittest.TestCase):
 
         self.assertEqual(self.strEl1.encodePayload(u'bork'), u'bork')
 
-    
-    
+
+
     def testUnicodeLen(self):
         """ Test getting the length of a UnicodeElement. """
 
         self.assertEqual(len(self.uniEl), 4)
-    
-    
-    
+
+
+
     def testUnicodeParse(self):
         """ Test parsing UnicodeElements. """
 
         self.mockStream.seek(2)
         self.assertEqual(self.uniEl.parse(self.mockStream, 4), u'bork')
-    
-    
-    
+
+
+
     def testUnicodeEncode(self):
         """ Test encoding UnicodeElements. """
 
         self.assertEqual(self.strEl1.encodePayload('bork'), u'bork')
-        
-        
-        
+
+
+
 class testDateElements(unittest.TestCase):
     """ Unit tests for ebmlite.core.DataElement """
-    
-    
-    
+
+
+
     def setUp(self):
         """ Set up the unit tests with a DateElement class with some
             custom data (id: 0x80, value: 0x07 71 E1 58 4D 0F 00 00).
         """
-                
+
         self.mockStream = StringIO(b'\x80\x07\x71\xe1\x58\x4d\x0f\x00\x00')
-        
+
         self.datEl = DateElement(stream=self.mockStream, offset=1, size=8,
                                  payloadOffset=1)
-    
-    
-    
+
+
+
     def testDateParse(self):
         """ Test parsing DateElements. """
 
         self.mockStream.seek(1)
         self.assertEqual(self.datEl.parse(self.mockStream, 8),
                          datetime.datetime(2018, 1, 1))
-    
-    
-    
+
+
+
     def testDateEncode(self):
         """ Test encoding DateElements. """
         val = self.datEl.encodePayload(datetime.datetime(2018, 1, 1))
@@ -359,53 +381,56 @@ class testDateElements(unittest.TestCase):
 
 class testBinaryElements(unittest.TestCase):
     """ Unit tests for ebmlite.core.BinaryElement """
-    
-    
-    
+
+
+
     def setUp(self):
         """ Set up the unit tests with a BinaryElement class with some
             custom data.
         """
 
         self.binEl = BinaryElement(StringIO(), size=2)
-    
-    
-    
+
+
+
     def testBinaryLen(self):
         """ Test getting the length of a BinaryElement. """
 
         self.assertEqual(len(self.binEl), 2)
-    
-    
-    
+
+
+
 class testVoidElements(unittest.TestCase):
     """ Unit tests for ebmlite.core.VoidElement """
-    
-    
-    
+
+
+
     def setUp(self):
         """ Set up the unit tests with a DateElement class with some
             custom data (id: -, value: 0x00 00 00 41).
         """
-                
+
         self.mockStream = StringIO()
 
         self.mockStream.string = '\x00\x00\x00A'
-                
-        self.voiEl = VoidElement(stream=self.mockStream, offset=1, size=4,
-                                     payloadOffset=1)
-        self.voiEl.id = 0x7c        
-        self.voiEl.schema = 'mide_ide.xml'
-    
-    
-    
+
+        mide_schema = loadSchema('mide_ide.xml')
+        eclass1 = type('VoidEl1Element', (VoidElement,),
+                      {'schema':mide_schema, id:0xEC,
+                       '__slots__': VoidElement.__slots__})
+
+        self.voiEl = eclass1(stream=self.mockStream, offset=1, size=4,
+                             payloadOffset=1)
+
+
+
     def testVoidParse(self):
         """ Test parsing a VoidElement. """
 
         self.assertEqual(self.voiEl.parse(self.mockStream, 4), bytearray())
-    
-    
-    
+
+
+
     def testVoidEncode(self):
         """ Test encoding VoidElements. """
 
@@ -416,51 +441,46 @@ class testVoidElements(unittest.TestCase):
     
 class testUnknownElements(unittest.TestCase):
     """ Unit tests for ebmlite.core.UnknownElement """
-    
-    
-    
+
+
+
     def setUp(self):
         """ Set up the unit tests with a DateElement class with some
             custom data (id: -, value: 0x00 00 00 41).
         """
-                
+
         self.mockStream = StringIO()
 
         self.mockStream.string = u'\x00\x00\x00A'
-                
-        self.unkEl1 = VoidElement(stream=self.mockStream, offset=1, size=4,
-                                     payloadOffset=1)
-        self.unkEl1.id = 0x7c        
-        self.unkEl1.schema = 'mide_ide.xml'
-                
-        self.unkEl2 = VoidElement(stream=self.mockStream, offset=1, size=4,
-                                     payloadOffset=1)
-        self.unkEl2.id = 0x7c        
-        self.unkEl2.schema = 'mide_ide.xml'
-                
-        self.unkEl3 = VoidElement(stream=self.mockStream, offset=1, size=4,
-                                     payloadOffset=1)
-        self.unkEl3.id = 0x7d       
-        self.unkEl3.schema = 'mide_ide.xml'
-    
-    
-    
+
+        mide_schema = loadSchema('mide_ide.xml')
+        self.unkEl1 = UnknownElement(stream=self.mockStream, offset=1, size=4,
+                                  payloadOffset=1, schema=mide_schema, eid=0x7c)
+
+        self.unkEl2 = UnknownElement(stream=self.mockStream, offset=1, size=4,
+                                  payloadOffset=1, schema=mide_schema, eid=0x7c)
+
+        self.unkEl3 = UnknownElement(stream=self.mockStream, offset=1, size=4,
+                                  payloadOffset=1, schema=mide_schema, eid=0x7c)
+
+
+
     def testUnknownEq(self):
         """ Test equality between UnknownElements. """
 
         self.assertEqual(self.unkEl1, self.unkEl2)
         self.assertNotEqual(self.unkEl1, self.unkEl3)
-        
-        
-        
+
+
+
 class testMasterElements(unittest.TestCase):
     """ Unit tests for ebmlite.core.MasterElement """
-    
-    
-    
+
+
+
     def setUp(self):
         """ Set up a MasterElement with a single UIntegerElement child. """
-        
+
         schema = loadSchema('./ebmlite/schemata/mide_ide.xml')
 
         """ Master Element:   ID: 0x1A45DFA3
@@ -468,87 +488,87 @@ class testMasterElements(unittest.TestCase):
                            Value:
                 UInt Element:   ID: 0x4286
                               Size: 0x81
-                             value: 0x42 
+                             value: 0x42
         """
         self.mockStream = StringIO(b'\x1A\x45\xDF\xA3\x84\x42\x86\x81\x10')
-        
+
         self.element = schema.elements[0x1A45DFA3](stream=self.mockStream,
                                                    offset=0,
                                                    size=4,
                                                    payloadOffset=5)
-        self.element.schema = loadSchema('./ebmlite/schemata/mide_ide.xml')
-        self.element.id = 0x1A45DFA3
-    
-    
-    
+
+
+
     def testParse(self):
         """ Test parsing MasterElements. """
 
-        masterEl = MasterElement()
-        masterEl.id = 0x1A45DFA3
-        masterEl.size = 4
-        masterEl.schema = loadSchema('./ebmlite/schemata/mide_ide.xml')
+        eclass1 = type('MasterEl1Element', (MasterElement,),
+                      {'id':0x1A45DFA3, 'name':'MasterEl1',
+                      'schema':self.element.schema,
+                       '__slots__': MasterElement.__slots__})
+
+        masterEl = eclass1(self.mockStream, offset=0, size=4, payloadOffset=5)
         self.assertEqual(masterEl, self.element)
-        
+
         sEbmlVer = self.element.parse()[0]
         sEbmlVer.stream = self.mockStream
         ebmlVer = masterEl.schema.elements[0x4286](masterEl.stream, 5, 1, 8)
-        ebmlVer.stream = self.mockStream        
+        ebmlVer.stream = self.mockStream
         ebmlVer._value = 16
         self.assertEqual(sEbmlVer, ebmlVer)
-    
-    
-    
+
+
+
     def testParseElement(self):
         """ Test parsing with parseElement. """
 
         self.mockStream.seek(5)
         newVer = self.element.parseElement(self.mockStream)[0]
-        
+
         ebmlVer = self.element.schema.elements[0x4286](self.mockStream, 5, 1, 8)
-        
+
         self.assertEqual(newVer, ebmlVer)
-    
-    
-    
+
+
+
     def testIter(self):
         """ Test getting an iterator from a MasterElement. """
 
         self.mockStream.seek(5)
-        
+
         ebmlVer = self.element.schema.elements[0x4286](self.mockStream, 5, 1, 8)
-        
+
         self.assertEqual(list(self.element), [ebmlVer])
-    
-    
-    
+
+
+
     def testLen(self):
         """ Test getting the length of a MasterElement. """
 
         self.assertEqual(len(self.element), 1)
-    
-    
-    
+
+
+
     def testValue(self):
         """ Test getting the value of MasterElements. """
 
         self.mockStream.seek(5)
-        
+
         ebmlVer = self.element.schema.elements[0x4286](self.mockStream, 5, 1, 8)
         self.assertEqual(self.element.value, [ebmlVer])
-    
-    
-    
+
+
+
     def testGetItem(self):
         """ Test getting items from MasterElements. """
 
         self.mockStream.seek(5)
-        
+
         ebmlVer = self.element.schema.elements[0x4286](self.mockStream, 5, 1, 8)
         self.assertEqual(self.element[0], ebmlVer)
-    
-    
-    
+
+
+
     def testGc(self):
         """ Test getting the cache from MasterElements. """
 
@@ -559,83 +579,83 @@ class testMasterElements(unittest.TestCase):
 
         self.element.gc()
         self.assertIsNone(self.element._value)
-    
-    
-    
+
+
+
     def testEncodePayload(self):
         """ Test encoding the payload of a MasterElement. """
 
         self.assertEqual(self.element.encodePayload({0x4286:16}),
                          u'\x42\x86\x81\x10')
-    
-    
-    
+
+
+
     def testEncode(self):
         """ Test encoding MasterElements. """
 
         self.assertEqual(self.element.encode({0x4286: 16}),
                          u'\x1A\x45\xDF\xA3\x84\x42\x86\x81\x10')
-    
-    
-    
+
+
+
     def testDump(self):
         """ Test dumping the contents of a MasterElement. """
 
         self.assertEqual(self.element.dump(),
                          collections.OrderedDict([['EBMLVersion', 16]]))
-        
-        
-        
+
+
+
 class testDocument(unittest.TestCase):
     """ Unit tests for ebmlite.core.Document """
-    
-    
-    
+
+
+
     def setUp(self):
         """ Set up a Schema from mide_ide.xml and create a Document from an IDE file. """
 
         self.schema = loadSchema('./ebmlite/schemata/mide_ide.xml')
         self.doc = self.schema.load('./tests/SSX46714-doesnot.IDE')
-        
+
         self.stream = StringIO(b'test')
-    
-    
-    
+
+
+
     def testClose(self):
         """ Test closing the stream in a Document """
 
         self.assertFalse(self.doc.stream.closed)
         self.doc.close()
         self.assertTrue(self.doc.stream.closed)
-    
-    
-    
+
+
+
     def testValue(self):
         """ Test getting the value from a Document. """
 
         self.assertEqual([x for x in self.doc], [x for x in self.doc.value])
         self.assertEqual(type(self.doc.value), types.GeneratorType)
-    
-    
-    
+
+
+
     def testVersion(self):
         """ Test getting the version of a Document. """
 
         self.assertEqual(self.doc.version, 2)
         self.doc.info['DocTypeVersion'] = 5
         self.assertEqual(self.doc.version, 5)
-    
-    
-    
+
+
+
     def testType(self):
         """ Test getting the type of a Document. """
 
         self.assertEqual(u'mide', self.doc.type)
         self.doc.info['DocType'] = 'bork'
         self.assertEqual(self.doc.type, 'bork')
-    
-    
-    
+
+
+
     def testEncode(self):
         """ Test encoding a Document. """
 
@@ -648,9 +668,9 @@ class testDocument(unittest.TestCase):
 
 class testSchema(unittest.TestCase):
     """ Unit tests for ebmlite.core.Schema """
-    
-    
-    
+
+
+
     def setUp(self):
         """ Set up a new Schema.  It is necessary to clear the cache to
             properly run tests.
@@ -659,11 +679,11 @@ class testSchema(unittest.TestCase):
         from ebmlite import core
         core.SCHEMATA = {}
         self.schema = loadSchema('./ebmlite/schemata/mide_ide.xml')
-        
+
         self.stream = StringIO(b'test')
-    
-    
-    
+
+
+
     def testAddElement(self):
         """ Test adding elements to a schema. """
 
@@ -674,27 +694,27 @@ class testSchema(unittest.TestCase):
         self.assertEqual(cls.id, 0x4DAB)
         self.assertEqual(cls.name, 'Dabs')
         self.assertEqual(cls.schema, self.schema)
-    
-    
-    
+
+
+
     def testGet(self):
         """ Test getting elements from a Schema. """
 
         self.assertEqual(self.schema.get(0x1A45DFA3).name, 'EBML')
         self.assertIsNone(self.schema.get(-1))
         self.assertEqual(self.schema.get(-1, 5), 5)
-    
-    
-    
+
+
+
     def testLoad(self):
         """ Test loading EMBL files with a Schema. """
 
         ide = self.schema.load('./tests/SSX46714-doesnot.IDE')
         self.assertEqual(dict(ide.info), 
-                         {'DocTypeVersion': 2, 'EBMLVersion': 1,
-                          'EBMLMaxIDLength': 4, 'EBMLReadVersion': 1,
-                          'EBMLMaxSizeLength': 8, 'DocTypeReadVersion': 2,
-                          'DocType': u'mide'})
+                         {'DocTypeVersion':2, 'EBMLVersion':1,
+                          'EBMLMaxIDLength':4, 'EBMLReadVersion':1,
+                          'EBMLMaxSizeLength':8, 'DocTypeReadVersion':2,
+                          'DocType':u'mide'})
     
     
     
@@ -704,28 +724,28 @@ class testSchema(unittest.TestCase):
         with open('./tests/SSX46714-doesnot.IDE', 'rb') as f:
             s = f.read()
         ide = self.schema.loads(s)
-        self.assertEqual(dict(ide.info), 
-                         {'DocTypeVersion': 2, 'EBMLVersion': 1,
-                          'EBMLMaxIDLength': 4, 'EBMLReadVersion': 1,
-                          'EBMLMaxSizeLength': 8, 'DocTypeReadVersion': 2,
-                          'DocType': u'mide'})
-    
-    
-    
+        self.assertEqual(dict(ide.info),
+                         {'DocTypeVersion':2, 'EBMLVersion':1,
+                          'EBMLMaxIDLength':4, 'EBMLReadVersion':1,
+                          'EBMLMaxSizeLength':8, 'DocTypeReadVersion':2,
+                          'DocType':u'mide'})
+
+
+
     def testVersion(self):
         """ Test getting the version of a Schema. """
 
         self.assertEqual(self.schema.version, 2)
-    
-    
-    
+
+
+
     def testType(self):
         """ Test getting the type of a Schema. """
 
         self.assertEqual(self.schema.type, 'mide')
-    
-    
-    
+
+
+
     def testEncode(self):
         """ Test encoding an Element with a Schema. """
 
