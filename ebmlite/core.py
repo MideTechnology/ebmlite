@@ -98,6 +98,8 @@ class Element(object):
         @cvar length: An explicit length (in bytes) of the element when
             encoding. `None` will use standard EBML variable-length encoding.
     """
+    __slots__ = ("stream", "offset", "size", "payloadOffset", "_value")
+
     # Parent `Schema`
     schema = None
 
@@ -263,6 +265,7 @@ class IntegerElement(Element):
     """ Base class for an EBML signed integer element. Schema-specific
         subclasses are generated when a `Schema` is loaded.
     """
+    __slots__ = ("stream", "offset", "size", "payloadOffset", "_value")
     dtype = int
     precache = True
 
@@ -292,6 +295,7 @@ class UIntegerElement(IntegerElement):
     """ Base class for an EBML unsigned integer element. Schema-specific
         subclasses are generated when a `Schema` is loaded.
     """
+    __slots__ = ("stream", "offset", "size", "payloadOffset", "_value")
     dtype = int
     precache = True
 
@@ -314,6 +318,7 @@ class FloatElement(Element):
     """ Base class for an EBML floating point element. Schema-specific
         subclasses are generated when a `Schema` is loaded.
     """
+    __slots__ = ("stream", "offset", "size", "payloadOffset", "_value")
     dtype = float
     precache = True
 
@@ -342,6 +347,7 @@ class StringElement(Element):
     """ Base class for an EBML ASCII string element. Schema-specific
         subclasses are generated when a `Schema` is loaded.
     """
+    __slots__ = ("stream", "offset", "size", "payloadOffset", "_value")
     dtype = str
 
     def __eq__(self, other):
@@ -373,6 +379,7 @@ class UnicodeElement(StringElement):
     """ Base class for an EBML UTF-8 string element. Schema-specific subclasses
         are generated when a `Schema` is loaded.
     """
+    __slots__ = ("stream", "offset", "size", "payloadOffset", "_value")
     dtype = unicode
 
     def __len__(self):
@@ -399,6 +406,7 @@ class DateElement(IntegerElement):
     """ Base class for an EBML 'date' element. Schema-specific subclasses are
         generated when a `Schema` is loaded.
     """
+    __slots__ = ("stream", "offset", "size", "payloadOffset", "_value")
     dtype = datetime
 
     def parse(self, stream, size):
@@ -421,6 +429,7 @@ class BinaryElement(Element):
         are generated when a `Schema` is loaded.
     """
 
+    __slots__ = ("stream", "offset", "size", "payloadOffset", "_value")
     def __len__(self):
         return self.size
 
@@ -432,6 +441,7 @@ class VoidElement(BinaryElement):
         its `value` is always returned as ``0xFF`` times its length. To get
         the actual contents, use `getRawValue()`.
     """
+    __slots__ = ("stream", "offset", "size", "payloadOffset", "_value")
 
     def parse(self, stream, size):
         return bytearray()
@@ -451,6 +461,8 @@ class UnknownElement(BinaryElement):
         present in a schema. Unlike other elements, each instance has its own
         ID.
     """
+    __slots__ = ("stream", "offset", "size", "payloadOffset", "_value", "id",
+                 "schema")
     name = "UnknownElement"
     precache = False
 
@@ -472,7 +484,8 @@ class UnknownElement(BinaryElement):
                 explicitly because `UnknownElement`s are not part of any
                 schema.
         """
-        super(UnknownElement, self).__init__(stream, offset, size, payloadOffset)
+        super(UnknownElement, self).__init__(stream, offset, size,
+                                             payloadOffset)
         self.id = eid
         self.schema = schema
 
@@ -498,6 +511,8 @@ class MasterElement(Element):
     """ Base class for an EBML 'master' element, a container for other
         elements.
     """
+    __slots__ = ("stream", "offset", "payloadOffset", "_value",
+                 "_size", "_length")
     dtype = list
 
     def parse(self):
@@ -609,6 +624,7 @@ class MasterElement(Element):
         # an infinite element iterates over it, so there's duplicated effort.)
         pos = self.payloadOffset
         payloadEnd = pos + self.size
+
         while pos < payloadEnd:
             self.stream.seek(pos)
             try:
@@ -1250,7 +1266,8 @@ class Schema(object):
                           {'id':eid, 'name':ename, 'schema':self,
                            'mandatory': mandatory, 'multiple': multiple,
                            'precache': precache, 'length':length,
-                           'children': dict(), '__doc__': docs})
+                           'children': dict(), '__doc__': docs,
+                           '__slots__': baseClass.__slots__})
 
             self.elements[eid] = eclass
             self.elementInfo[eid] = attribs
