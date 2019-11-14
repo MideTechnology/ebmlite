@@ -18,7 +18,6 @@ setuptools.setup(
                      'Natural Language :: English',
                      'Programming Language :: Python :: 2.7'],
         keywords='ebml binary matroska webm',
-        python_requires='~=2.7',
         packages=setuptools.find_packages(),
         package_dir={'': '.'},
         package_data={

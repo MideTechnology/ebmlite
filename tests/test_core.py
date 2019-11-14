@@ -2,127 +2,127 @@ import collections
 import datetime
 import types
 import unittest
-from StringIO import StringIO
+from io import BytesIO as StringIO
+import sys
 
 from ebmlite.core import loadSchema, BinaryElement, DateElement, Element, FloatElement, \
         IntegerElement, MasterElement, StringElement, UIntegerElement, \
         UnicodeElement, VoidElement, UnknownElement
 
-
-
+           
+                            
 class testCoreElement(unittest.TestCase):
     """ Unit tests for ebmlite.core.Element """
-
-
-
+    
+    
+    
     def setUp(self):
         """ Set up the unit tests with a generic Element class with some
             custom data (id: 0x4F56, value: 0x71EA).
         """
-
+        
         # set element as:
         #       id:   00 1111  0101 0110
         #    value:   11 0001  1110 1010
         #   header: 0100 1111  0101 0110
         #     data: 0111 0001  1110 1010
-        self.mockStream = StringIO('\x4f\x56\x71\xea')
-
-        GenericElement = type('GenericElement', (Element,),
-                              {'id':0x4343, 'name':'Generic Element',
+        self.mockStream = StringIO(b'\x4f\x56\x71\xea')
+        
+        GenericElement = type(str('GenericElement'), (Element,),
+                              {'id': 0x4343, 'name': 'Generic Element',
                                'schema':loadSchema('./ebmlite/schemata/mide_ide.xml'),
-                               'mandatory':False, 'multiple':False,
-                               'precache':False, 'length':4, 'children':dict(),
-                               '__doc__':'no'})
-
+                               'mandatory': False, 'multiple': False,
+                               'precache': False, 'length': 4, 'children': dict(),
+                               '__doc__': 'no'})
+        
         self.element = GenericElement(stream=self.mockStream, offset=0, size=4,
                                payloadOffset=2)
-
-
-
+        
+        
+    
     def testParse(self):
         """ Test parsing a generic element as a bytestring. """
-
-        self.assertEqual(self.element.parse(self.mockStream, 4), '\x4f\x56\x71\xea')
-
-
-
+        
+        self.assertEqual(self.element.parse(self.mockStream, 4), bytearray(u'\x4f\x56\x71\xea', 'latin-1'))
+    
+    
+    
     def testValue(self):
         """ Test getting a value from a generic element as a bytestring. """
-
+        
         # Test first parse
-        self.assertEqual(self.element.value, '\x71\xea')
-
+        self.assertEqual(self.element.value, bytearray(u'\x71\xea', 'latin-1'))
+        
         # Test that mockstring is empty and that the value has been cached
-        self.assertEqual(self.mockStream.pos, 4)
-        self.assertEqual(self.element.value, '\x71\xea')
-
-
-
+        self.assertEqual(len(self.mockStream.getvalue()) - len(self.mockStream.read()), 4)
+        self.assertEqual(self.element.value, bytearray(u'\x71\xea', 'latin-1'))
+    
+    
+    
     def testGetRaw(self):
         """ Test getting a raw bytestring of a full generic element. """
-
-        self.assertEqual(self.element.getRaw(), '\x4f\x56\x71\xea')
-
-
-
+        
+        self.assertEqual(self.element.getRaw(), b'\x4f\x56\x71\xea')
+                             
+    
+    
     def testGetRawValue(self):
         """ Test getting a raw bytestring of the data from a generic element. """
-
-        self.assertEqual(self.element.getRawValue(), '\x71\xea')
-
-
-
+        
+        self.assertEqual(self.element.getRawValue(), b'\x71\xea')
+    
+    
+    
     def testGc(self):
         """ Test clearing caches. """
-
+        
         self.assertEqual(self.element._value, None)
         self.assertEqual(self.element.gc(), 0)
 
         self.element.value
-        self.assertEqual(self.element._value, '\x71\xea')
-
+        self.assertEqual(self.element._value, bytearray(u'\x71\xea', 'latin-1'))
+        
         self.assertEqual(self.element.gc(), 1)
         self.assertEqual(self.element._value, None)
-
-
-
+    
+    
+    
     def testEncodePayload(self):
         """ Test encoding a payload. """
-
+        
         self.assertEqual(self.element.encodePayload('\x4f\x56\x71\xea', length=4),
-                         '\x4f\x56\x71\xea')
+                         u'\x4f\x56\x71\xea')
 
-
-
+    
+    
     def testEncode(self):
         """ Test encoding a full EBML element. """
 
-        self.assertEqual(self.element.encode('\x71\xea', 2), 'CC\x82\x71\xea')
-        pass
-
-
-
+        self.assertEqual(self.element.encode('\x71\xea', 2), u'CC\x82\x71\xea')
+    
+    
+    
     def testDump(self):
         """Test dumping an element to a dict"""
-
-        self.assertEqual(self.element.dump(), '\x71\xea')
-
-
-
+        
+        self.assertEqual(self.element.dump(), bytearray(u'\x71\xea', 'latin-1'))
+        
+        
+        
 class testIntElements(unittest.TestCase):
     """ Unit tests for ebmlite.core.IntElement """
-
-
-
+    
+    
+    
     def setUp(self):
         """ Set up the unit tests with an IntegerElement class with some
             custom data (id: -, value: 0xFC18).
         """
-
+        
         # -1000 = -0b0000 0011  1110 1000 =>
         # 0b1111 1100  0001 1000 =>
         # 0xfc18
-        self.mockStream = StringIO('\xfc\x18')
+        self.mockStream = StringIO(b'\xfc\x18')
 
         mide_schema = loadSchema('mide_ide.xml')
         eclass1 = type('IntEl1Element', (IntegerElement,),
@@ -138,30 +138,33 @@ class testIntElements(unittest.TestCase):
         self.uintEl1 = eclass2(stream=self.mockStream, offset=0, size=4,
                                payloadOffset=2)
 
-
-
+    
+    
     def testIntParse(self):
         """ Test parsing an IntegerElement. """
 
-        self.assertEqual(self.intEl1.parse(self.mockStream, 2), -1000)
-
-
-
+        self.assertEqual(self.intEl1.parse(self.mockStream, 2), -1000) 
+    
+    
+    
     def testIntEncode(self):
         """ Test encoding an IntegerElement. """
 
-        self.assertEqual(self.intEl1.encodePayload(0x4242, 2), 'BB')
-        self.assertEqual(self.intEl1.encodePayload(-1000, 2), '\xfc\x18')
+        val1 = self.intEl1.encodePayload(0x4242, 2)
+        self.assertEqual(val1, u'BB')
 
-
-
+        val2 = self.intEl1.encodePayload(-1000, 2)
+        self.assertEqual(val2, u'\xfc\x18')
+    
+    
+    
     def testIntEq(self):
         """ Test equality of IntegerElements. """
 
         # Define buffers for IntegerElements
-        m1 = StringIO('\x4f\x56\x71\xea')
-        m2 = StringIO('abcd')
-        m3 = StringIO('\x4f\x56\x71\xea')
+        m1 = StringIO(b'\x4f\x56\x71\xea')
+        m2 = StringIO(b'abcd')
+        m3 = StringIO(b'\x4f\x56\x71\xea')
 
         # Create IntegerElements
         mide_schema = loadSchema('mide_ide.xml')
@@ -186,34 +189,34 @@ class testIntElements(unittest.TestCase):
         intEl1.stream.seek(0)
         intEl3.stream.seek(0)
         self.assertEqual(intEl1, intEl3)
-
-
-
+        
+                
+    
     def testUIntParse(self):
         """ Test parsing UIntegerElements. """
 
         self.assertEqual(self.uintEl1.parse(self.mockStream, 2), 64536)
-
-
-
+    
+    
+    
     def testUintEncode(self):
         """ Test encoding UIntegerElements. """
 
-        self.assertEqual(self.uintEl1.encodePayload(0x4142), 'AB')
-
+        self.assertEqual(self.uintEl1.encodePayload(0x4142), u'AB')
+        
 
 
 class testFloatElements(unittest.TestCase):
     """ Unit tests for ebmlite.core.FloatElement """
-
-
-
+    
+    
+    
     def setUp(self):
         """ Set up the unit tests with a FloatElement class with some
             custom data (id: 0x4F56, value: 0x3E AA AB).
         """
 
-        self.mockStream = StringIO('\x4f\x56\x3e\xaa\xaa\xab')
+        self.mockStream = StringIO(b'\x4f\x56\x3e\xaa\xaa\xab')
 
         mide_schema = loadSchema('mide_ide.xml')
         eclass1 = type('FloatEl1Element', (FloatElement,),
@@ -229,36 +232,36 @@ class testFloatElements(unittest.TestCase):
         """ Test equality of FloatElements with floats. """
 
         self.assertAlmostEqual(self.floatEl.value, 1.0/3.0)
-
-
-
+    
+    
+    
     def testFloatParse(self):
         """ Test parsing FloatElements. """
 
         self.mockStream.seek(2)
         self.assertAlmostEqual(self.floatEl.parse(self.mockStream, 4), 1.0/3.0)
-
-
-
+    
+    
+    
     def testFloatEncode(self):
         """ Test encoding FloatElements. """
 
         self.assertEqual(self.floatEl.encodePayload(1.0/3.0, length=4),
-                         '\x3e\xaa\xaa\xab')
-
+                         u'\x3e\xaa\xaa\xab')
+        
 
 
 class testStringElements(unittest.TestCase):
     """ Unit tests for ebmlite.core.StringElement """
-
-
-
+    
+    
+    
     def setUp(self):
         """ Set up the unit tests with a StringElement class with some
             custom data (id: 0x4F40, value: 'bork').
         """
 
-        self.mockStream = StringIO('\x4f\x40bork\x4f\x40bork')
+        self.mockStream = StringIO(b'\x4f\x40bork\x4f\x40bork')
 
         mide_schema = loadSchema('mide_ide.xml')
         matroska_schema = loadSchema('matroska.xml')
@@ -310,14 +313,14 @@ class testStringElements(unittest.TestCase):
         """ Test parsing StringElements. """
 
         self.mockStream.seek(2)
-        self.assertEqual(self.strEl1.parse(self.mockStream, 4), 'bork')
-
-
-
+        self.assertEqual(self.strEl1.parse(self.mockStream, 4), u'bork')
+    
+    
+    
     def testStringEncode(self):
         """ Test encoding StringElements. """
 
-        self.assertEqual(self.strEl1.encodePayload('bork'), 'bork')
+        self.assertEqual(self.strEl1.encodePayload(u'bork'), u'bork')
 
 
 
@@ -353,7 +356,7 @@ class testDateElements(unittest.TestCase):
             custom data (id: 0x80, value: 0x07 71 E1 58 4D 0F 00 00).
         """
 
-        self.mockStream = StringIO('\x80\x07\x71\xe1\x58\x4d\x0f\x00\x00')
+        self.mockStream = StringIO(b'\x80\x07\x71\xe1\x58\x4d\x0f\x00\x00')
 
         self.datEl = DateElement(stream=self.mockStream, offset=1, size=8,
                                  payloadOffset=1)
@@ -371,10 +374,10 @@ class testDateElements(unittest.TestCase):
 
     def testDateEncode(self):
         """ Test encoding DateElements. """
-        self.assertEqual(self.datEl.encodePayload(datetime.datetime(2018, 1, 1)),
-                         '\x07\x71\xe1\x58\x4d\x0f\x00\x00')
-
-
+        val = self.datEl.encodePayload(datetime.datetime(2018, 1, 1))
+        self.assertEqual(val, u'\x07\x71\xe1\x58\x4d\x0f\x00\x00')
+    
+    
 
 class testBinaryElements(unittest.TestCase):
     """ Unit tests for ebmlite.core.BinaryElement """
@@ -432,10 +435,10 @@ class testVoidElements(unittest.TestCase):
         """ Test encoding VoidElements. """
 
         self.assertEqual(self.voiEl.encodePayload(0x41424344, length=4),
-                         '\xff\xff\xff\xff')
-
-
-
+                         u'\xff\xff\xff\xff')
+    
+    
+    
 class testUnknownElements(unittest.TestCase):
     """ Unit tests for ebmlite.core.UnknownElement """
 
@@ -448,7 +451,7 @@ class testUnknownElements(unittest.TestCase):
 
         self.mockStream = StringIO()
 
-        self.mockStream.string = '\x00\x00\x00A'
+        self.mockStream.string = u'\x00\x00\x00A'
 
         mide_schema = loadSchema('mide_ide.xml')
         self.unkEl1 = UnknownElement(stream=self.mockStream, offset=1, size=4,
@@ -458,7 +461,7 @@ class testUnknownElements(unittest.TestCase):
                                   payloadOffset=1, schema=mide_schema, eid=0x7c)
 
         self.unkEl3 = UnknownElement(stream=self.mockStream, offset=1, size=4,
-                                  payloadOffset=1, schema=mide_schema, eid=0x7c)
+                                  payloadOffset=1, schema=mide_schema, eid=0x7d)
 
 
 
@@ -487,7 +490,7 @@ class testMasterElements(unittest.TestCase):
                               Size: 0x81
                              value: 0x42
         """
-        self.mockStream = StringIO('\x1A\x45\xDF\xA3\x84\x42\x86\x81\x10')
+        self.mockStream = StringIO(b'\x1A\x45\xDF\xA3\x84\x42\x86\x81\x10')
 
         self.element = schema.elements[0x1A45DFA3](stream=self.mockStream,
                                                    offset=0,
@@ -583,15 +586,15 @@ class testMasterElements(unittest.TestCase):
         """ Test encoding the payload of a MasterElement. """
 
         self.assertEqual(self.element.encodePayload({0x4286:16}),
-                         bytearray('\x42\x86\x81\x10'))
+                         u'\x42\x86\x81\x10')
 
 
 
     def testEncode(self):
         """ Test encoding MasterElements. """
 
-        self.assertEqual(self.element.encode({0x4286:16}),
-                         bytearray('\x1A\x45\xDF\xA3\x84\x42\x86\x81\x10'))
+        self.assertEqual(self.element.encode({0x4286: 16}),
+                         u'\x1A\x45\xDF\xA3\x84\x42\x86\x81\x10')
 
 
 
@@ -614,7 +617,7 @@ class testDocument(unittest.TestCase):
         self.schema = loadSchema('./ebmlite/schemata/mide_ide.xml')
         self.doc = self.schema.load('./tests/SSX46714-doesnot.IDE')
 
-        self.stream = StringIO('test')
+        self.stream = StringIO(b'test')
 
 
 
@@ -647,7 +650,7 @@ class testDocument(unittest.TestCase):
     def testType(self):
         """ Test getting the type of a Document. """
 
-        self.assertEqual(self.doc.type, 'mide')
+        self.assertEqual(u'mide', self.doc.type)
         self.doc.info['DocType'] = 'bork'
         self.assertEqual(self.doc.type, 'bork')
 
@@ -657,9 +660,9 @@ class testDocument(unittest.TestCase):
         """ Test encoding a Document. """
 
         self.stream = StringIO()
-        self.doc.encode(self.stream, {0x52A1:50})
+        self.doc.encode(self.stream, {0x52A1: 50})
         self.stream.seek(0)
-        self.assertEqual(self.stream.buf, '\x52\xA1\x81\x32')
+        self.assertEqual(self.stream.getvalue(), b'\x52\xA1\x81\x32')
 
 
 
@@ -677,7 +680,7 @@ class testSchema(unittest.TestCase):
         core.SCHEMATA = {}
         self.schema = loadSchema('./ebmlite/schemata/mide_ide.xml')
 
-        self.stream = StringIO('test')
+        self.stream = StringIO(b'test')
 
 
 
@@ -707,14 +710,14 @@ class testSchema(unittest.TestCase):
         """ Test loading EMBL files with a Schema. """
 
         ide = self.schema.load('./tests/SSX46714-doesnot.IDE')
-        self.assertEqual(dict(ide.info),
+        self.assertEqual(dict(ide.info), 
                          {'DocTypeVersion':2, 'EBMLVersion':1,
                           'EBMLMaxIDLength':4, 'EBMLReadVersion':1,
                           'EBMLMaxSizeLength':8, 'DocTypeReadVersion':2,
-                          'DocType':'mide'})
-
-
-
+                          'DocType':u'mide'})
+    
+    
+    
     def testLoads(self):
         """ Test laoding EBML strings with a Schema. """
 
@@ -725,7 +728,7 @@ class testSchema(unittest.TestCase):
                          {'DocTypeVersion':2, 'EBMLVersion':1,
                           'EBMLMaxIDLength':4, 'EBMLReadVersion':1,
                           'EBMLMaxSizeLength':8, 'DocTypeReadVersion':2,
-                          'DocType':'mide'})
+                          'DocType':u'mide'})
 
 
 
@@ -746,29 +749,29 @@ class testSchema(unittest.TestCase):
     def testEncode(self):
         """ Test encoding an Element with a Schema. """
 
-        stream = StringIO('')
-        self.schema.encode(stream, {0x52A1:50})
+        stream = StringIO(b'')
+        self.schema.encode(stream, {0x52A1: 50})
         stream.seek(0)
-        self.assertEqual(stream.buf, '\x52\xA1\x81\x32')
-
-
-
+        self.assertEqual(stream.getvalue(), b'\x52\xA1\x81\x32')
+    
+    
+    
     def testEncodes(self):
         """ Test encoding an Element with a Schema from a string. """
 
-        self.assertEqual(self.schema.encodes({0x52A1:50}), '\x52\xA1\x81\x32')
-
-
-
+        self.assertEqual(self.schema.encodes({0x52A1: 50}), b'\x52\xA1\x81\x32')
+    
+    
+    
     def testVerify(self):
         """ Test verifying a string as valid with a Schema. """
 
-        self.assertTrue(self.schema.verify('\x42\x86\x81\x01'))
+        self.assertTrue(self.schema.verify(b'\x42\x86\x81\x01'))
         with self.assertRaises(IOError):
-            self.schema.verify('\x00\x42\x86\x81\x01')
-
-
-
+            self.schema.verify(b'\x00\x42\x86\x81\x01')
+        
+    
+    
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()

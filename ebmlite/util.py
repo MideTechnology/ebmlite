@@ -10,7 +10,8 @@ Created on Aug 11, 2017
 @todo: Add other options to command-line utility for the other arguments of
     `toXml()` and `xml2ebml()`.
 '''
-from StringIO import StringIO
+from __future__ import division, absolute_import, print_function, unicode_literals
+from io import BytesIO as StringIO
 
 __author__ = "dstokes"
 __copyright__ = "Copyright 2017 Mide Technology Corporation"
@@ -21,7 +22,15 @@ import sys
 import tempfile
 from xml.etree import ElementTree as ET
 
-import core, encoding
+import ebmlite.core as core
+import ebmlite.encoding as encoding
+
+from base64 import b64encode
+
+if sys.version_info.major == 3:
+    from builtins import str as unicode
+    basestring = unicode
+    long = int
 
 __all__ = ['toXml', 'xml2ebml', 'loadXml', 'pprint']
 
@@ -57,11 +66,11 @@ def toXml(el, parent=None, offsets=True, sizes=True, types=True, ids=True):
     else:
         xmlEl = ET.SubElement(parent, elname)
     if isinstance(el, core.Document):
-        xmlEl.set('source', str(el.filename))
-        xmlEl.set('schemaName', str(el.schema.name))
-        xmlEl.set('schemaFile', str(el.schema.filename))
+        xmlEl.set('source', el.filename)
+        xmlEl.set('schemaName', el.schema.name)
+        xmlEl.set('schemaFile', el.schema.filename)
     else:
-        if ids and isinstance(el.id, (int, long)):
+        if ids and isinstance(el.id, (int,)):
             xmlEl.set('id', "0x%X" % el.id)
         if types:
             xmlEl.set('type', el.dtype.__name__)
@@ -69,15 +78,28 @@ def toXml(el, parent=None, offsets=True, sizes=True, types=True, ids=True):
     if offsets:
         xmlEl.set('offset', str(el.offset))
     if sizes:
-        xmlEl.set('size', str(el.size).strip('L'))
+        xmlEl.set('size', str(el.size).strip(u'L'))
+        if hasattr(el, 'sizeLength'):
+            xmlEl.set('sizeLength', str(el.sizeLength))
 
     if isinstance(el, core.MasterElement):
         for chEl in el:
             toXml(chEl, xmlEl, offsets, sizes, types)
     elif isinstance(el, core.BinaryElement):
-        xmlEl.text = b64encode(el.value)
+       
+        if sys.version_info.major == 3:
+            xmlEl.text = b64encode(el.value).decode()
+        else:
+            xmlEl.text = b64encode(el.value)
     elif not isinstance(el, core.VoidElement):
-        xmlEl.set('value', unicode(el.value).encode('ascii', 'xmlcharrefreplace'))
+        if sys.version_info.major == 3:
+            if isinstance(el.value, bytes):
+                valString = el.value.decode('ascii')
+            else:
+                valString = str(el.value)
+            xmlEl.set('value', valString)
+        else:
+            xmlEl.set('value', unicode(el.value).encode('ascii', 'xmlcharrefreplace'))
 
     return xmlEl
 
@@ -85,6 +107,20 @@ def toXml(el, parent=None, offsets=True, sizes=True, types=True, ids=True):
 #===============================================================================
 #
 #===============================================================================
+
+def recurseSize(el):
+    if el.get('size') is not None:
+        size = int(el.get('size', 0))
+    else:
+        size = 0
+        if len(el) > 0:
+            for sEl in el:
+                size += recurseSize(sEl)
+        else:
+            size = int(el.get('size', 0))
+
+    return encoding.getLength(size) + encoding.getLength(int(el.get('id'), base=16)) + size
+
 
 def xmlElement2ebml(xmlEl, ebmlFile, schema, sizeLength=None, unknown=True):
     """ Convert an XML element to EBML, recursing if necessary. For converting
@@ -139,15 +175,24 @@ def xmlElement2ebml(xmlEl, ebmlFile, schema, sizeLength=None, unknown=True):
         sl = xmlEl.get('sizeLength', sizeLength)
 
     if issubclass(cls, core.MasterElement):
-        ebmlFile.write(encId)
-        sizePos = ebmlFile.tell()
-        ebmlFile.write(encoding.encodeSize(None, sl))
+        if sys.version_info.major == 3:
+            ebmlFile.write(bytes(encId, 'latin-1'))
+            sizePos = ebmlFile.tell()
+            ebmlFile.write(bytes(encoding.encodeSize(None, sl), 'latin-1'))
+        else:
+            ebmlFile.write(bytearray(encId, 'latin-1'))
+            sizePos = ebmlFile.tell()
+            ebmlFile.write(bytearray(encoding.encodeSize(None, sl), 'latin-1'))
+
         size = 0
         for chEl in xmlEl:
-            size += xmlElement2ebml(chEl, ebmlFile, schema, sl)
+            size += xmlElement2ebml(chEl, ebmlFile, schema)
         endPos = ebmlFile.tell()
         ebmlFile.seek(sizePos)
-        ebmlFile.write(encoding.encodeSize(size, sl))
+        if sys.version_info.major == 3:
+            ebmlFile.write(bytes(encoding.encodeSize(size, sl), 'latin-1'))
+        else:
+            ebmlFile.write(bytearray(encoding.encodeSize(size, sl), 'latin-1'))
         ebmlFile.seek(endPos)
         return len(encId) + (endPos - sizePos)
 
@@ -169,7 +214,10 @@ def xmlElement2ebml(xmlEl, ebmlFile, schema, sizeLength=None, unknown=True):
         sl = int(sl)
 
     encoded = cls.encode(val, size, lengthSize=sl)
-    ebmlFile.write(encoded)
+    if sys.version_info.major == 3:
+        ebmlFile.write(bytes(encoded, 'latin-1'))
+    else:
+        ebmlFile.write(bytearray(encoded, 'latin-1'))
     return len(encoded)
 
 
@@ -198,7 +246,7 @@ def xml2ebml(xmlFile, ebmlFile, schema, sizeLength=None, headers=True,
         @return: the size of the ebml file in bytes.
         @raise NameError: raises if an xml element is not present in the schema.
     """
-    if isinstance(ebmlFile, basestring):
+    if isinstance(ebmlFile, str):
         ebmlFile = open(ebmlFile, 'wb')
         openedEbml = True
     else:
@@ -274,7 +322,7 @@ def loadXml(xmlFile, schema, ebmlFile=None):
 #
 #===============================================================================
 
-def pprint(el, values=True, out=sys.stdout, indent="  ", _depth=0):
+def pprint(el, values=True, out=sys.stdout, indent=u"  ", _depth=0):
     """ Test function to recursively crawl an EBML document or element and
         print its structure, with child elements shown indented.
 
@@ -288,27 +336,27 @@ def pprint(el, values=True, out=sys.stdout, indent="  ", _depth=0):
 
     if _depth == 0:
         if values:
-            out.write("Offset Size   Element (ID): Value\n")
+            out.write(b"Offset Size   Element (ID): Value\n")
         else:
-            out.write("Offset Size   Element (ID)\n")
-        out.write("====== ====== =================================\n")
+            out.write(b"Offset Size   Element (ID)\n")
+        out.write(b"====== ====== =================================\n")
 
     if isinstance(el, core.Document):
-        out.write("%06s %06s %s %s (Document, type %s)\n" % (el.offset, el.size, tab, el.name, el.type))
+        out.write(("%06s %06s %s %s (Document, type %s)\n" % (str(el.offset), str(el.size), tab, str(el.name), el.type)).encode('latin-1'))
         for i in el:
             pprint(i, values, out, indent, _depth+1)
     else:
-        out.write("%06s %06s %s %s (ID 0x%0X)" % (el.offset, el.size, tab, el.name, el.id))
+        out.write(("%06s %06s %s %s (ID 0x%0X)" % (str(el.offset), str(el.size), tab, str(el.name), el.id)).encode('latin-1'))
         if isinstance(el, core.MasterElement):
-            out.write(": (master) %d subelements\n" % len(el.value))
+            out.write(b": (master) %d subelements\n" % len(el.value))
             for i in el:
                 pprint(i, values, out, indent, _depth+1)
         else:
-            out.write(": (%s)" % el.dtype.__name__)
+            out.write((": (%s)" % el.dtype.__name__).encode('latin-1'))
             if values and not isinstance(el, core.BinaryElement):
-                out.write(" %r\n" % (el.value))
+                out.write(b" %r\n" % (el.value))
             else:
-                out.write("\n")
+                out.write(b"\n")
 
     out.flush()
 
