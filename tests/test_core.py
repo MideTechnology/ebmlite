@@ -461,7 +461,7 @@ class testUnknownElements(unittest.TestCase):
                                   payloadOffset=1, schema=mide_schema, eid=0x7c)
 
         self.unkEl3 = UnknownElement(stream=self.mockStream, offset=1, size=4,
-                                  payloadOffset=1, schema=mide_schema, eid=0x7c)
+                                  payloadOffset=1, schema=mide_schema, eid=0x7d)
 
 
 

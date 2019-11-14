@@ -106,7 +106,7 @@ class Element(object):
         @cvar length: An explicit length (in bytes) of the element when
             encoding. `None` will use standard EBML variable-length encoding.
     """
-    __slots__ = ("stream", "offset", "size", "payloadOffset", "_value")
+    __slots__ = ("stream", "offset", "size", "sizeLength", "payloadOffset", "_value")
 
     # Parent `Schema`
     schema = None
@@ -282,7 +282,7 @@ class IntegerElement(Element):
     """ Base class for an EBML signed integer element. Schema-specific
         subclasses are generated when a `Schema` is loaded.
     """
-    __slots__ = ("stream", "offset", "size", "payloadOffset", "_value")
+    __slots__ = ("stream", "offset", "size", "sizeLength", "payloadOffset", "_value")
     dtype = int
     precache = True
 
@@ -312,7 +312,7 @@ class UIntegerElement(IntegerElement):
     """ Base class for an EBML unsigned integer element. Schema-specific
         subclasses are generated when a `Schema` is loaded.
     """
-    __slots__ = ("stream", "offset", "size", "payloadOffset", "_value")
+    __slots__ = ("stream", "offset", "size", "sizeLength", "payloadOffset", "_value")
     dtype = int
     precache = True
 
@@ -335,7 +335,7 @@ class FloatElement(Element):
     """ Base class for an EBML floating point element. Schema-specific
         subclasses are generated when a `Schema` is loaded.
     """
-    __slots__ = ("stream", "offset", "size", "payloadOffset", "_value")
+    __slots__ = ("stream", "offset", "size", "sizeLength", "payloadOffset", "_value")
     dtype = float
     precache = True
 
@@ -364,7 +364,7 @@ class StringElement(Element):
     """ Base class for an EBML ASCII string element. Schema-specific
         subclasses are generated when a `Schema` is loaded.
     """
-    __slots__ = ("stream", "offset", "size", "payloadOffset", "_value")
+    __slots__ = ("stream", "offset", "size", "sizeLength", "payloadOffset", "_value")
     dtype = str
 
     def __eq__(self, other):
@@ -396,7 +396,7 @@ class UnicodeElement(StringElement):
     """ Base class for an EBML UTF-8 string element. Schema-specific subclasses
         are generated when a `Schema` is loaded.
     """
-    __slots__ = ("stream", "offset", "size", "payloadOffset", "_value")
+    __slots__ = ("stream", "offset", "size", "sizeLength", "payloadOffset", "_value")
     dtype = unicode
 
     def __len__(self):
@@ -423,7 +423,7 @@ class DateElement(IntegerElement):
     """ Base class for an EBML 'date' element. Schema-specific subclasses are
         generated when a `Schema` is loaded.
     """
-    __slots__ = ("stream", "offset", "size", "payloadOffset", "_value")
+    __slots__ = ("stream", "offset", "size", "sizeLength", "payloadOffset", "_value")
     dtype = datetime
 
     def parse(self, stream, size):
@@ -446,7 +446,7 @@ class BinaryElement(Element):
         are generated when a `Schema` is loaded.
     """
 
-    __slots__ = ("stream", "offset", "size", "payloadOffset", "_value")
+    __slots__ = ("stream", "offset", "size", "sizeLength", "payloadOffset", "_value")
     def __len__(self):
         return self.size
 
@@ -458,7 +458,7 @@ class VoidElement(BinaryElement):
         its `value` is always returned as ``0xFF`` times its length. To get
         the actual contents, use `getRawValue()`.
     """
-    __slots__ = ("stream", "offset", "size", "payloadOffset", "_value")
+    __slots__ = ("stream", "offset", "size", "sizeLength", "payloadOffset", "_value")
 
     def parse(self, stream, size):
         return bytearray()
@@ -478,7 +478,7 @@ class UnknownElement(BinaryElement):
         present in a schema. Unlike other elements, each instance has its own
         ID.
     """
-    __slots__ = ("stream", "offset", "size", "payloadOffset", "_value", "id",
+    __slots__ = ("stream", "offset", "size", "sizeLength", "payloadOffset", "_value", "id",
                  "schema")
     name = "UnknownElement"
     precache = False
