@@ -12,7 +12,7 @@ def getTypeMatch(el, elType):
 
 
 # Load the IDE file.
-schemaFile = './schemata/mide_ide.xml'
+schemaFile = './ebmlite/schemata/mide_ide.xml'
 ebmlFile = './tests/SSX46714-doesNot.ide'
 schema = core.loadSchema(schemaFile)
 ideRoot = schema.load(ebmlFile)
@@ -58,7 +58,7 @@ rawData = b''
 payloadType = schema[0xB2]
 for block in dataBlocks:
     rawData += block.dump()['ChannelDataPayload']
-rawData = np.fromstring(str(rawData), dtype=chEl['ChannelFormat'][1])
+rawData = np.frombuffer(rawData, dtype=chEl['ChannelFormat'][1])
 rawData.resize((len(rawData)//3, 3))
 
 # Calculate the time stamps of the data.
