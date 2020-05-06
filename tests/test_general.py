@@ -6,6 +6,7 @@ Created on Aug 14, 2017
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import unittest
+import pytest
 from xml.dom.minidom import parseString
 from xml.etree import ElementTree as ET
 
@@ -139,7 +140,7 @@ class Test(unittest.TestCase):
                                         newl='\n',
                                         encoding='utf-8')
 
-
+    @pytest.mark.skip()
     def testInfiniteElement(self):
         """ Test parsing an EBML file with an infinite-length element. """
         schemaFile = './ebmlite/schemata/matroska.xml'
