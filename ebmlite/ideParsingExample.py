@@ -1,9 +1,13 @@
-from __future__ import division, absolute_import, print_function#, unicode_literals
-
+from __future__ import print_function
+from __future__ import absolute_import
+from __future__ import division
+from builtins import next
+from builtins import str
+from past.utils import old_div
 import numpy as np
 import matplotlib.pyplot as plt
 
-import ebmlite.core as core
+from . import core
 
 
 def getTypeMatch(el, elType):
@@ -12,8 +16,8 @@ def getTypeMatch(el, elType):
 
 
 # Load the IDE file.
-schemaFile = './schemata/mide_ide.xml'
-ebmlFile = './tests/SSX46714-doesNot.ide'
+schemaFile = b'./schemata/mide_ide.xml'
+ebmlFile = b'./tests/SSX46714-doesNot.ide'
 schema = core.loadSchema(schemaFile)
 ideRoot = schema.load(ebmlFile)
 
@@ -26,71 +30,71 @@ recProps = getTypeMatch(ideRoot, recPropType)
 chList = getTypeMatch(recProps, chListType).dump()
 
 # Print the ID and name of each channel.
-chIdNames = [[ch['ChannelID'], ch['ChannelName']] for ch in chList['Channel']]
-print('Channels:\r\n%s\r\n' % (str(chIdNames)))
+chIdNames = [[ch[b'ChannelID'], ch[b'ChannelName']] for ch in chList[b'Channel']]
+print(b'Channels:\r\n%s\r\n' % (str(chIdNames)))
 
 # Define the channel that we'll be working with.
 chId = 8
 
 # Get the channel that we want to work with from the list of channels.
-chEl = next(ch for ch in chList['Channel'] if ch['ChannelID'] == chId)
+chEl = next(ch for ch in chList[b'Channel'] if ch[b'ChannelID'] == chId)
 
 # Print the ID and name of each subchannel.
-schIdNames = [[sch['SubChannelID'], sch['SubChannelName']] for sch in chEl['SubChannel']]
-print('Subchannels:\r\n%s\r\n' % (str(schIdNames),))
+schIdNames = [[sch[b'SubChannelID'], sch[b'SubChannelName']] for sch in chEl[b'SubChannel']]
+print(b'Subchannels:\r\n%s\r\n' % (str(schIdNames),))
 
 # Define the subchannel that we'll be working with.
 schId = 0
 
 # Get the channel that we want to work with from the list of channels.
-schEl = next(sch for sch in chEl['SubChannel'] if sch['SubChannelID'] == schId)
+schEl = next(sch for sch in chEl[b'SubChannel'] if sch[b'SubChannelID'] == schId)
 
 # Collect all the channelDataBlocks into a list.
 chDataType = schema[0xA1]
-dataBlocks = filter(lambda x: type(x) == chDataType, ideRoot)
+dataBlocks = [x for x in ideRoot if type(x) == chDataType]
 
 # Filter the dataBlocks to only include blocks for the channel we want.
 chIdType = schema[0xB0]
 dataBlocks = [block for block in dataBlocks if getTypeMatch(block, chIdType).value == chId]
 
 # Get the raw data from each ChannelDataBlock, and convert to an array.
-rawData = b''
+rawData = ''
 payloadType = schema[0xB2]
 for block in dataBlocks:
-    rawData += block.dump()['ChannelDataPayload']
-rawData = np.fromstring(str(rawData), dtype=chEl['ChannelFormat'][1])
-rawData.resize((len(rawData)//3, 3))
+    rawData += block.dump()[b'ChannelDataPayload']
+rawData = np.fromstring(str(rawData), dtype=chEl[b'ChannelFormat'][1])
+rawData.resize((old_div(len(rawData),3), 3))
 
 # Calculate the time stamps of the data.
 times = np.arange(len(rawData))/5000.0
 
 # Plot the raw data from the IDE file.
 h = plt.plot(times, rawData[:, schId])
-plt.title('Raw Data')
+plt.title(b'Raw Data')
 plt.show()
 
 # Make a list of polynomial IDs that affect ch8.0.
-chCalId = chEl['ChannelCalibrationIDRef']
-schCalId = chEl['SubChannel'][schId]['SubChannelCalibrationIDRef']
+chCalId = chEl[b'ChannelCalibrationIDRef']
+schCalId = chEl[b'SubChannel'][schId][b'SubChannelCalibrationIDRef']
 
 # Create a list of polynomials.
 calListType = schema[0x4B00]
 calList = getTypeMatch(ideRoot, calListType)
 uniType = schema[0x4B01]
 biType = schema[0x4B02]
-polys = filter(lambda x: type(x) in [uniType, biType], calList)
+polys = [x for x in calList if type(x) in [uniType, biType]]
 
 # filter the polynomials to whichever affect ch8.0
-polys = [poly.dump() for poly in polys if poly.dump()['CalID'] in [chCalId, schCalId]]
+polys = [poly.dump() for poly in polys if poly.dump()[b'CalID'] in [chCalId, schCalId]]
 
 # Apply calibration polynomials to the data, channel first, then subchannel.
 # The subchannel polynomial is a bivariate polynomial, which references a
 # different channel; however, the coefficients simplifies to f(x,y) = x, so we
 # completely ignore it.
-chPoly = polys[0]['PolynomialCoef']
+chPoly = polys[0][b'PolynomialCoef']
 calData = rawData*chPoly[0] + chPoly[1]
 
 # Plot the calibrated data.
 plt.plot(times, calData[:, schId])
-plt.title('Calibrated Data')
+plt.title(b'Calibrated Data')
 plt.show()

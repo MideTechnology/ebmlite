@@ -7,12 +7,13 @@ functionality is transparent.
 
 @author: dstokes
 '''
-from __future__ import division, absolute_import, print_function, unicode_literals
+from __future__ import absolute_import, division, print_function, unicode_literals
 
+from past.builtins import basestring
 import platform
 from threading import currentThread, Event
 
-__all__ = ['ThreadAwareFile']
+__all__ = [b'ThreadAwareFile']
 
 class ThreadAwareFile(file):
     """ A 'replacement' for a standard read-only file stream that supports
@@ -40,17 +41,17 @@ class ThreadAwareFile(file):
             one of the "read" modes (``r``, ``rb``, ``rU``, etc.).
         """
         # Ensure the file mode, if specified, is "read."
-        mode = args[1] if len(args) > 1 else 'r'
+        mode = args[1] if len(args) > 1 else b'r'
         if isinstance(mode, basestring):
-            if 'a' in mode or 'w' in mode or '+' in mode:
-                raise IOError("%s is read-only" % self.__class__.__name__)
+            if b'a' in mode or b'w' in mode or b'+' in mode:
+                raise IOError(b"%s is read-only" % self.__class__.__name__)
 
         # Undocumented keyword argument `_new` is used by `makeThreadAware()`
         # to prevent a new file for the current thread from being created.
-        newFile = kwargs.pop('_new', True)
+        newFile = kwargs.pop(b'_new', True)
         
         # Blocking timeout. Not a `file` keyword argument; remove.
-        self.timeout = kwargs.pop('timeout', 60.0)
+        self.timeout = kwargs.pop(b'timeout', 60.0)
         
         self.initArgs = args
         self.initKwargs = kwargs
@@ -70,12 +71,12 @@ class ThreadAwareFile(file):
 
     def __repr__(self):
         # Format the object's ID appropriately for the architecture (32b/64b)
-        if '32' in platform.architecture()[0]:
-            fmt = "<%s %s %r, mode %r at 0x%08X>"
+        if b'32' in platform.architecture()[0]:
+            fmt = b"<%s %s %r, mode %r at 0x%08X>"
         else:
-            fmt = "<%s %s %r, mode %r at 0x%016X>"
+            fmt = b"<%s %s %r, mode %r at 0x%016X>"
             
-        return fmt % ("closed" if self.closed else "open",
+        return fmt % (b"closed" if self.closed else b"open",
                       self.__class__.__name__, 
                       self.initArgs[0],
                       self._mode, 
@@ -90,7 +91,7 @@ class ThreadAwareFile(file):
         if isinstance(fileStream, cls):
             return fileStream
         elif not isinstance(fileStream, file):
-            raise TypeError("Not a file: %r" % fileStream)
+            raise TypeError(b"Not a file: %r" % fileStream)
 
         f = cls(fileStream.name, fileStream.mode, _new=False)
         f.threads[currentThread().ident] = fileStream
@@ -119,7 +120,7 @@ class ThreadAwareFile(file):
         try:
             self._ready.wait(self.timeout)
             self._ready.clear()
-            for v in self.threads.values():
+            for v in list(self.threads.values()):
                 v.close()
         finally:
             self._ready.set()
@@ -132,7 +133,7 @@ class ThreadAwareFile(file):
             self._ready.wait(self.timeout)
             self._ready.clear()
             
-            for i in self.threads.keys():
+            for i in list(self.threads.keys()):
                 if self.threads[i].closed:
                     del self.threads[i]
         finally:
@@ -213,15 +214,15 @@ class ThreadAwareFile(file):
         return self.getThreadStream().tell(*args, **kwargs)
 
     def truncate(self, *args, **kwargs):
-        raise IOError("Can't truncate(); %s is read-only" % 
+        raise IOError(b"Can't truncate(); %s is read-only" %
                       self.__class__.__name__)
 
     def write(self, *args, **kwargs):
-        raise IOError("Can't write(); %s is read-only" % 
+        raise IOError(b"Can't write(); %s is read-only" %
                       self.__class__.__name__)
 
     def writelines(self, *args, **kwargs):
-        raise IOError("Can't writelines(); %s is read-only" % 
+        raise IOError(b"Can't writelines(); %s is read-only" %
                       self.__class__.__name__)
 
     def xreadlines(self, *args, **kwargs):

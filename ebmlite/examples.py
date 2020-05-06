@@ -1,7 +1,7 @@
-from __future__ import division, absolute_import, print_function#, unicode_literals
-
+from __future__ import print_function
+from __future__ import absolute_import
 # Imports from EBMLite
-import ebmlite.core as core
+from . import core
 from .util import toXml, loadXml, xml2ebml, pprint
 
 # imports from python's built in xml library
@@ -13,9 +13,9 @@ from xml.dom.minidom import parseString
 # =======================================
 
 # Files to use in this example
-schemaFile = './schemata/mide_ide.xml'
-ebmlFile1  = './tests/SSX46714-doesnot.IDE'
-xmlFile1   = './tests/example-xml.xml'
+schemaFile = b'./schemata/mide_ide.xml'
+ebmlFile1  = b'./tests/SSX46714-doesnot.IDE'
+xmlFile1   = b'./tests/example-xml.xml'
 
 # load the schema to use with these files.  This creates an object that is used
 # to parse EBML files.
@@ -26,22 +26,22 @@ ebmlDoc1   = schema.load(ebmlFile1, headers=True)       # load the file through
                                                         # the schema
 ebmlRoot   = toXml(ebmlDoc1)                            # convert the file into
                                                         # a tree of XML elements
-xmlString1 = ET.tostring(ebmlRoot, encoding='UTF-8')    # convert the xml tree
+xmlString1 = ET.tostring(ebmlRoot, encoding=b'UTF-8')    # convert the xml tree
                                                         # into a string
 
 # Save xml
-with open(xmlFile1, 'wt') as f:
+with open(xmlFile1, b'wt') as f:
     # convert the xml string into a minidom object and pretty-print
-    f.write(parseString(xmlString1).toprettyxml(indent='    '))
+    f.write(parseString(xmlString1).toprettyxml(indent=b'    '))
 
 # =======================================
 # converting a file from XML to EBML
 # =======================================
 
 # Files to use in this example
-schemaFile = './schemata/mide_ide.xml'
-ebmlFile1  = './tests/example-ebml.ide'
-xmlFile1   = './tests/example-xml.xml'
+schemaFile = b'./schemata/mide_ide.xml'
+ebmlFile1  = b'./tests/example-ebml.ide'
+xmlFile1   = b'./tests/example-xml.xml'
 
 # load the schema to use with these files.  This creates an object that is used
 # to parse EBML files.
@@ -58,9 +58,9 @@ xmlDoc1 = loadXml(xmlFile1, schema)
 # =======================================
 
 # Files to use in this example
-schemaFile = './schemata/mide_ide.xml'
-ebmlFile1  = './tests/example-ebml.ide'
-prettyXml  = './tests/example-pretty.txt'
+schemaFile = b'./schemata/mide_ide.xml'
+ebmlFile1  = b'./tests/example-ebml.ide'
+prettyXml  = b'./tests/example-pretty.txt'
 
 # load the schema to use with these files.  This creates an object that is used
 # to parse EBML files.
@@ -70,15 +70,15 @@ schema = core.loadSchema(schemaFile)
 ebmlDoc1 = schema.load(ebmlFile1, headers=True) # load the file through the schema
 
 # save the ebml to an easily readable format
-pprint(ebmlDoc1, out=open(prettyXml, 'wt'))
+pprint(ebmlDoc1, out=open(prettyXml, b'wt'))
 
 # =======================================
 # Get specific data from an EBML file
 # =======================================
 
 # Files to use in this example
-schemaFile = './schemata/mide_ide.xml'
-ebmlFile1  = './tests/example-ebml.ide'
+schemaFile = b'./schemata/mide_ide.xml'
+ebmlFile1  = b'./tests/example-ebml.ide'
 
 # load the schema to use with these files.  This creates an object that is used
 # to parse EBML files.
@@ -91,11 +91,11 @@ ebmlDoc1 = schema.load(ebmlFile1, headers=True) # load the file through the sche
 ebmlDict = ebmlDoc1.dump()
 
 # extract recording properties from EBML
-recProp = ebmlDict['RecordingProperties']
+recProp = ebmlDict[b'RecordingProperties']
 
 # extract recorder info from recording properties
-recInfo = recProp['RecorderInfo']
+recInfo = recProp[b'RecorderInfo']
 
 # extract recorder serial number from recording properties
-recSerial = recInfo['RecorderSerial']
-print('recorder serial number: %d' % recSerial)
+recSerial = recInfo[b'RecorderSerial']
+print(b'recorder serial number: %d' % recSerial)
