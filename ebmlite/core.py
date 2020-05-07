@@ -97,7 +97,7 @@ class Element(object):
         @cvar length: An explicit length (in bytes) of the element when
             encoding. `None` will use standard EBML variable-length encoding.
     """
-    __slots__ = ("stream", "offset", "size", "payloadOffset", "_value")
+    __slots__ = ("stream", "offset", "size", "sizeLength", "payloadOffset", "_value")
 
     # Parent `Schema`
     schema = None
