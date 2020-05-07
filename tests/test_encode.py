@@ -1,8 +1,8 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from builtins import chr
-from builtins import str
-from builtins import range
+# from builtins import chr
+# from builtins import str
+# from builtins import range
 import unittest
 from datetime import timedelta, datetime
 

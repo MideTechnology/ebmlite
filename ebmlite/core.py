@@ -37,11 +37,11 @@ EBML files quickly and efficiently, and that's about it.
 '''
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from future import standard_library
-standard_library.install_aliases()
-from builtins import bytes
-from past.builtins import basestring
-from builtins import object
+# from future import standard_library
+# standard_library.install_aliases()
+# from builtins import bytes
+# from past.builtins import basestring
+# from builtins import object
 __author__ = b"David Randall Stokes"
 __copyright__ = b"Copyright 2018 Mide Technology Corporation"
 
@@ -1061,7 +1061,7 @@ class Schema(object):
         self.source = source
         self.filename = None
 
-        if isinstance(source, basestring):
+        if isinstance(source, (str, bytes, bytearray)):
             self.filename = os.path.realpath(source)
         elif hasattr(source, "name"):
             self.filename = os.path.realpath(source.name)
@@ -1154,7 +1154,7 @@ class Schema(object):
 
         # Use text in the element as its docstring. Note: embedded HTML tags
         # (as in the Matroska schema) will cause the text to be truncated.
-        docs = el.text.strip() if isinstance(el.text, basestring) else None
+        docs = el.text.strip() if isinstance(el.text, (str, bytes, bytearray)) else None
 
         baseClass = self.BASE_CLASSES[el.tag]
 
@@ -1245,7 +1245,7 @@ class Schema(object):
             if ename is None:
                 raise ValueError(b'Element definition missing required '
                                  b'"name" attribute')
-            elif not isinstance(ename, basestring):
+            elif not isinstance(ename, (str, bytes, bytearray)):
                 raise TypeError(b'Invalid type for element name: ' + \
                                  b'{} ({})'.format(ename, type(ename).__name__))
             elif not (ename[0].isalpha() or ename[0] == b"_"):
@@ -1338,7 +1338,7 @@ class Schema(object):
                 document. The contents of the ``EBML`` element will always be
                 read.
         """
-        if isinstance(fp, basestring):
+        if isinstance(fp, (str, bytes, bytearray)):
             fp = open(fp, 'rb')
 
         return self.document(fp, name=name, headers=headers, **kwargs)

@@ -1,9 +1,9 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from future import standard_library
-standard_library.install_aliases()
-from builtins import zip
-from builtins import range
+# from future import standard_library
+# standard_library.install_aliases()
+# from builtins import zip
+# from builtins import range
 import unittest
 from datetime import timedelta, datetime
 from math import ceil, floor, log
