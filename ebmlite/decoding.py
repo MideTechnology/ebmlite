@@ -6,10 +6,6 @@ Note: this module does not decode `Document`, `BinaryElement`, or
 and `MasterElement` objects are special cases, and `BinaryElement` objects do
 not require special decoding. 
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-
-# from builtins import str
-# from builtins import chr
 __author__ = b"dstokes"
 __copyright__ = b"Copyright 2018 Mide Technology Corporation"
 

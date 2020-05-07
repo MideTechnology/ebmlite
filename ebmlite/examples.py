@@ -1,5 +1,3 @@
-from __future__ import print_function
-from __future__ import absolute_import
 # Imports from EBMLite
 from . import core
 from .util import toXml, loadXml, xml2ebml, pprint

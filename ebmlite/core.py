@@ -35,13 +35,6 @@ EBML files quickly and efficiently, and that's about it.
     Eventually, recognize official schemata when loading, like the system
     currently handles legacy ``python-ebml`` schemata.
 '''
-from __future__ import absolute_import, division, print_function, unicode_literals
-
-# from future import standard_library
-# standard_library.install_aliases()
-# from builtins import bytes
-# from past.builtins import basestring
-# from builtins import object
 __author__ = b"David Randall Stokes"
 __copyright__ = b"Copyright 2018 Mide Technology Corporation"
 

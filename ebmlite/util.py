@@ -10,11 +10,6 @@ Created on Aug 11, 2017
 @todo: Add other options to command-line utility for the other arguments of
     `toXml()` and `xml2ebml()`.
 '''
-from __future__ import absolute_import, division, print_function, unicode_literals
-# from future import standard_library
-# standard_library.install_aliases()
-# from builtins import str
-# from past.builtins import basestring
 from io import StringIO
 
 __author__ = b"dstokes"

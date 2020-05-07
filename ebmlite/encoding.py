@@ -4,10 +4,6 @@ Functions for encoding EBML elements and their values.
 Note: this module does not encode Document or MasterElement objects; they are
 special cases, handled in `core.py`.
 '''
-from __future__ import absolute_import, division, print_function, unicode_literals
-
-# from builtins import range
-# from builtins import str
 __author__ = b"dstokes"
 __copyright__ = b"Copyright 2018 Mide Technology Corporation"
 

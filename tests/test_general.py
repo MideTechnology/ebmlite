@@ -3,8 +3,6 @@ Created on Aug 14, 2017
 
 @author: dstokes
 '''
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import unittest
 import pytest
 from xml.dom.minidom import parseString
