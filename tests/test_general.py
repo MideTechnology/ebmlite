@@ -140,7 +140,6 @@ class Test(unittest.TestCase):
                                         newl='\n',
                                         encoding='utf-8')
 
-    @pytest.mark.skip()
     def testInfiniteElement(self):
         """ Test parsing an EBML file with an infinite-length element. """
         schemaFile = './ebmlite/schemata/matroska.xml'
@@ -162,12 +161,10 @@ class Test(unittest.TestCase):
         # dropping the second line because that will reference different source
         # file names
         xmlLines1 = xmlString1.splitlines()
-        xmlLines1 = [xmlLines1[0]] + xmlLines1[2:]
         xmlLines2 = xmlString2.splitlines()
-        xmlLines2 = [xmlLines2[0]] + xmlLines2[2:]
 
         # Compare as lists to narrow the location of any differences
-        self.assertListEqual(xmlLines1, xmlLines2,
+        self.assertListEqual(xmlLines1[1:], xmlLines2[1:],
                              b'One or more lines are different in the xml documents')
 
 
