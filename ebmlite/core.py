@@ -694,7 +694,7 @@ class MasterElement(Element):
         if data is None:
             return result
         elif isinstance(data, dict):
-            data = list(data.items())
+            data = data.items()
         elif not isinstance(data, (list, tuple)):
             raise TypeError("wrong type for %s payload: %s" % (cls.name,
                                                                type(data)))
