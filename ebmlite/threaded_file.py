@@ -7,10 +7,14 @@ functionality is transparent.
 
 @author: dstokes
 '''
-import platform
-from threading import currentThread, Event
+__author__ = "David Randall Stokes, Connor Flanigan"
+__copyright__ = "Copyright 2020, Mide Technology Corporation"
+__credits__ = "David Randall Stokes, Connor Flanigan, Becker Awqatty, Derek Witt"
 
 __all__ = ['ThreadAwareFile']
+
+import platform
+from threading import currentThread, Event
 
 class ThreadAwareFile(file):
     """ A 'replacement' for a standard read-only file stream that supports

@@ -10,10 +10,13 @@ Created on Aug 11, 2017
 @todo: Add other options to command-line utility for the other arguments of
     `toXml()` and `xml2ebml()`.
 """
-from io import StringIO
+__author__ = "David Randall Stokes, Connor Flanigan"
+__copyright__ = "Copyright 2020, Mide Technology Corporation"
+__credits__ = "David Randall Stokes, Connor Flanigan, Becker Awqatty, Derek Witt"
 
-__author__ = "dstokes"
-__copyright__ = "Copyright 2017 Mide Technology Corporation"
+__all__ = ['toXml', 'xml2ebml', 'loadXml', 'pprint']
+
+from io import StringIO
 
 import ast
 from base64 import b64encode, b64decode
@@ -22,8 +25,6 @@ import tempfile
 from xml.etree import ElementTree as ET
 
 from . import core, encoding
-
-__all__ = ['toXml', 'xml2ebml', 'loadXml', 'pprint']
 
 # ===============================================================================
 #

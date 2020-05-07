@@ -35,8 +35,9 @@ EBML files quickly and efficiently, and that's about it.
     Eventually, recognize official schemata when loading, like the system
     currently handles legacy ``python-ebml`` schemata.
 """
-__author__ = "David Randall Stokes"
-__copyright__ = "Copyright 2018 Mide Technology Corporation"
+__author__ = "David Randall Stokes, Connor Flanigan"
+__copyright__ = "Copyright 2020, Mide Technology Corporation"
+__credits__ = "David Randall Stokes, Connor Flanigan, Becker Awqatty, Derek Witt"
 
 __all__ = ['BinaryElement', 'DateElement', 'Document', 'Element',
            'FloatElement', 'IntegerElement', 'MasterElement', 'Schema',
@@ -305,7 +306,7 @@ class FloatElement(Element):
     """ Base class for an EBML floating point element. Schema-specific
         subclasses are generated when a `Schema` is loaded.
     """
-    __slots__ = ("stream", "offset", "size", "sizeLenght", "payloadOffset", "_value")
+    __slots__ = ("stream", "offset", "size", "sizeLength", "payloadOffset", "_value")
     dtype = float
     precache = True
 
