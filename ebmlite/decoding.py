@@ -15,9 +15,9 @@ __all__ = ['readElementID', 'readElementSize', 'readFloat', 'readInt',
 from datetime import datetime, timedelta
 import struct
 
-#===============================================================================
+# ===============================================================================
 #
-#===============================================================================
+# ===============================================================================
 
 # Pre-built structs for packing/unpacking various data types
 _struct_uint32 = struct.Struct(">I")
@@ -36,9 +36,9 @@ _struct_float32_unpack = _struct_float32.unpack
 _struct_float64_unpack = _struct_float64.unpack
 
 
-#===============================================================================
-#--- Reading and Decoding
-#===============================================================================
+# ===============================================================================
+# --- Reading and Decoding
+# ===============================================================================
 
 def decodeIntLength(byte):
     """ Extract the encoded size from an initial byte.
@@ -81,7 +81,7 @@ def decodeIDLength(byte):
         return 4, byte
 
     length, _ = decodeIntLength(byte)
-    raise IOError(b'Invalid length for ID: %d' % length)
+    raise IOError('Invalid length for ID: %d' % length)
 
 
 def readElementID(stream):
@@ -95,7 +95,7 @@ def readElementID(stream):
     length, eid = decodeIDLength(ord(ch))
 
     if length > 4:
-        raise IOError(b'Cannot decode element ID with length > 4.')
+        raise IOError('Cannot decode element ID with length > 4.')
     if length > 1:
         eid = _struct_uint32_unpack((ch + stream.read(length-1)
                                      ).rjust(4, b'\x00'))[0]
@@ -113,10 +113,9 @@ def readElementSize(stream):
     length, size = decodeIntLength(ord(ch))
 
     if length > 1:
-        size = _struct_uint64_unpack((chr(size).encode('latin-1') + stream.read(length-1)
+        size = _struct_uint64_unpack((chr(size).encode('latin-1') +
+                                      stream.read(length - 1)
                                       ).rjust(8, b'\x00'))[0]
-
-    # print("size = %x, length = %x" % (size, int(2**(7*length))))
 
     if size == (2**(7*length)) - 1:
         # EBML 'unknown' size, all bytes 0xFF
@@ -129,6 +128,7 @@ def readUInt(stream, size):
     """ Read an unsigned integer from a file (or file-like stream).
 
         @param stream: The source file-like object.
+        @param size: The number of bytes to read from the stream.
         @return: The decoded value.
     """
 
@@ -143,6 +143,7 @@ def readInt(stream, size):
     """ Read a signed integer from a file (or file-like stream).
 
         @param stream: The source file-like object.
+        @param size: The number of bytes to read from the stream.
         @return: The decoded value.
     """
 
@@ -154,13 +155,14 @@ def readInt(stream, size):
         pad = b'\xff'
     else:
         pad = b'\x00'
-    return _struct_int64_unpack_from(data.rjust(8,pad))[0]
+    return _struct_int64_unpack_from(data.rjust(8, pad))[0]
 
 
 def readFloat(stream, size):
     """ Read an floating point value from a file (or file-like stream).
 
         @param stream: The source file-like object.
+        @param size: The number of bytes to read from the stream.
         @return: The decoded value.
         @raise IOError: raised if the length of this floating point number is not valid (0, 4, 8 bytes)
     """
@@ -179,6 +181,7 @@ def readString(stream, size):
     """ Read an ASCII string from a file (or file-like stream).
 
         @param stream: The source file-like object.
+        @param size: The number of bytes to read from the stream.
         @return: The decoded value.
     """
     if size == 0:
@@ -193,6 +196,7 @@ def readUnicode(stream, size):
     """ Read an UTF-8 encoded string from a file (or file-like stream).
 
         @param stream: The source file-like object.
+        @param size: The number of bytes to read from the stream.
         @return: The decoded value.
     """
 
@@ -209,6 +213,7 @@ def readDate(stream, size=8):
         from a file (or file-like stream).
 
         @param stream: The source file-like object.
+        @param size: The number of bytes to read from the stream.
         @return: The decoded value (as `datetime.datetime`).
         @raise IOError: raised if the length of the date is not 8 bytes.
     """
