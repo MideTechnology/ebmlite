@@ -808,7 +808,7 @@ class Document(MasterElement):
                 self.name = self.__class__.__name__
 
         if size is None:
-            # Note: this doesn't work for cBytesIO!
+            # Note: this doesn't work for cStringIO!
             if isinstance(stream, BytesIO):
                 self.size = len(stream.getvalue())
             elif self.filename and os.path.exists(self.filename):
@@ -891,7 +891,7 @@ class Document(MasterElement):
         """ Get one of the document's root elements by index.
         """
         # TODO: Cache parsed root elements, handle indexing dynamically.
-        if isinstance(idx, (int, int)):
+        if isinstance(idx, int):
             if idx < 0:
                 raise IndexError("Negative indices in a Document not (yet) supported")
             n = None
@@ -1231,7 +1231,7 @@ class Schema(object):
             if eid is None:
                 raise ValueError('Element definition missing required '
                                  '"id" attribute')
-            elif not isinstance(eid, (int, int)):
+            elif not isinstance(eid, int):
                 raise TypeError("Invalid type for element ID: " + \
                                 "{} ({})".format(eid, type(eid).__name__))
 
