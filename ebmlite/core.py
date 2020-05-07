@@ -35,8 +35,8 @@ EBML files quickly and efficiently, and that's about it.
     Eventually, recognize official schemata when loading, like the system
     currently handles legacy ``python-ebml`` schemata.
 '''
-__author__ = b"David Randall Stokes"
-__copyright__ = b"Copyright 2018 Mide Technology Corporation"
+__author__ = "David Randall Stokes"
+__copyright__ = "Copyright 2018 Mide Technology Corporation"
 
 __all__ = ['BinaryElement', 'DateElement', 'Document', 'Element',
            'FloatElement', 'IntegerElement', 'MasterElement', 'Schema',
@@ -234,11 +234,11 @@ class Element(object):
             @return: A bytearray containing the encoded EBML data.
         """
         if infinite and not issubclass(cls, MasterElement):
-            raise ValueError(b"Only Master elements can have 'infinite' lengths")
+            raise ValueError("Only Master elements can have 'infinite' lengths")
         length = cls.length if length is None else length
         if isinstance(value, (list, tuple)):
             if not cls.multiple:
-                raise ValueError(b"Multiple %s elements per parent not permitted"
+                raise ValueError("Multiple %s elements per parent not permitted"
                                  % cls.name)
             result = bytearray()
             for v in value:
@@ -462,7 +462,7 @@ class UnknownElement(BinaryElement):
     """
     __slots__ = ("stream", "offset", "size", "payloadOffset", "_value", "id",
                  "schema")
-    name = b"UnknownElement"
+    name = "UnknownElement"
     precache = False
 
     def __init__(self, stream=None, offset=0, size=0, payloadOffset=0, eid=None,
@@ -598,7 +598,7 @@ class MasterElement(Element):
                         break
                 except TypeError as err:
                     # Will occur at end of file; message will contain "ord()".
-                    if b"ord()" in bytes(err):
+                    if "ord()" in str(err):
                         break
                     # Not the expected EOF TypeError!
                     raise
@@ -630,7 +630,7 @@ class MasterElement(Element):
                 el, pos = self.parseElement(self.stream, nocache=nocache)
                 yield el
             except TypeError as err:
-                if b"ord()" in bytes(err):
+                if "ord()" in str(err):
                     break
                 raise
 
@@ -696,11 +696,11 @@ class MasterElement(Element):
         elif isinstance(data, dict):
             data = list(data.items())
         elif not isinstance(data, (list, tuple)):
-            raise TypeError(b"wrong type for %s payload: %s" % (cls.name,
+            raise TypeError("wrong type for %s payload: %s" % (cls.name,
                                                                type(data)))
         for k,v in data:
             if k not in cls.schema:
-                raise TypeError(b"Element type %r not found in schema" % k)
+                raise TypeError("Element type %r not found in schema" % k)
             # TODO: Validation of hierarchy, multiplicity, mandate, etc.
             result.extend(cls.schema[k].encode(v))
 
@@ -786,7 +786,7 @@ class Document(MasterElement):
         if not all((hasattr(stream, 'read'),
                     hasattr(stream, 'tell'),
                     hasattr(stream, 'seek'))):
-            raise TypeError(b'Object %r does not have the necessary stream methods' % stream)
+            raise TypeError('Object %r does not have the necessary stream methods' % stream)
 
         self._value = None
         self.stream = stream
@@ -893,19 +893,19 @@ class Document(MasterElement):
         # TODO: Cache parsed root elements, handle indexing dynamically.
         if isinstance(idx, (int, int)):
             if idx < 0:
-                raise IndexError(b"Negative indices in a Document not (yet) supported")
+                raise IndexError("Negative indices in a Document not (yet) supported")
             n = None
             for n, el in enumerate(self):
                 if n == idx:
                     return el
             if n is None:
                 # If object being enumerated is empty, `n` is never set.
-                raise IndexError(b"Document contained no readable data")
-            raise IndexError(b"list index out of range (0-%d)" % n)
+                raise IndexError("Document contained no readable data")
+            raise IndexError("list index out of range (0-%d)" % n)
         elif isinstance(idx, slice):
-            raise IndexError(b"Document root slicing not (yet) supported")
+            raise IndexError("Document root slicing not (yet) supported")
         else:
-            raise TypeError(b"list indices must be integers, not %s" % type(idx))
+            raise TypeError("list indices must be integers, not %s" % type(idx))
 
 
     @property
@@ -976,7 +976,7 @@ class Document(MasterElement):
             if len(data)>0 and isinstance(data[0],list):
                 # List of lists: special case for Documents.
                 # Encode as multiple 'root' elements.
-                raise TypeError(b'Cannot encode multiple Documents')
+                raise TypeError('Cannot encode multiple Documents')
             else:
                 for v in data:
                     stream.write(cls.encodePayload(v))
@@ -1100,24 +1100,24 @@ class Schema(object):
     def _parseLegacySchema(self, schema):
         """ Parse a legacy python-ebml schema XML file.
         """
-        for el in schema.findall(b'element'):
+        for el in schema.findall('element'):
             attribs = el.attrib.copy()
 
-            eid = int(attribs[b'id'],16) if b'id' in attribs else None
-            ename = attribs[b'name'].strip() if b'name' in attribs else None
-            etype = attribs[b'type'].strip() if b'type' in attribs else None
+            eid = int(attribs['id'],16) if 'id' in attribs else None
+            ename = attribs['name'].strip() if 'name' in attribs else None
+            etype = attribs['type'].strip() if 'type' in attribs else None
 
             # Use text in the element as its docstring. Note: embedded HTML
             # tags (as in the Matroska schema) will cause the text to be
             # truncated.
-            docs = el.text.strip() if isinstance(el.text, basestring) else None
+            docs = el.text.strip() if isinstance(el.text, (str, bytes, bytearray)) else None
 
             if etype is None:
-                raise ValueError(b'Element "%s" (ID 0x%02X) missing required '
-                                 b'"type" attribute' % (ename, eid))
+                raise ValueError('Element "%s" (ID 0x%02X) missing required '
+                                 '"type" attribute' % (ename, eid))
 
             if etype not in self.ELEMENT_TYPES:
-                raise ValueError(b"Unknown type for element %r (ID 0x%02x): %r" %
+                raise ValueError("Unknown type for element %r (ID 0x%02x): %r" %
                                  (ename, eid, etype))
 
             self.addElement(eid, ename, self.ELEMENT_TYPES[etype], attribs,
@@ -1134,7 +1134,7 @@ class Schema(object):
 
         if el.tag not in self.BASE_CLASSES:
             if el.tag.endswith('Element'):
-                raise ValueError(b'Unknown element type: %s' % el.tag)
+                raise ValueError('Unknown element type: %s' % el.tag)
 
             # FUTURE: Add schema-describing metadata (author, origin,
             # description, etc.) to XML as non-Element elements. Parse them
@@ -1215,7 +1215,7 @@ class Schema(object):
             eid = oldEl.id
 
             if not issubclass(self.elements[eid], baseClass):
-                raise TypeError(b'%s %r (ID 0x%02X) redefined as %s' %
+                raise TypeError('%s %r (ID 0x%02X) redefined as %s' %
                             (oldEl.__name__, ename, eid, baseClass.__name__))
 
             newatts = self.elementInfo[eid].copy()
@@ -1223,32 +1223,32 @@ class Schema(object):
             if self.elementInfo[eid] == newatts:
                 eclass = self.elements[eid]
             else:
-                raise TypeError(b'Element %r (ID 0x%02X) redefined with '
-                                b'different attributes' % (ename, eid))
+                raise TypeError('Element %r (ID 0x%02X) redefined with '
+                                'different attributes' % (ename, eid))
         else:
             # New element class. It requires both a name and an ID.
             # Validate both the name and the ID.
             if eid is None:
-                raise ValueError(b'Element definition missing required '
-                                 b'"id" attribute')
+                raise ValueError('Element definition missing required '
+                                 '"id" attribute')
             elif not isinstance(eid, (int, int)):
-                raise TypeError(b"Invalid type for element ID: " + \
-                                b"{} ({})".format(eid, type(eid).__name__))
+                raise TypeError("Invalid type for element ID: " + \
+                                "{} ({})".format(eid, type(eid).__name__))
 
             if ename is None:
-                raise ValueError(b'Element definition missing required '
-                                 b'"name" attribute')
+                raise ValueError('Element definition missing required '
+                                 '"name" attribute')
             elif not isinstance(ename, (str, bytes, bytearray)):
-                raise TypeError(b'Invalid type for element name: ' + \
-                                 b'{} ({})'.format(ename, type(ename).__name__))
-            elif not (ename[0].isalpha() or ename[0] == b"_"):
-                raise ValueError(b"Invalid element name: %r" % ename)
+                raise TypeError('Invalid type for element name: ' + \
+                                 '{} ({})'.format(ename, type(ename).__name__))
+            elif not (ename[0].isalpha() or ename[0] == "_"):
+                raise ValueError("Invalid element name: %r" % ename)
 
-            mandatory = _getBool(attribs, b'mandatory', False)
-            multiple = _getBool(attribs, b'multiple', False)
-            precache = _getBool(attribs, b'precache', baseClass.precache)
-            length = _getInt(attribs, b'length', None)
-            isGlobal = _getInt(attribs, b'global', None)
+            mandatory = _getBool(attribs, 'mandatory', False)
+            multiple = _getBool(attribs, 'multiple', False)
+            precache = _getBool(attribs, 'precache', baseClass.precache)
+            length = _getInt(attribs, 'length', None)
+            isGlobal = _getInt(attribs, 'global', None)
 
             if isGlobal is None:
                 # Element 'level'. The old schema format used level to define
@@ -1258,7 +1258,7 @@ class Schema(object):
                 # format defined these as having a level of -1. The new format
                 # uses a Boolean attribute, `global`, but fall back to
                 # reading `level` if `global` isn't defined.
-                isGlobal = _getInt(attribs, b'level', None) == -1
+                isGlobal = _getInt(attribs, 'level', None) == -1
 
             # Create a new Element subclass
             eclass = type('%sElement' % ename, (baseClass,),
@@ -1425,7 +1425,7 @@ class Schema(object):
                 for subel in el:
                     _crawl(subel)
             elif isinstance(el, UnknownElement):
-                raise NameError(b"Verification failed, unknown element ID %x" %
+                raise NameError("Verification failed, unknown element ID %x" %
                                 el.id)
             else:
                 _ = el.value
@@ -1470,7 +1470,7 @@ def loadSchema(filename, reload=False, **kwargs):
         return SCHEMATA[filename]
 
     if not os.path.exists(filename):
-        raise IOError(errno.ENOENT, b'Could not find schema XML', origName)
+        raise IOError(errno.ENOENT, 'Could not find schema XML', origName)
 
     schema = Schema(filename, **kwargs)
     SCHEMATA[filename] = schema

@@ -6,8 +6,8 @@ Note: this module does not decode `Document`, `BinaryElement`, or
 and `MasterElement` objects are special cases, and `BinaryElement` objects do
 not require special decoding. 
 """
-__author__ = b"dstokes"
-__copyright__ = b"Copyright 2018 Mide Technology Corporation"
+__author__ = "dstokes"
+__copyright__ = "Copyright 2018 Mide Technology Corporation"
 
 __all__ = ['readElementID', 'readElementSize', 'readFloat', 'readInt',
            'readUInt', 'readDate', 'readString', 'readUnicode']
@@ -171,8 +171,8 @@ def readFloat(stream, size):
     elif size == 0:
         return 0.0
 
-    raise IOError(b"Cannot read floating point value of length %s; "
-                  b"only lengths of 0, 4, or 8 bytes supported." % size)
+    raise IOError("Cannot read floating point value of length %s; "
+                  "only lengths of 0, 4, or 8 bytes supported." % size)
 
 
 def readString(stream, size):
@@ -213,7 +213,7 @@ def readDate(stream, size=8):
         @raise IOError: raised if the length of the date is not 8 bytes.
     """
     if size != 8:
-        raise IOError(b"Cannot read date value of length %d, only 8." % size)
+        raise IOError("Cannot read date value of length %d, only 8." % size)
     data = stream.read(size)
     nanoseconds = _struct_int64_unpack(data)[0]
     delta = timedelta(microseconds=(nanoseconds // 1000))

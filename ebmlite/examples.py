@@ -11,9 +11,9 @@ from xml.dom.minidom import parseString
 # =======================================
 
 # Files to use in this example
-schemaFile = b'./schemata/mide_ide.xml'
-ebmlFile1  = b'./tests/SSX46714-doesnot.IDE'
-xmlFile1   = b'./tests/example-xml.xml'
+schemaFile = './schemata/mide_ide.xml'
+ebmlFile1  = './tests/SSX46714-doesnot.IDE'
+xmlFile1   = './tests/example-xml.xml'
 
 # load the schema to use with these files.  This creates an object that is used
 # to parse EBML files.
@@ -24,7 +24,7 @@ ebmlDoc1   = schema.load(ebmlFile1, headers=True)       # load the file through
                                                         # the schema
 ebmlRoot   = toXml(ebmlDoc1)                            # convert the file into
                                                         # a tree of XML elements
-xmlString1 = ET.tostring(ebmlRoot, encoding=b'UTF-8')    # convert the xml tree
+xmlString1 = ET.tostring(ebmlRoot, encoding='UTF-8')    # convert the xml tree
                                                         # into a string
 
 # Save xml

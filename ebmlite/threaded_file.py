@@ -10,7 +10,7 @@ functionality is transparent.
 import platform
 from threading import currentThread, Event
 
-__all__ = [b'ThreadAwareFile']
+__all__ = ['ThreadAwareFile']
 
 class ThreadAwareFile(file):
     """ A 'replacement' for a standard read-only file stream that supports

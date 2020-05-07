@@ -4,11 +4,11 @@ Functions for encoding EBML elements and their values.
 Note: this module does not encode Document or MasterElement objects; they are
 special cases, handled in `core.py`.
 '''
-__author__ = b"dstokes"
-__copyright__ = b"Copyright 2018 Mide Technology Corporation"
+__author__ = "dstokes"
+__copyright__ = "Copyright 2018 Mide Technology Corporation"
 
-__all__ = [b'encodeBinary', b'encodeDate', b'encodeFloat', b'encodeId', b'encodeInt',
-           b'encodeSize', b'encodeString', b'encodeUInt', b'encodeUnicode']
+__all__ = ['encodeBinary', 'encodeDate', 'encodeFloat', 'encodeId', 'encodeInt',
+           'encodeSize', 'encodeString', 'encodeUInt', 'encodeUnicode']
 
 import datetime
 import sys
@@ -87,7 +87,7 @@ def encodeSize(val, length=None):
         prefix = LENGTH_PREFIXES[length]
         return encodeUInt(val|prefix, length)
     except (IndexError, TypeError):
-        raise ValueError(b"Cannot encode element size %s" % length)
+        raise ValueError("Cannot encode element size %s" % length)
 
 
 #===============================================================================
@@ -107,7 +107,7 @@ def encodeId(eid, length=None):
     """
     if length is not None:
         if length < 1 or length > 4:
-            raise ValueError(b"Cannot encode an ID 0x%0x to length %d" %
+            raise ValueError("Cannot encode an ID 0x%0x to length %d" %
                              (eid, length))
     return encodeUInt(eid, length)
 
@@ -128,8 +128,8 @@ def encodeUInt(val, length=None):
     if length is None:
         return packed
     if len(packed) > length:
-        raise ValueError(b"Encoded length (%d) greater than specified length "
-                         b"(%d)" % (len(packed), length))
+        raise ValueError("Encoded length (%d) greater than specified length "
+                         "(%d)" % (len(packed), length))
     return packed.rjust(length, pad)
 
 
@@ -161,8 +161,8 @@ def encodeInt(val, length=None):
     if length is None:
         return packed
     if len(packed) > length:
-        raise ValueError(b"Encoded length (%d) greater than specified length "
-                         b"(%d)" % (len(packed), length))
+        raise ValueError("Encoded length (%d) greater than specified length "
+                         "(%d)" % (len(packed), length))
     return packed.rjust(length, pad)
 
 
@@ -189,7 +189,7 @@ def encodeFloat(val, length=None):
     elif length == 8:
         return _struct_float64.pack(val)
     else:
-        raise ValueError(b"Cannot encode float of length %d; only 0, 4, or 8" %
+        raise ValueError("Cannot encode float of length %d; only 0, 4, or 8" %
                          length)
 
 
@@ -269,7 +269,7 @@ def encodeDate(val, length=None):
     if length is None:
         length = 8
     elif length != 8:
-        raise ValueError(b"Dates must be of length 8")
+        raise ValueError("Dates must be of length 8")
 
     if val is None:
         val = datetime.datetime.utcnow()

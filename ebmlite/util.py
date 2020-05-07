@@ -12,8 +12,8 @@ Created on Aug 11, 2017
 '''
 from io import StringIO
 
-__author__ = b"dstokes"
-__copyright__ = b"Copyright 2017 Mide Technology Corporation"
+__author__ = "dstokes"
+__copyright__ = "Copyright 2017 Mide Technology Corporation"
 
 import ast
 from base64 import b64encode, b64decode
@@ -23,7 +23,7 @@ from xml.etree import ElementTree as ET
 
 from . import core, encoding
 
-__all__ = [b'toXml', b'xml2ebml', b'loadXml', b'pprint']
+__all__ = ['toXml', 'xml2ebml', 'loadXml', 'pprint']
 
 #===============================================================================
 #
@@ -115,12 +115,12 @@ def xmlElement2ebml(xmlEl, ebmlFile, schema, sizeLength=None, unknown=True):
         # Element name not in schema. Go ahead if allowed (`unknown` is `True`)
         # and the XML element specifies an ID,
         if not unknown:
-            raise NameError(b"Unrecognized EBML element name: %s" % xmlEl.tag)
+            raise NameError("Unrecognized EBML element name: %s" % xmlEl.tag)
 
         eid = xmlEl.get('id', None)
         if eid is None:
-            raise NameError(b"Unrecognized EBML element name with no 'id' "
-                            b"attribute in XML: %s" % xmlEl.tag)
+            raise NameError("Unrecognized EBML element name with no 'id' "
+                            "attribute in XML: %s" % xmlEl.tag)
         cls = core.UnknownElement
         encId = encoding.encodeId(int(eid, 16))
         cls.id = int(eid, 16)
@@ -218,11 +218,11 @@ def xml2ebml(xmlFile, ebmlFile, schema, sizeLength=None, headers=True,
         xmlRoot = xmlDoc.getroot()
 
     if xmlRoot.tag not in schema and xmlRoot.tag != schema.document.__name__:
-        raise NameError(b"XML element %s not an element or document in "
-                        b"schema %s (wrong schema)" % (xmlRoot.tag, schema.name))
+        raise NameError("XML element %s not an element or document in "
+                        "schema %s (wrong schema)" % (xmlRoot.tag, schema.name))
 
-    headers = headers and b'EBML' in schema
-    if headers and b'EBML' not in (el.tag for el in xmlRoot):
+    headers = headers and 'EBML' in schema
+    if headers and 'EBML' not in (el.tag for el in xmlRoot):
         pos = ebmlFile.tell()
         cls = schema.document
         ebmlFile.write(cls.encodePayload(cls._createHeaders()))
@@ -259,7 +259,7 @@ def loadXml(xmlFile, schema, ebmlFile=None):
             automatically-generated temporary file.
         @return The root node of the specified EBML file.
     """
-    if ebmlFile == b":memory:":
+    if ebmlFile == ":memory:":
         ebmlFile = StringIO()
         xml2ebml(xmlFile, ebmlFile, schema)
         ebmlFile.seek(0)
@@ -317,13 +317,13 @@ def pprint(el, values=True, out=sys.stdout, indent="  ", _depth=0):
 #
 #===============================================================================
 
-if __name__ == b"__main__":
+if __name__ == "__main__":
     import argparse
     import os.path
     from xml.dom.minidom import parseString
 
     def errPrint(msg):
-        sys.stderr.write(b"%s\n" % msg)
+        sys.stderr.write("%s\n" % msg)
         sys.stderr.flush()
         exit(1)
 
@@ -333,53 +333,53 @@ if __name__ == b"__main__":
         XML and EBML and viewing the structure of an EBML file.
         """)
 
-    argparser.add_argument(b'mode',
-                           choices=[b"xml2ebml", b"ebml2xml", b"view"],
-                           help=b"The utility to run.")
-    argparser.add_argument(b'input',
-                           metavar=b"[FILE.ebml|FILE.xml]",
+    argparser.add_argument('mode',
+                           choices=["xml2ebml", "ebml2xml", "view"],
+                           help="The utility to run.")
+    argparser.add_argument('input',
+                           metavar="[FILE.ebml|FILE.xml]",
                            help="""The source file: XML for 'xml2ebml,' EBML
                                    for 'ebml2xml' or 'view.'""")
-    argparser.add_argument(b'schema',
-                           metavar=b"SCHEMA.xml",
+    argparser.add_argument('schema',
+                           metavar="SCHEMA.xml",
                            help="""The name of the schema file. Only the name
                                    itself is required if the schema file is in
                                    the standard schema directory.""")
-    argparser.add_argument(b'-o', b'--output',
-                           metavar=b"[FILE.xml|FILE.ebml]",
-                           help=b"The output file.")
-    argparser.add_argument(b'-c', b'--clobber',
-                           action=b"store_true",
-                           help=b"Clobber (overwrite) existing files.")
-    argparser.add_argument(b'-p', b'--pretty',
-                           action=b"store_true",
-                           help=b"Generate 'pretty' XML with ebml2xml.")
+    argparser.add_argument('-o', '--output',
+                           metavar="[FILE.xml|FILE.ebml]",
+                           help="The output file.")
+    argparser.add_argument('-c', '--clobber',
+                           action="store_true",
+                           help="Clobber (overwrite) existing files.")
+    argparser.add_argument('-p', '--pretty',
+                           action="store_true",
+                           help="Generate 'pretty' XML with ebml2xml.")
 
     args = argparser.parse_args()
 
     if not os.path.exists(args.input):
-        sys.stderr.write(b"Input file does not exist: %s\n" % args.input)
+        sys.stderr.write("Input file does not exist: %s\n" % args.input)
         exit(1)
 
     try:
         schema = core.loadSchema(args.schema)
     except IOError as err:
-        errPrint(b"Error loading schema: %s\n" % err)
+        errPrint("Error loading schema: %s\n" % err)
 
     if args.output:
         output = os.path.realpath(os.path.expanduser(args.output))
         if os.path.exists(output) and not args.clobber:
-            errPrint(b"Output file exists: %s" % args.output)
-        out = open(output, b'wb')
+            errPrint("Output file exists: %s" % args.output)
+        out = open(output, 'wb')
     else:
         out = sys.stdout
 
-    if args.mode == b"xml2ebml":
+    if args.mode == "xml2ebml":
         xml2ebml(args.input, out, schema)  # , sizeLength=4, headers=True, unknown=True)
-    elif args.mode == b"ebml2xml":
+    elif args.mode == "ebml2xml":
         doc = schema.load(args.input, headers=True)
         root = toXml(doc)  # , offsets, sizes, types, ids)
-        s = ET.tostring(root, encoding=b"utf-8")
+        s = ET.tostring(root, encoding="utf-8")
         if args.pretty:
             parseString(s).writexml(out, addindent=b'\t', newl=b'\n', encoding=b'utf-8')
         else:
