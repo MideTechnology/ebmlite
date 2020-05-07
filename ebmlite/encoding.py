@@ -1,9 +1,9 @@
-'''
+"""
 Functions for encoding EBML elements and their values.
 
 Note: this module does not encode Document or MasterElement objects; they are
 special cases, handled in `core.py`.
-'''
+"""
 __author__ = "dstokes"
 __copyright__ = "Copyright 2018 Mide Technology Corporation"
 
@@ -16,9 +16,9 @@ import sys
 from .decoding import _struct_uint64, _struct_int64
 from .decoding import _struct_float32, _struct_float64
 
-#===============================================================================
+# ===============================================================================
 #
-#===============================================================================
+# ===============================================================================
 
 # If no length is given, use the platform's size of a float.
 DEFAULT_FLOAT_SIZE = 4 if sys.maxsize <= 2147483647 else 8
@@ -35,11 +35,12 @@ LENGTH_PREFIXES = [0,
                    ]
 
 # Translation table for removing invalid EBML string characters (32 < x < 127)
-STRING_CHARACTERS = (b"?"*32 + bytearray(list(range(32,127)))).ljust(256, b'?')
+STRING_CHARACTERS = (b"?"*32 + bytearray(range(32, 127))).ljust(256, b'?')
 
-#===============================================================================
+# ===============================================================================
 #
-#===============================================================================
+# ===============================================================================
+
 
 def getLength(val):
     """ Calculate the encoded length of a value.
@@ -85,14 +86,14 @@ def encodeSize(val, length=None):
     length = getLength(val) if length is None else length
     try:
         prefix = LENGTH_PREFIXES[length]
-        return encodeUInt(val|prefix, length)
+        return encodeUInt(val | prefix, length)
     except (IndexError, TypeError):
         raise ValueError("Cannot encode element size %s" % length)
 
 
-#===============================================================================
-#--- Encoding
-#===============================================================================
+# ===============================================================================
+# --- Encoding
+# ===============================================================================
 
 def encodeId(eid, length=None):
     """ Encode an element ID.
