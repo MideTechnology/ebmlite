@@ -1,4 +1,4 @@
-'''
+"""
 Some utilities for manipulating EBML documents: translate to/from XML, etc.
 This module may be imported or used as a command-line utility.
 
@@ -9,7 +9,7 @@ Created on Aug 11, 2017
     directly to a file, allowing the conversion of huge EBML files.
 @todo: Add other options to command-line utility for the other arguments of
     `toXml()` and `xml2ebml()`.
-'''
+"""
 from io import StringIO
 
 __author__ = "dstokes"
@@ -25,9 +25,10 @@ from . import core, encoding
 
 __all__ = ['toXml', 'xml2ebml', 'loadXml', 'pprint']
 
-#===============================================================================
+# ===============================================================================
 #
-#===============================================================================
+# ===============================================================================
+
 
 def toXml(el, parent=None, offsets=True, sizes=True, types=True, ids=True):
     """ Convert an EBML Document to XML. Binary elements will contain
@@ -61,7 +62,7 @@ def toXml(el, parent=None, offsets=True, sizes=True, types=True, ids=True):
         xmlEl.set('schemaName', el.schema.name)
         xmlEl.set('schemaFile', el.schema.filename)
     else:
-        if ids and isinstance(el.id, (int, int)):
+        if ids and isinstance(el.id, int):
             xmlEl.set('id', "0x%X" % el.id)
         if types:
             xmlEl.set('type', el.dtype.__name__)
