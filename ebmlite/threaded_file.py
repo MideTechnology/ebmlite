@@ -9,7 +9,7 @@ functionality is transparent.
 '''
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from past.builtins import basestring
+# from past.builtins import basestring
 import platform
 from threading import currentThread, Event
 

@@ -11,10 +11,10 @@ Created on Aug 11, 2017
     `toXml()` and `xml2ebml()`.
 '''
 from __future__ import absolute_import, division, print_function, unicode_literals
-from future import standard_library
-standard_library.install_aliases()
-from builtins import str
-from past.builtins import basestring
+# from future import standard_library
+# standard_library.install_aliases()
+# from builtins import str
+# from past.builtins import basestring
 from io import StringIO
 
 __author__ = b"dstokes"
@@ -109,7 +109,7 @@ def xmlElement2ebml(xmlEl, ebmlFile, schema, sizeLength=None, unknown=True):
         @raise NameError: raised if an xml element is not present in the schema and unknown is False, OR if the xml
             element does not have an ID.
     """
-    if not isinstance(xmlEl.tag, basestring):
+    if not isinstance(xmlEl.tag, (str, bytes, bytearray)):
         # (Probably) a comment; disregard.
         return 0
         
@@ -203,7 +203,7 @@ def xml2ebml(xmlFile, ebmlFile, schema, sizeLength=None, headers=True,
         @return: the size of the ebml file in bytes.
         @raise NameError: raises if an xml element is not present in the schema.
     """
-    if isinstance(ebmlFile, basestring):
+    if isinstance(ebmlFile, (str, bytes, bytearray)):
         ebmlFile = open(ebmlFile, 'wb')
         openedEbml = True
     else:
