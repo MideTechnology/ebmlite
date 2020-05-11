@@ -5,15 +5,14 @@ python:
   - "3.5"
   - "3.6"
   - "3.7"
+  - "3.8"
 install: pip install .
 script: python -m pytest
 
 matrix:
   include:
 
-    # Windows, which does not cooperate well, and needs separate cases for
-    # python 2.7 and 3.7, and I'm not sure how to support more 3.x versions
-    # just yet, but ¯\_(ツ)_/¯
+    # Windows, which does not cooperate well
 
     - os: windows
       language: shell
