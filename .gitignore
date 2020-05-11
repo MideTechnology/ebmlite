@@ -17,7 +17,7 @@ build/*
 dist/*
 env
 env?
-.mypy
+.mypy*
 venv
 venv?
 */.*

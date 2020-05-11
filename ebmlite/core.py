@@ -50,7 +50,7 @@ from datetime import datetime
 import errno
 import os.path
 from io import BytesIO
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union, BinaryIO
 from xml.etree import ElementTree as ET
 
 from .decoding import readElementID, readElementSize
@@ -122,7 +122,7 @@ class Element(object):
     # For python-ebml compatibility; not currently used.
     children = None
 
-    def parse(self, stream: Any, size: int) -> bytearray:
+    def parse(self, stream: BinaryIO, size: int) -> Any:
         """ Type-specific helper function for parsing the element's payload.
             It is assumed the file pointer is at the start of the payload.
         """
@@ -207,13 +207,13 @@ class Element(object):
     # ==========================================================================
 
     @classmethod
-    def encodePayload(cls, data: Union[bytes, bytearray], length: Optional[int] = None) -> bytes:
+    def encodePayload(cls, data, length: Optional[int] = None) -> bytes:
         """ Type-specific payload encoder. """
         return encoding.encodeBinary(data, length)
 
     @classmethod
     def encode(cls,
-               value: Union[bytes, bytearray, Tuple, List],
+               value,
                length: Optional[int] = None,
                lengthSize: Optional[int] = None,
                infinite: bool = False) -> bytes:
@@ -245,7 +245,7 @@ class Element(object):
         encId = encoding.encodeId(cls.id)
         return encId + encoding.encodeSize(length, lengthSize) + payload
 
-    def dump(self) -> Any:
+    def dump(self):
         """ Dump this element's value as nested dictionaries, keyed by
             element name. For non-master elements, this just returns the
             element's value; this method exists to maintain uniformity.
@@ -269,7 +269,7 @@ class IntegerElement(Element):
             return False
         return self.value == other.value
 
-    def parse(self, stream: Any, size: int) -> int:
+    def parse(self, stream: BinaryIO, size: int) -> int:
         """ Type-specific helper function for parsing the element's payload.
             It is assumed the file pointer is at the start of the payload.
         """
@@ -292,7 +292,7 @@ class UIntegerElement(IntegerElement):
     dtype = int
     precache = True
 
-    def parse(self, stream: Any, size: int) -> int:
+    def parse(self, stream: BinaryIO, size: int) -> int:
         """ Type-specific helper function for parsing the element's payload.
             It is assumed the file pointer is at the start of the payload.
         """
@@ -320,7 +320,7 @@ class FloatElement(Element):
             return False
         return self.value == other.value
 
-    def parse(self, stream: Any, size: int) -> float:
+    def parse(self, stream: BinaryIO, size: int) -> float:
         """ Type-specific helper function for parsing the element's payload.
             It is assumed the file pointer is at the start of the payload.
         """
@@ -350,7 +350,7 @@ class StringElement(Element):
     def __len__(self):
         return self.size
 
-    def parse(self, stream: Any, size: int) -> bytes:
+    def parse(self, stream: BinaryIO, size: int) -> bytes:
         """ Type-specific helper function for parsing the element's payload.
             It is assumed the file pointer is at the start of the payload.
         """
@@ -376,7 +376,7 @@ class UnicodeElement(StringElement):
         # Value may be multiple bytes per character
         return len(self.value)
 
-    def parse(self, stream: Any, size: int) -> str:
+    def parse(self, stream: BinaryIO, size: int) -> str:
         """ Type-specific helper function for parsing the element's payload.
             It is assumed the file pointer is at the start of the payload.
         """
@@ -398,7 +398,7 @@ class DateElement(IntegerElement):
     __slots__ = ("stream", "offset", "size", "sizeLength", "payloadOffset", "_value")
     dtype: datetime = datetime
 
-    def parse(self, stream: Any, size: int) -> datetime:
+    def parse(self, stream: BinaryIO, size: int) -> datetime:
         """ Type-specific helper function for parsing the element's payload.
             It is assumed the file pointer is at the start of the payload.
         """
@@ -434,7 +434,7 @@ class VoidElement(BinaryElement):
     """
     __slots__ = ("stream", "offset", "size", "sizeLength", "payloadOffset", "_value")
 
-    def parse(self, stream: Any, size: Any):
+    def parse(self, stream: BinaryIO, size: Any):
         return bytearray()
 
     @classmethod
@@ -458,7 +458,7 @@ class UnknownElement(BinaryElement):
     precache = False
 
     def __init__(self,
-                 stream: Any = None,
+                 stream: Optional[BinaryIO] = None,
                  offset: int = 0,
                  size: int = 0,
                  payloadOffset: int = 0,
@@ -518,7 +518,7 @@ class MasterElement(Element):
         # parse(). Used only when pre-caching.
         return self.value
 
-    def parseElement(self, stream: Any, nocache: bool = False):
+    def parseElement(self, stream: BinaryIO, nocache: bool = False):
         """ Read the next element from a stream, instantiate a `MasterElement`
             object, and then return it and the offset of the next element
             (this element's position + size).
@@ -1357,7 +1357,7 @@ class Schema(object):
     # Encoding
     # ==========================================================================
 
-    def encode(self, stream, data, headers=False) -> bytes:
+    def encode(self, stream: BinaryIO, data, headers=False) -> bytes:
         """ Write an EBML document using this Schema to a file or file-like
             stream.
 
