@@ -50,6 +50,7 @@ from datetime import datetime
 import errno
 import os.path
 from io import BytesIO
+from typing import Any, Dict, List, Optional, Tuple, Union
 from xml.etree import ElementTree as ET
 
 from .decoding import readElementID, readElementSize
@@ -70,7 +71,7 @@ SCHEMA_PATH = ['',
 
 # SCHEMATA: A dictionary of loaded schemata, keyed by filename. Used by
 # `loadSchema()`. In most cases, SCHEMATA should not be otherwise modified.
-SCHEMATA = {}
+SCHEMATA: Dict[Union[str, bytes, bytearray], Any] = {}
 
 
 # ==============================================================================
@@ -104,7 +105,7 @@ class Element(object):
     schema = None
 
     # Python native data type.
-    dtype = bytearray
+    dtype: Any = bytearray
 
     # Should this element's value be read/cached when the element is parsed?
     precache = False
@@ -121,14 +122,14 @@ class Element(object):
     # For python-ebml compatibility; not currently used.
     children = None
 
-    def parse(self, stream, size):
+    def parse(self, stream: Any, size: int) -> bytearray:
         """ Type-specific helper function for parsing the element's payload.
             It is assumed the file pointer is at the start of the payload.
         """
         # Document-wide caching could be implemented here.
         return bytearray(stream.read(size))
 
-    def __init__(self, stream=None, offset=0, size=0, payloadOffset=0):
+    def __init__(self, stream=None, offset: int = 0, size: int = 0, payloadOffset: int = 0):
         """ Constructor. Instantiate a new Element from a file. In most cases,
             elements should be created when a `Document` is loaded, rather
             than instantiated explicitly.
@@ -149,7 +150,7 @@ class Element(object):
         return "<%s (ID:0x%02X), offset %s, size %s>" % \
             (self.__class__.__name__, self.id, self.offset, self.size)
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         """ Equality check. Elements are considered equal if they are the same
             type and have the same ID, size, offset, and schema. Note: element
             value is not considered! Check for value equality explicitly
@@ -167,7 +168,7 @@ class Element(object):
             return False
 
     @property
-    def value(self):
+    def value(self) -> Any:
         """ Parse and cache the element's value. """
         if self._value is not None:
             return self._value
@@ -175,13 +176,13 @@ class Element(object):
         self._value = self.parse(self.stream, self.size)
         return self._value
 
-    def getRaw(self):
+    def getRaw(self) -> Union[bytes, bytearray]:
         """ Get the element's raw binary data, including EBML headers.
         """
         self.stream.seek(self.offset)
         return self.stream.read(self.size + (self.payloadOffset - self.offset))
 
-    def getRawValue(self):
+    def getRawValue(self) -> Union[bytes, bytearray]:
         """ Get the raw binary of the element's value.
         """
         self.stream.seek(self.payloadOffset)
@@ -191,7 +192,7 @@ class Element(object):
     # Caching (experimental)
     # ==========================================================================
 
-    def gc(self, recurse=False):
+    def gc(self, recurse: bool = False) -> int:
         """ Clear any cached values. To save memory and/or force values to be
             re-read from the file. Returns the number of cached values cleared.
         """
@@ -206,12 +207,16 @@ class Element(object):
     # ==========================================================================
 
     @classmethod
-    def encodePayload(cls, data, length=None):
+    def encodePayload(cls, data: Union[bytes, bytearray], length: Optional[int] = None) -> bytes:
         """ Type-specific payload encoder. """
         return encoding.encodeBinary(data, length)
 
     @classmethod
-    def encode(cls, value, length=None, lengthSize=None, infinite=False):
+    def encode(cls,
+               value: Union[bytes, bytearray, Tuple, List],
+               length: Optional[int] = None,
+               lengthSize: Optional[int] = None,
+               infinite: bool = False) -> bytes:
         """ Encode an EBML element.
 
             @param value: The value to encode, or a list of values to encode.
@@ -240,7 +245,7 @@ class Element(object):
         encId = encoding.encodeId(cls.id)
         return encId + encoding.encodeSize(length, lengthSize) + payload
 
-    def dump(self):
+    def dump(self) -> Any:
         """ Dump this element's value as nested dictionaries, keyed by
             element name. For non-master elements, this just returns the
             element's value; this method exists to maintain uniformity.
@@ -264,14 +269,14 @@ class IntegerElement(Element):
             return False
         return self.value == other.value
 
-    def parse(self, stream, size):
+    def parse(self, stream: Any, size: int) -> int:
         """ Type-specific helper function for parsing the element's payload.
             It is assumed the file pointer is at the start of the payload.
         """
         return readInt(stream, size)
 
     @classmethod
-    def encodePayload(cls, data, length=None):
+    def encodePayload(cls, data: int, length: Optional[int] = None) -> bytes:
         """ Type-specific payload encoder for signed integer elements. """
         return encoding.encodeInt(data, length)
 
@@ -287,14 +292,14 @@ class UIntegerElement(IntegerElement):
     dtype = int
     precache = True
 
-    def parse(self, stream, size):
+    def parse(self, stream: Any, size: int) -> int:
         """ Type-specific helper function for parsing the element's payload.
             It is assumed the file pointer is at the start of the payload.
         """
         return readUInt(stream, size)
 
     @classmethod
-    def encodePayload(cls, data, length=None):
+    def encodePayload(cls, data: int, length: Optional[int] = None) -> bytes:
         """ Type-specific payload encoder for unsigned integer elements. """
         return encoding.encodeUInt(data, length)
 
@@ -315,14 +320,14 @@ class FloatElement(Element):
             return False
         return self.value == other.value
 
-    def parse(self, stream, size):
+    def parse(self, stream: Any, size: int) -> float:
         """ Type-specific helper function for parsing the element's payload.
             It is assumed the file pointer is at the start of the payload.
         """
         return readFloat(stream, size)
 
     @classmethod
-    def encodePayload(cls, data, length=None):
+    def encodePayload(cls, data: float, length: Optional[int] = None) -> bytes:
         """ Type-specific payload encoder for floating point elements. """
         return encoding.encodeFloat(data, length)
 
@@ -345,14 +350,14 @@ class StringElement(Element):
     def __len__(self):
         return self.size
 
-    def parse(self, stream, size):
+    def parse(self, stream: Any, size: int) -> bytes:
         """ Type-specific helper function for parsing the element's payload.
             It is assumed the file pointer is at the start of the payload.
         """
         return readString(stream, size)
 
     @classmethod
-    def encodePayload(cls, data, length=None):
+    def encodePayload(cls, data: Union[bytes, bytearray], length: Optional[int] = None) -> bytes:
         """ Type-specific payload encoder for ASCII string elements. """
         return encoding.encodeString(data, length)
 
@@ -371,14 +376,14 @@ class UnicodeElement(StringElement):
         # Value may be multiple bytes per character
         return len(self.value)
 
-    def parse(self, stream, size):
+    def parse(self, stream: Any, size: int) -> str:
         """ Type-specific helper function for parsing the element's payload.
             It is assumed the file pointer is at the start of the payload.
         """
         return readUnicode(stream, size)
 
     @classmethod
-    def encodePayload(cls, data, length=None):
+    def encodePayload(cls, data: str, length: Optional[int] = None) -> bytes:
         """ Type-specific payload encoder for Unicode string elements. """
         return encoding.encodeUnicode(data, length)
 
@@ -391,16 +396,16 @@ class DateElement(IntegerElement):
         generated when a `Schema` is loaded.
     """
     __slots__ = ("stream", "offset", "size", "sizeLength", "payloadOffset", "_value")
-    dtype = datetime
+    dtype: datetime = datetime
 
-    def parse(self, stream, size):
+    def parse(self, stream: Any, size: int) -> datetime:
         """ Type-specific helper function for parsing the element's payload.
             It is assumed the file pointer is at the start of the payload.
         """
         return readDate(stream, size)
 
     @classmethod
-    def encodePayload(cls, data, length=None):
+    def encodePayload(cls, data: datetime, length: Optional[int] = None) -> bytes:
         """ Type-specific payload encoder for date elements. """
         return encoding.encodeDate(data, length)
 
@@ -429,11 +434,11 @@ class VoidElement(BinaryElement):
     """
     __slots__ = ("stream", "offset", "size", "sizeLength", "payloadOffset", "_value")
 
-    def parse(self, stream, size):
+    def parse(self, stream: Any, size: Any):
         return bytearray()
 
     @classmethod
-    def encodePayload(cls, data, length=0):
+    def encodePayload(cls, data: Any, length: Optional[int] = 0) -> bytearray:
         """ Type-specific payload encoder for Void elements. """
         length = 0 if length is None else length
         return bytearray(b'\xff' * length)
@@ -452,8 +457,13 @@ class UnknownElement(BinaryElement):
     name = "UnknownElement"
     precache = False
 
-    def __init__(self, stream=None, offset=0, size=0, payloadOffset=0, eid=None,
-                 schema=None):
+    def __init__(self,
+                 stream: Any = None,
+                 offset: int = 0,
+                 size: int = 0,
+                 payloadOffset: int = 0,
+                 eid: Optional[int] = None,
+                 schema: Any = None):
         """ Constructor. Instantiate a new `UnknownElement` from a file. In
             most cases, elements should be created when a `Document` is loaded,
             rather than instantiated explicitly.
@@ -508,7 +518,7 @@ class MasterElement(Element):
         # parse(). Used only when pre-caching.
         return self.value
 
-    def parseElement(self, stream, nocache=False):
+    def parseElement(self, stream: Any, nocache: bool = False):
         """ Read the next element from a stream, instantiate a `MasterElement`
             object, and then return it and the offset of the next element
             (this element's position + size).
@@ -540,7 +550,7 @@ class MasterElement(Element):
         return el, payloadOffset + el.size
 
     @classmethod
-    def _isValidChild(cls, elId):
+    def _isValidChild(cls, elId: int) -> bool:
         """ Is the given element ID represent a valid sub-element, i.e.
             explicitly specified as a child element or a 'global' in the
             schema?
@@ -558,7 +568,7 @@ class MasterElement(Element):
             return elId in cls._childIds
 
     @property
-    def size(self):
+    def size(self) -> int:
         """ The element's size. Master elements can be instantiated with this
             as `None`; this denotes an 'infinite' EBML element, and its size
             will be determined by iterating over its contents until an invalid
@@ -592,13 +602,13 @@ class MasterElement(Element):
             return self._size
 
     @size.setter
-    def size(self, esize):
+    def size(self, esize: int):
         if esize is not None:
             # Only create the `_size` attribute for a real value. Don't
             # define it if it's `None`, so `size` will get calculated.
             self._size = esize
 
-    def __iter__(self, nocache=False):
+    def __iter__(self, nocache: bool = False):
         """ x.__iter__() <==> iter(x)
         """
         # TODO: Better support for 'infinite' elements (getting the size of
@@ -648,7 +658,7 @@ class MasterElement(Element):
     # Caching (experimental!)
     # ==========================================================================
 
-    def gc(self, recurse=False):
+    def gc(self, recurse: bool = False) -> int:
         """ Clear any cached values. To save memory and/or force values to be
             re-read from the file.
         """
@@ -664,7 +674,7 @@ class MasterElement(Element):
     # ==========================================================================
 
     @classmethod
-    def encodePayload(cls, data, length=None):
+    def encodePayload(cls, data, length: Optional[int] = None) -> bytearray:
         """ Type-specific payload encoder for 'master' elements.
         """
         result = bytearray()
@@ -684,7 +694,11 @@ class MasterElement(Element):
         return result
 
     @classmethod
-    def encode(cls, data, length=None, lengthSize=None, infinite=False):
+    def encode(cls,
+               data,
+               length: Optional[int] = None,
+               lengthSize: Optional[int] = None,
+               infinite: bool = False) -> bytes:
         """ Encode an EBML master element.
 
             @param data: The data to encode, provided as a dictionary keyed by
@@ -713,7 +727,7 @@ class MasterElement(Element):
                                                 lengthSize=lengthSize,
                                                 infinite=infinite)
 
-    def dump(self):
+    def dump(self) -> OrderedDict:
         """ Dump this element's value as nested dictionaries, keyed by
             element name. The values of 'multiple' elements return as lists.
             Note: The order of 'multiple' elements relative to other elements
@@ -743,7 +757,7 @@ class Document(MasterElement):
         Loading a `Schema` generates a subclass.
     """
 
-    def __init__(self, stream, name=None, size=None, headers=True):
+    def __init__(self, stream, name: Optional[str] = None, size: Optional[int] = None, headers: bool = True):
         """ Constructor. Instantiate a `Document` from a file-like stream.
             In most cases, `Schema.load()` should be used instead of
             explicitly instantiating a `Document`.
@@ -890,7 +904,7 @@ class Document(MasterElement):
     # Caching (experimental!)
     # ==========================================================================
 
-    def gc(self, recurse=False):
+    def gc(self, recurse: bool = False) -> int:
         # TODO: Implement this if/when caching of root elements is implemented.
         return 0
 
@@ -1008,7 +1022,7 @@ class Schema(object):
     # factory function.
     UNKNOWN = UnknownElement
 
-    def __init__(self, source, name=None):
+    def __init__(self, source, name: Optional[Union[str, bytes, bytearray]] = None):
         """ Constructor. Creates a new Schema from a schema description XML.
 
             @param source: The Schema's source, either a string with the full
@@ -1120,7 +1134,12 @@ class Schema(object):
             for chEl in el:
                 self._parseSchema(chEl, cls)
 
-    def addElement(self, eid, ename, baseClass, attribs={}, parent=None,
+    def addElement(self,
+                   eid: int,
+                   ename: Union[str, bytes, bytearray],
+                   baseClass,
+                   attribs={},
+                   parent=None,
                    docs=None):
         """ Create a new `Element` subclass and add it to the schema.
 
@@ -1317,7 +1336,7 @@ class Schema(object):
     # Schema info stuff. Uses python-ebml schema XML data. Refactor later.
     # ==========================================================================
 
-    def _getInfo(self, eid, dtype):
+    def _getInfo(self, eid: int, dtype):
         """ Helper method to get the 'default' value of an element. """
         try:
             return dtype(self.elementInfo[eid]['default'])
@@ -1338,7 +1357,7 @@ class Schema(object):
     # Encoding
     # ==========================================================================
 
-    def encode(self, stream, data, headers=False):
+    def encode(self, stream, data, headers=False) -> bytes:
         """ Write an EBML document using this Schema to a file or file-like
             stream.
 
@@ -1388,7 +1407,7 @@ class Schema(object):
 # ==============================================================================
 
 
-def loadSchema(filename, reload=False, **kwargs):
+def loadSchema(filename: Union[str, bytes, bytearray], reload=False, **kwargs):
     """ Import a Schema XML file. Loading the same file more than once will
         return the initial instantiation, unless `reload` is `True`.
 

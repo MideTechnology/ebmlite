@@ -13,6 +13,8 @@ __credits__ = "David Randall Stokes, Connor Flanigan, Becker Awqatty, Derek Witt
 __all__ = ['readElementID', 'readElementSize', 'readFloat', 'readInt',
            'readUInt', 'readDate', 'readString', 'readUnicode']
 
+from typing import Any, IO, Optional, Tuple, Union
+
 from datetime import datetime, timedelta
 import struct
 
@@ -41,7 +43,7 @@ _struct_float64_unpack = _struct_float64.unpack
 # --- Reading and Decoding
 # ==============================================================================
 
-def decodeIntLength(byte):
+def decodeIntLength(byte: int) -> Tuple[int, int]:
     """ Extract the encoded size from an initial byte.
 
         @return: The size, and the byte with the size removed (it is the first
@@ -66,7 +68,7 @@ def decodeIntLength(byte):
     return 8, 0
 
 
-def decodeIDLength(byte):
+def decodeIDLength(byte: int) -> Tuple[int, int]:
     """ Extract the encoded ID size from an initial byte.
 
         @return: The size and the original byte (it is part of the ID).
@@ -85,7 +87,7 @@ def decodeIDLength(byte):
     raise IOError('Invalid length for ID: %d' % length)
 
 
-def readElementID(stream):
+def readElementID(stream: IO) -> Tuple[int, int]:
     """ Read an element ID from a file (or file-like stream).
 
         @param stream: The source file-like object.
@@ -103,7 +105,7 @@ def readElementID(stream):
     return eid, length
 
 
-def readElementSize(stream):
+def readElementSize(stream: IO) -> Tuple[Optional[int], int]:
     """ Read an element size from a file (or file-like stream).
 
         @param stream: The source file-like object.
@@ -125,7 +127,7 @@ def readElementSize(stream):
     return size, length
 
 
-def readUInt(stream, size):
+def readUInt(stream: IO, size: int) -> int:
     """ Read an unsigned integer from a file (or file-like stream).
 
         @param stream: The source file-like object.
@@ -140,7 +142,7 @@ def readUInt(stream, size):
     return _struct_uint64_unpack_from(data.rjust(8, b'\x00'))[0]
 
 
-def readInt(stream, size):
+def readInt(stream: IO, size) -> int:
     """ Read a signed integer from a file (or file-like stream).
 
         @param stream: The source file-like object.
@@ -159,7 +161,7 @@ def readInt(stream, size):
     return _struct_int64_unpack_from(data.rjust(8, pad))[0]
 
 
-def readFloat(stream, size):
+def readFloat(stream: IO, size: int) -> float:
     """ Read an floating point value from a file (or file-like stream).
 
         @param stream: The source file-like object.
@@ -178,7 +180,7 @@ def readFloat(stream, size):
                   "only lengths of 0, 4, or 8 bytes supported." % size)
 
 
-def readString(stream, size):
+def readString(stream: IO, size: int) -> bytes:
     """ Read an ASCII string from a file (or file-like stream).
 
         @param stream: The source file-like object.
@@ -193,7 +195,7 @@ def readString(stream, size):
     return value
 
 
-def readUnicode(stream, size):
+def readUnicode(stream: IO, size: int) -> str:
     """ Read an UTF-8 encoded string from a file (or file-like stream).
 
         @param stream: The source file-like object.
@@ -209,7 +211,7 @@ def readUnicode(stream, size):
     return str(data, 'utf_8')
 
 
-def readDate(stream, size=8):
+def readDate(stream: IO, size: int = 8) -> datetime:
     """ Read an EBML encoded date (nanoseconds since UTC 2001-01-01T00:00:00)
         from a file (or file-like stream).
 

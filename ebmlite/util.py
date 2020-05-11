@@ -17,6 +17,7 @@ __credits__ = "David Randall Stokes, Connor Flanigan, Becker Awqatty, Derek Witt
 __all__ = ['toXml', 'xml2ebml', 'loadXml', 'pprint']
 
 from io import StringIO
+from typing import IO
 
 import ast
 from base64 import b64encode, b64decode
@@ -358,6 +359,8 @@ if __name__ == "__main__":
                            help="Generate 'pretty' XML with ebml2xml.")
 
     args = argparser.parse_args()
+
+    out: IO
 
     if not os.path.exists(args.input):
         sys.stderr.write("Input file does not exist: %s\n" % args.input)

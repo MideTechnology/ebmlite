@@ -12,6 +12,7 @@ __all__ = ['encodeBinary', 'encodeDate', 'encodeFloat', 'encodeId', 'encodeInt',
            'encodeSize', 'encodeString', 'encodeUInt', 'encodeUnicode']
 
 import datetime
+from typing import ByteString, Optional, Union
 import sys
 
 from .decoding import _struct_uint64, _struct_int64
@@ -43,7 +44,7 @@ STRING_CHARACTERS = (b"?"*32 + bytearray(range(32, 127))).ljust(256, b'?')
 # ==============================================================================
 
 
-def getLength(val):
+def getLength(val: int) -> int:
     """ Calculate the encoded length of a value.
         @param val: A value to be encoded, generally either an ID or a size for
             an EBML element
@@ -68,7 +69,7 @@ def getLength(val):
         return 8
 
 
-def encodeSize(val, length=None):
+def encodeSize(val: int, length: Optional[int] = None) -> bytes:
     """ Encode an element size.
 
         @param val: The size to encode. If `None`, the EBML 'unknown' size
@@ -96,7 +97,7 @@ def encodeSize(val, length=None):
 # --- Encoding
 # ==============================================================================
 
-def encodeId(eid, length=None):
+def encodeId(eid: int, length: Optional[int] = None) -> bytes:
     """ Encode an element ID.
 
         @param eid: The EBML ID to encode.
@@ -114,7 +115,7 @@ def encodeId(eid, length=None):
     return encodeUInt(eid, length)
 
 
-def encodeUInt(val, length=None):
+def encodeUInt(val: int, length: Optional[int] = None) -> bytes:
     """ Encode an unsigned integer.
 
         @param val: The unsigned integer value to encode.
@@ -135,7 +136,7 @@ def encodeUInt(val, length=None):
     return packed.rjust(length, pad)
 
 
-def encodeInt(val, length=None):
+def encodeInt(val: int, length: Optional[int] = None) -> bytes:
     """ Encode a signed integer.
 
         @param val: The signed integer value to encode.
@@ -168,7 +169,7 @@ def encodeInt(val, length=None):
     return packed.rjust(length, pad)
 
 
-def encodeFloat(val, length=None):
+def encodeFloat(val: float, length: Optional[int] = None) -> bytes:
     """ Encode a floating point value.
 
         @param val: The floating point value to encode.
@@ -195,7 +196,7 @@ def encodeFloat(val, length=None):
                          length)
 
 
-def encodeBinary(val, length=None):
+def encodeBinary(val: ByteString, length: Optional[int] = None) -> bytes:
     """ Encode binary data.
 
         @param val: A string or bytearray containing the data to encode.
@@ -221,7 +222,7 @@ def encodeBinary(val, length=None):
                          (len(val), length))
 
 
-def encodeString(val, length=None):
+def encodeString(val: ByteString, length: Optional[int] = None):
     """ Encode an ASCII string.
 
         @param val: The string (or bytearray) to encode.
@@ -241,7 +242,7 @@ def encodeString(val, length=None):
     return encodeBinary(val.translate(STRING_CHARACTERS), length)
 
 
-def encodeUnicode(val, length=None):
+def encodeUnicode(val: str, length: Optional[int] = None) -> bytes:
     """ Encode a Unicode string.
 
         @param val: The Unicode string to encode.
@@ -258,7 +259,7 @@ def encodeUnicode(val, length=None):
     return encodeBinary(val, length)
 
 
-def encodeDate(val, length=None):
+def encodeDate(val: datetime.datetime, length: Optional[int] = None) -> bytes:
     """ Encode a `datetime` object as an EBML date (i.e. nanoseconds since
         2001-01-01T00:00:00).
 
