@@ -163,9 +163,9 @@ class Test(unittest.TestCase):
 
         # Compare as lists to narrow the location of any differences
         self.assertListEqual(xmlLines1[1:], xmlLines2[1:],
-                             b'One or more lines are different in the xml documents')
+                             'One or more lines are different in the xml documents')
 
 
-if __name__ == b"__main__":
-    testsuite = unittest.TestLoader().discover(b'.')
+if __name__ == "__main__":
+    testsuite = unittest.TestLoader().discover('.')
     unittest.TextTestRunner(verbosity=1).run(testsuite)
