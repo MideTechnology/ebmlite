@@ -769,6 +769,6 @@ class testSchema(unittest.TestCase):
 
 
 
-if __name__ == b"__main__":
+if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()
