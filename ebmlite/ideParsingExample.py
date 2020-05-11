@@ -57,7 +57,7 @@ payloadType = schema[0xB2]
 for block in dataBlocks:
     rawData += block.dump()['ChannelDataPayload']
 rawData = np.fromstring(str(rawData), dtype=chEl['ChannelFormat'][1])
-rawData.resize((old_div(len(rawData), 3), 3))
+rawData.resize((len(rawData)//3, 3))
 
 # Calculate the time stamps of the data.
 times = np.arange(len(rawData))/5000.0
