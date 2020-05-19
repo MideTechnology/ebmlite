@@ -21,3 +21,5 @@ venv
 venv?
 */.*
 *.egg*
+
+.mypy_cache

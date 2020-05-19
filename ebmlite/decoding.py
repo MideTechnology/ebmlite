@@ -6,10 +6,9 @@ Note: this module does not decode `Document`, `BinaryElement`, or
 and `MasterElement` objects are special cases, and `BinaryElement` objects do
 not require special decoding. 
 """
-from __future__ import division, absolute_import, print_function, unicode_literals
-
-__author__ = "dstokes"
-__copyright__ = "Copyright 2018 Mide Technology Corporation"
+__author__ = "David Randall Stokes, Connor Flanigan"
+__copyright__ = "Copyright 2020, Mide Technology Corporation"
+__credits__ = "David Randall Stokes, Connor Flanigan, Becker Awqatty, Derek Witt"
 
 __all__ = ['readElementID', 'readElementSize', 'readFloat', 'readInt',
            'readUInt', 'readDate', 'readString', 'readUnicode']
@@ -17,9 +16,9 @@ __all__ = ['readElementID', 'readElementSize', 'readFloat', 'readInt',
 from datetime import datetime, timedelta
 import struct
 
-#===============================================================================
+# ==============================================================================
 #
-#===============================================================================
+# ==============================================================================
 
 # Pre-built structs for packing/unpacking various data types
 _struct_uint32 = struct.Struct(">I")
@@ -38,9 +37,9 @@ _struct_float32_unpack = _struct_float32.unpack
 _struct_float64_unpack = _struct_float64.unpack
 
 
-#===============================================================================
-#--- Reading and Decoding
-#===============================================================================
+# ==============================================================================
+# --- Reading and Decoding
+# ==============================================================================
 
 def decodeIntLength(byte):
     """ Extract the encoded size from an initial byte.
@@ -115,11 +114,9 @@ def readElementSize(stream):
     length, size = decodeIntLength(ord(ch))
 
     if length > 1:
-        size = _struct_uint64_unpack((chr(size).encode() +
+        size = _struct_uint64_unpack((chr(size).encode('latin-1') +
                                       stream.read(length - 1)
-                                      ).rjust(8, '\x00'.encode()))[0]
-
-    # print("size = %x, length = %x" % (size, int(2**(7*length))))
+                                      ).rjust(8, b'\x00'))[0]
 
     if size == (2**(7*length)) - 1:
         # EBML 'unknown' size, all bytes 0xFF
@@ -155,16 +152,10 @@ def readInt(stream, size):
         return 0
 
     data = stream.read(size)
-    if isinstance(data[0], int):
-        val = data[0]
-    else:
-        val = ord(data[0])
-
-    if val & 0b10000000:
+    if data[0] & 0b10000000:
         pad = b'\xff'
     else:
         pad = b'\x00'
-
     return _struct_int64_unpack_from(data.rjust(8, pad))[0]
 
 
@@ -195,10 +186,10 @@ def readString(stream, size):
         @return: The decoded value.
     """
     if size == 0:
-        return u''
+        return b''
 
     value = stream.read(size)
-    value = value.decode('ascii').partition(u'\x00')[0]
+    value = value.partition(b'\x00')[0]
     return value
 
 
@@ -214,10 +205,8 @@ def readUnicode(stream, size):
         return u''
 
     data = stream.read(size)
-    if isinstance(data, bytes):
-        data = data.decode('utf-8')
-
-    return data.partition(u'\x00')[0]
+    data = data.partition(b'\x00')[0]
+    return str(data, 'utf_8')
 
 
 def readDate(stream, size=8):
