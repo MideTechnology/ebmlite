@@ -46,11 +46,11 @@ class testDecoding(unittest.TestCase):
                    b'\x10\x41\x42\x43']
         eIDs = [128, 16449, 2113858, 272712259]
                            
-        for id, i, eID in zip(idBytes, list(range(1, len(idBytes) + 1)), eIDs):
+        for i, (id, eID) in enumerate(zip(idBytes, eIDs)):
             self.mockStream = BytesIO(id)
             self.mockStream.seek(0)
             readElIDOut = readElementID(self.mockStream)
-            self.assertEqual(readElIDOut, (eID, i))
+            self.assertEqual(readElIDOut, (eID, i + 1))
 
 
     
@@ -74,10 +74,10 @@ class testDecoding(unittest.TestCase):
                    0x414243444546,
                    0x41424344454647]
         
-        for id, i, elSz in zip(idBytes, list(range(1, len(idBytes) + 1)), elSizes):
+        for i, (id, elSz) in enumerate(zip(idBytes, elSizes)):
             self.mockStream = BytesIO(id)
             self.mockStream.seek(0)
-            self.assertEqual(readElementSize(self.mockStream), (elSz, i))
+            self.assertEqual(readElementSize(self.mockStream), (elSz, i + 1))
        
 
     
@@ -89,12 +89,12 @@ class testDecoding(unittest.TestCase):
                    b'\x25\x41\x42',
                    b'\x15\x41\x42\x43']
         ints = [0x85, 0x4541, 0x254142, 0x15414243]
-        
-        for id, i, numOut in zip(idBytes, list(range(1, len(idBytes) + 1)), ints):
+
+        for i, (id, numOut) in enumerate(zip(idBytes, ints)):
             self.mockStream = BytesIO(id)
             self.mockStream.seek(0)
-            a = readUInt(self.mockStream, i)
-            self.assertEqual(a, numOut)
+            val = readUInt(self.mockStream, i + 1)
+            self.assertEqual(val, numOut)
        
 
     
@@ -108,10 +108,10 @@ class testDecoding(unittest.TestCase):
                    b'\x15\x41\x42\x43']
         ints = [0x75, 0x4541, 0x254142, 0x15414243]
         
-        for id, i, numOut in zip(idBytes, list(range(1, len(idBytes) + 1)), ints):
+        for i, (id, numOut) in enumerate(zip(idBytes, ints)):
             self.mockStream = BytesIO(id)
-            a = readInt(self.mockStream, i)
-            self.assertEqual(a, numOut)
+            val = readInt(self.mockStream, i + 1)
+            self.assertEqual(val, numOut)
             
         # Negative ints
         idBytes = [b'\xf5',
@@ -123,10 +123,10 @@ class testDecoding(unittest.TestCase):
                 -1*(0xffffff ^ 0xb54142) - 1,
                 -1*(0xffffffff ^ 0xa5414243) - 1]
         
-        for id, i, numOut in zip(idBytes, list(range(1, len(idBytes) + 1)), ints):
+        for i, (id, numOut) in enumerate(zip(idBytes,  ints)):
             self.mockStream = BytesIO(id)
-            a = readInt(self.mockStream, i)
-            self.assertEqual(a, numOut)
+            val = readInt(self.mockStream, i + 1)
+            self.assertEqual(val, numOut)
             
         
             
@@ -181,7 +181,8 @@ class testDecoding(unittest.TestCase):
         self.assertEqual(readString(self.mockStream, 0), b'')
         
         self.mockStream = BytesIO(b'test')
-        self.assertEqual(readString(self.mockStream, len(self.mockStream.getvalue())),
+        mockLen = len(self.mockStream.getvalue())
+        self.assertEqual(readString(self.mockStream, mockLen),
                          b'test')
             
     
@@ -193,7 +194,8 @@ class testDecoding(unittest.TestCase):
         self.assertEqual(readUnicode(self.mockStream, 0), u'')
         
         self.mockStream = BytesIO(b'TEST')
-        self.assertEqual(readUnicode(self.mockStream, len(self.mockStream.getvalue())),
+        mockLen = len(self.mockStream.getvalue())
+        self.assertEqual(readUnicode(self.mockStream, mockLen),
                          u'TEST')
     
     
