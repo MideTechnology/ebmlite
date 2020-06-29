@@ -195,10 +195,10 @@ def readString(stream, size):
         @return: The decoded value.
     """
     if size == 0:
-        return u''
+        return b''
 
     value = stream.read(size)
-    value = value.decode('ascii').partition(u'\x00')[0]
+    value = value.partition(b'\x00')[0]
     return value
 
 
