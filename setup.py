@@ -5,7 +5,7 @@ with open('README.md', 'r') as fh:
 
 setuptools.setup(
         name='ebmlite',
-        version='2.0.0',
+        version='3.0.0',
         author='Mide Technology',
         author_email='help@mide.com',
         description='A lightweight, "pure Python" library for parsing EBML (Extensible Binary Markup Language) data.',

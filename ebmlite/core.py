@@ -1151,7 +1151,7 @@ class Schema(object):
         def _getBool(d, k, default):
             """ Helper function to get a dictionary value cast to bool. """
             try:
-                return bytearray(d[k]).strip()[0] in b'Tt1'
+                return str(d[k]).strip()[0] in 'Tt1'
             except (KeyError, TypeError, IndexError, ValueError):
                 # TODO: Don't fail silently for some exceptions.
                 pass
@@ -1246,7 +1246,7 @@ class Schema(object):
 
     def __repr__(self):
         try:
-            return b"<%s %r from '%s'>" % (self.__class__.__name__, self.name,
+            return "<%s %r from '%s'>" % (self.__class__.__name__, self.name,
                                            self.filename or self.source)
         except AttributeError:
             return object.__repr__(self)
