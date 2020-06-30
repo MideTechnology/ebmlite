@@ -1151,7 +1151,7 @@ class Schema(object):
         def _getBool(d, k, default):
             """ Helper function to get a dictionary value cast to bool. """
             try:
-                return bytearray(d[k]).strip()[0] in b'Tt1'
+                return bytearray(d[k], 'latin-1').strip()[0] in b'Tt1'
             except (KeyError, TypeError, IndexError, ValueError):
                 # TODO: Don't fail silently for some exceptions.
                 pass
