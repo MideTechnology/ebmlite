@@ -1,9 +1,7 @@
-from __future__ import division, absolute_import, print_function#, unicode_literals
-
 import numpy as np
 import matplotlib.pyplot as plt
 
-import ebmlite.core as core
+from . import core
 
 
 def getTypeMatch(el, elType):
@@ -47,14 +45,14 @@ schEl = next(sch for sch in chEl['SubChannel'] if sch['SubChannelID'] == schId)
 
 # Collect all the channelDataBlocks into a list.
 chDataType = schema[0xA1]
-dataBlocks = filter(lambda x: type(x) == chDataType, ideRoot)
+dataBlocks = [x for x in ideRoot if type(x) == chDataType]
 
 # Filter the dataBlocks to only include blocks for the channel we want.
 chIdType = schema[0xB0]
 dataBlocks = [block for block in dataBlocks if getTypeMatch(block, chIdType).value == chId]
 
 # Get the raw data from each ChannelDataBlock, and convert to an array.
-rawData = b''
+rawData = ''
 payloadType = schema[0xB2]
 for block in dataBlocks:
     rawData += block.dump()['ChannelDataPayload']
@@ -78,7 +76,7 @@ calListType = schema[0x4B00]
 calList = getTypeMatch(ideRoot, calListType)
 uniType = schema[0x4B01]
 biType = schema[0x4B02]
-polys = filter(lambda x: type(x) in [uniType, biType], calList)
+polys = [x for x in calList if type(x) in [uniType, biType]]
 
 # filter the polynomials to whichever affect ch8.0
 polys = [poly.dump() for poly in polys if poly.dump()['CalID'] in [chCalId, schCalId]]

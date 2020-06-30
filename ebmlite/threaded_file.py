@@ -7,12 +7,14 @@ functionality is transparent.
 
 @author: dstokes
 '''
-from __future__ import division, absolute_import, print_function, unicode_literals
+__author__ = "David Randall Stokes, Connor Flanigan"
+__copyright__ = "Copyright 2020, Mide Technology Corporation"
+__credits__ = "David Randall Stokes, Connor Flanigan, Becker Awqatty, Derek Witt"
+
+__all__ = ['ThreadAwareFile']
 
 import platform
 from threading import currentThread, Event
-
-__all__ = ['ThreadAwareFile']
 
 class ThreadAwareFile(file):
     """ A 'replacement' for a standard read-only file stream that supports
@@ -41,7 +43,7 @@ class ThreadAwareFile(file):
         """
         # Ensure the file mode, if specified, is "read."
         mode = args[1] if len(args) > 1 else 'r'
-        if isinstance(mode, basestring):
+        if isinstance(mode, (str, bytes, bytearray)):
             if 'a' in mode or 'w' in mode or '+' in mode:
                 raise IOError("%s is read-only" % self.__class__.__name__)
 
@@ -119,7 +121,7 @@ class ThreadAwareFile(file):
         try:
             self._ready.wait(self.timeout)
             self._ready.clear()
-            for v in self.threads.values():
+            for v in list(self.threads.values()):
                 v.close()
         finally:
             self._ready.set()
@@ -213,15 +215,15 @@ class ThreadAwareFile(file):
         return self.getThreadStream().tell(*args, **kwargs)
 
     def truncate(self, *args, **kwargs):
-        raise IOError("Can't truncate(); %s is read-only" % 
+        raise IOError("Can't truncate(); %s is read-only" %
                       self.__class__.__name__)
 
     def write(self, *args, **kwargs):
-        raise IOError("Can't write(); %s is read-only" % 
+        raise IOError("Can't write(); %s is read-only" %
                       self.__class__.__name__)
 
     def writelines(self, *args, **kwargs):
-        raise IOError("Can't writelines(); %s is read-only" % 
+        raise IOError("Can't writelines(); %s is read-only" %
                       self.__class__.__name__)
 
     def xreadlines(self, *args, **kwargs):

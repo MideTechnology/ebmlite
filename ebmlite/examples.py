@@ -1,7 +1,5 @@
-from __future__ import division, absolute_import, print_function#, unicode_literals
-
 # Imports from EBMLite
-import ebmlite.core as core
+from . import core
 from .util import toXml, loadXml, xml2ebml, pprint
 
 # imports from python's built in xml library
@@ -32,7 +30,7 @@ xmlString1 = ET.tostring(ebmlRoot, encoding='UTF-8')    # convert the xml tree
 # Save xml
 with open(xmlFile1, 'wt') as f:
     # convert the xml string into a minidom object and pretty-print
-    f.write(parseString(xmlString1).toprettyxml(indent='    '))
+    f.write(parseString(xmlString1).toprettyxml(indent=b'    '))
 
 # =======================================
 # converting a file from XML to EBML

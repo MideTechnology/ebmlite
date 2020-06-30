@@ -1,13 +1,12 @@
-'''
+"""
 Functions for encoding EBML elements and their values.
 
 Note: this module does not encode Document or MasterElement objects; they are
 special cases, handled in `core.py`.
-'''
-from __future__ import division, absolute_import, print_function, unicode_literals
-
-__author__ = "dstokes"
-__copyright__ = "Copyright 2018 Mide Technology Corporation"
+"""
+__author__ = "David Randall Stokes, Connor Flanigan"
+__copyright__ = "Copyright 2020, Mide Technology Corporation"
+__credits__ = "David Randall Stokes, Connor Flanigan, Becker Awqatty, Derek Witt"
 
 __all__ = ['encodeBinary', 'encodeDate', 'encodeFloat', 'encodeId', 'encodeInt',
            'encodeSize', 'encodeString', 'encodeUInt', 'encodeUnicode']
@@ -17,14 +16,10 @@ import sys
 
 from .decoding import _struct_uint64, _struct_int64
 from .decoding import _struct_float32, _struct_float64
-import base64
 
-if sys.version_info.major == 3:
-    unicode = str
-
-#===============================================================================
+# ==============================================================================
 #
-#===============================================================================
+# ==============================================================================
 
 # If no length is given, use the platform's size of a float.
 DEFAULT_FLOAT_SIZE = 4 if sys.maxsize <= 2147483647 else 8
@@ -41,11 +36,12 @@ LENGTH_PREFIXES = [0,
                    ]
 
 # Translation table for removing invalid EBML string characters (32 < x < 127)
-STRING_CHARACTERS = (b"?"*32 + bytearray(range(32,127))).ljust(256, b'?')
+STRING_CHARACTERS = (b"?"*32 + bytearray(range(32, 127))).ljust(256, b'?')
 
-#===============================================================================
+# ==============================================================================
 #
-#===============================================================================
+# ==============================================================================
+
 
 def getLength(val):
     """ Calculate the encoded length of a value.
@@ -86,7 +82,7 @@ def encodeSize(val, length=None):
     if val is None:
         # 'unknown' size: all bits 1.
         length = 1 if (length is None or length == -1) else length
-        return u'\xff' * length
+        return b'\xff' * length
 
     length = getLength(val) if (length is None or length == -1) else length
     try:
@@ -96,9 +92,9 @@ def encodeSize(val, length=None):
         raise ValueError("Cannot encode element size %s" % length)
 
 
-#===============================================================================
-#--- Encoding
-#===============================================================================
+# ==============================================================================
+# --- Encoding
+# ==============================================================================
 
 def encodeId(eid, length=None):
     """ Encode an element ID.
@@ -128,8 +124,8 @@ def encodeUInt(val, length=None):
             left-padded with ``0x00`` if `length` is not `None`.
         @raise ValueError: raised if val is longer than length.
     """
-    pad = u'\x00'
-    packed = _struct_uint64.pack(val).decode('latin-1').lstrip(pad)
+    pad = b'\x00'
+    packed = _struct_uint64.pack(val).lstrip(pad)
 
     if length is None:
         return packed
@@ -151,21 +147,17 @@ def encodeInt(val, length=None):
         @raise ValueError: raised if val is longer than length.
     """
     if val == 0:
-        packed = u''
-        pad = u'\x00'
+        packed = b''
+        pad = b'\x00'
     elif val > 0:
-        pad = u'\x00'
-        packed = _struct_int64.pack(val).decode('latin-1').lstrip(pad)
-        if isinstance(packed[0], int):
-            if packed[0] & 0b10000000:
-                packed = pad + packed
-        else:
-            if ord(packed[0]) & 0b10000000:
-                packed = pad + packed
+        pad = b'\x00'
+        packed = _struct_int64.pack(val).lstrip(pad)
+        if packed[0] & 0b10000000:
+            packed = pad + packed
     else:
-        pad = u'\xff'
-        packed = _struct_int64.pack(val).decode('latin-1').lstrip(pad) or pad
-        if not ord(packed[0]) & 0b10000000:
+        pad = b'\xff'
+        packed = _struct_int64.pack(val).lstrip(pad) or pad
+        if not packed[0] & 0b10000000:
             packed = pad + packed
 
     if length is None:
@@ -188,16 +180,16 @@ def encodeFloat(val, length=None):
     """
     if length is None:
         if val is None or val == 0.0:
-            return u''
+            return b''
         else:
             length = DEFAULT_FLOAT_SIZE
 
     if length == 0:
-        return u''
+        return b''
     if length == 4:
-        return _struct_float32.pack(val).decode('latin-1')
+        return _struct_float32.pack(val)
     elif length == 8:
-        return _struct_float64.pack(val).decode('latin-1')
+        return _struct_float64.pack(val)
     else:
         raise ValueError("Cannot encode float of length %d; only 0, 4, or 8" %
                          length)
@@ -214,28 +206,19 @@ def encodeBinary(val, length=None):
             with ``0x00`` if `length` is not `None`.
         @raise ValueError: raised if val is longer than length.
     """
-    if not isinstance(val, unicode):
-        val = val.decode('latin-1')
+    if isinstance(val, str):
+        print(val)
+        val = val.encode('utf_8')
     elif val is None:
-        val = u''
-    try:
-        if length is None:
-            return val
-        elif len(val) <= length:
-            return val.ljust(length, u'\x00')
-        else:
-            raise ValueError("Length of data (%d) exceeds specified length (%d)" %
-                             (len(val), length))
-    except ValueError as e:
-        val = base64.b64decode(val)
+        val = b''
 
-        if length is None:
-            return val
-        elif len(val) <= length:
-            return val.ljust(length, b'\x00')
-        else:
-            raise ValueError("Length of data (%d) exceeds specified length (%d)" %
-                             (len(val), length))
+    if length is None:
+        return val
+    elif len(val) <= length:
+        return val.ljust(length, b'\x00')
+    else:
+        raise ValueError("Length of data (%d) exceeds specified length (%d)" %
+                         (len(val), length))
 
 
 def encodeString(val, length=None):
@@ -249,8 +232,8 @@ def encodeString(val, length=None):
         @return: The binary representation of val as a string, truncated or
             left-padded with ``0x00`` if `length` is not `None`.
     """
-    if isinstance(val, unicode):
-        val = val.encode('latin-1', 'replace')
+    if isinstance(val, str):
+        val = val.encode('ascii', 'replace')
 
     if length is not None:
         val = val[:length]
