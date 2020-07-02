@@ -105,7 +105,7 @@ class Element(object):
     schema = None
 
     # Python native data type.
-    dtype: Any = bytearray
+    dtype = bytearray
 
     # Should this element's value be read/cached when the element is parsed?
     precache = False
@@ -122,14 +122,14 @@ class Element(object):
     # For python-ebml compatibility; not currently used.
     children = None
 
-    def parse(self, stream: BinaryIO, size: int) -> Any:
+    def parse(self, stream, size):
         """ Type-specific helper function for parsing the element's payload.
             It is assumed the file pointer is at the start of the payload.
         """
         # Document-wide caching could be implemented here.
         return bytearray(stream.read(size))
 
-    def __init__(self, stream=None, offset: int = 0, size: int = 0, payloadOffset: int = 0):
+    def __init__(self, stream=None, offset=0, size=0, payloadOffset=0):
         """ Constructor. Instantiate a new Element from a file. In most cases,
             elements should be created when a `Document` is loaded, rather
             than instantiated explicitly.
@@ -150,7 +150,7 @@ class Element(object):
         return "<%s (ID:0x%02X), offset %s, size %s>" % \
             (self.__class__.__name__, self.id, self.offset, self.size)
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other):
         """ Equality check. Elements are considered equal if they are the same
             type and have the same ID, size, offset, and schema. Note: element
             value is not considered! Check for value equality explicitly
@@ -168,7 +168,7 @@ class Element(object):
             return False
 
     @property
-    def value(self) -> Any:
+    def value(self):
         """ Parse and cache the element's value. """
         if self._value is not None:
             return self._value
@@ -176,7 +176,7 @@ class Element(object):
         self._value = self.parse(self.stream, self.size)
         return self._value
 
-    def getRaw(self) -> Union[bytes, bytearray]:
+    def getRaw(self):
         """ Get the element's raw binary data, including EBML headers.
         """
         self.stream.seek(self.offset)

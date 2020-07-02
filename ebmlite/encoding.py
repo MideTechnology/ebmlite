@@ -69,7 +69,7 @@ def getLength(val: int) -> int:
         return 8
 
 
-def encodeSize(val: int, length: Optional[int] = None) -> bytes:
+def encodeSize(val: Optional[int], length: Optional[int] = None) -> bytes:
     """ Encode an element size.
 
         @param val: The size to encode. If `None`, the EBML 'unknown' size
