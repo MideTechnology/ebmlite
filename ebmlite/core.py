@@ -1,4 +1,4 @@
-'''
+"""'''
 EBMLite: A lightweight EBML parsing library. It is designed to crawl through
 EBML files quickly and efficiently, and that's about it.
 
@@ -34,14 +34,14 @@ EBML files quickly and efficiently, and that's about it.
     ``mandatory`` and ``multiple`` attributes). Add ``range`` later.
     Eventually, recognize official schemata when loading, like the system
     currently handles legacy ``python-ebml`` schemata.
-'''
-
-__author__ = "David Randall Stokes"
-__copyright__ = "Copyright 2018 Mide Technology Corporation"
+"""
+__author__ = "David Randall Stokes, Connor Flanigan"
+__copyright__ = "Copyright 2020, Mide Technology Corporation"
+__credits__ = "David Randall Stokes, Connor Flanigan, Becker Awqatty, Derek Witt"
 
 __all__ = ['BinaryElement', 'DateElement', 'Document', 'Element',
            'FloatElement', 'IntegerElement', 'MasterElement', 'Schema',
-           'StringElement', 'UIntegerElement','UnicodeElement',
+           'StringElement', 'UIntegerElement', 'UnicodeElement',
            'UnknownElement', 'VoidElement', 'loadSchema']
 
 from ast import literal_eval
@@ -49,18 +49,18 @@ from collections import OrderedDict
 from datetime import datetime
 import errno
 import os.path
-from StringIO import StringIO
+from io import BytesIO
 from xml.etree import ElementTree as ET
 
-from decoding import readElementID, readElementSize
-from decoding import readFloat, readInt, readUInt, readDate
-from decoding import readString, readUnicode
-import encoding
-import schemata
+from .decoding import readElementID, readElementSize
+from .decoding import readFloat, readInt, readUInt, readDate
+from .decoding import readString, readUnicode
+from . import encoding
+from . import schemata
 
-#===============================================================================
+# ==============================================================================
 #
-#===============================================================================
+# ==============================================================================
 
 # SCHEMA_PATH: A list of paths for schema XML files, similar to `sys.path`.
 # When `loadSchema()` is used, it will search these paths, in order, to find
@@ -73,9 +73,9 @@ SCHEMA_PATH = ['',
 SCHEMATA = {}
 
 
-#===============================================================================
+# ==============================================================================
 #
-#===============================================================================
+# ==============================================================================
 
 class Element(object):
     """ Base class for all EBML elements. Each data type has its own subclass,
@@ -98,6 +98,8 @@ class Element(object):
         @cvar length: An explicit length (in bytes) of the element when
             encoding. `None` will use standard EBML variable-length encoding.
     """
+    __slots__ = ("stream", "offset", "size", "sizeLength", "payloadOffset", "_value")
+
     # Parent `Schema`
     schema = None
 
@@ -119,14 +121,12 @@ class Element(object):
     # For python-ebml compatibility; not currently used.
     children = None
 
-
     def parse(self, stream, size):
         """ Type-specific helper function for parsing the element's payload.
             It is assumed the file pointer is at the start of the payload.
         """
         # Document-wide caching could be implemented here.
-        return  bytearray(stream.read(size))
-
+        return bytearray(stream.read(size))
 
     def __init__(self, stream=None, offset=0, size=0, payloadOffset=0):
         """ Constructor. Instantiate a new Element from a file. In most cases,
@@ -145,11 +145,9 @@ class Element(object):
         self.payloadOffset = payloadOffset
         self._value = None
 
-
     def __repr__(self):
         return "<%s (ID:0x%02X), offset %s, size %s>" % \
             (self.__class__.__name__, self.id, self.offset, self.size)
-
 
     def __eq__(self, other):
         """ Equality check. Elements are considered equal if they are the same
@@ -168,7 +166,6 @@ class Element(object):
         except AttributeError:
             return False
 
-
     @property
     def value(self):
         """ Parse and cache the element's value. """
@@ -178,13 +175,11 @@ class Element(object):
         self._value = self.parse(self.stream, self.size)
         return self._value
 
-
     def getRaw(self):
         """ Get the element's raw binary data, including EBML headers.
         """
         self.stream.seek(self.offset)
         return self.stream.read(self.size + (self.payloadOffset - self.offset))
-
 
     def getRawValue(self):
         """ Get the raw binary of the element's value.
@@ -192,10 +187,9 @@ class Element(object):
         self.stream.seek(self.payloadOffset)
         return self.stream.read(self.size)
 
-
-    #===========================================================================
+    # ==========================================================================
     # Caching (experimental)
-    #===========================================================================
+    # ==========================================================================
 
     def gc(self, recurse=False):
         """ Clear any cached values. To save memory and/or force values to be
@@ -207,16 +201,14 @@ class Element(object):
         self._value = None
         return 1
 
-
-    #===========================================================================
+    # ==========================================================================
     # Encoding
-    #===========================================================================
+    # ==========================================================================
 
     @classmethod
     def encodePayload(cls, data, length=None):
         """ Type-specific payload encoder. """
         return encoding.encodeBinary(data, length)
-
 
     @classmethod
     def encode(cls, value, length=None, lengthSize=None, infinite=False):
@@ -248,7 +240,6 @@ class Element(object):
         encId = encoding.encodeId(cls.id)
         return encId + encoding.encodeSize(length, lengthSize) + payload
 
-
     def dump(self):
         """ Dump this element's value as nested dictionaries, keyed by
             element name. For non-master elements, this just returns the
@@ -257,21 +248,21 @@ class Element(object):
         return self.value
 
 
-#===============================================================================
+# ==============================================================================
+
 
 class IntegerElement(Element):
     """ Base class for an EBML signed integer element. Schema-specific
         subclasses are generated when a `Schema` is loaded.
     """
+    __slots__ = ("stream", "offset", "size", "sizeLength", "payloadOffset", "_value")
     dtype = int
     precache = True
-
 
     def __eq__(self, other):
         if not super(IntegerElement, self).__eq__(other):
             return False
         return self.value == other.value
-
 
     def parse(self, stream, size):
         """ Type-specific helper function for parsing the element's payload.
@@ -279,19 +270,20 @@ class IntegerElement(Element):
         """
         return readInt(stream, size)
 
-
     @classmethod
     def encodePayload(cls, data, length=None):
         """ Type-specific payload encoder for signed integer elements. """
         return encoding.encodeInt(data, length)
 
 
-#===============================================================================
+# ==============================================================================
+
 
 class UIntegerElement(IntegerElement):
     """ Base class for an EBML unsigned integer element. Schema-specific
         subclasses are generated when a `Schema` is loaded.
     """
+    __slots__ = ("stream", "offset", "size", "sizeLength", "payloadOffset", "_value")
     dtype = int
     precache = True
 
@@ -301,19 +293,20 @@ class UIntegerElement(IntegerElement):
         """
         return readUInt(stream, size)
 
-
     @classmethod
     def encodePayload(cls, data, length=None):
         """ Type-specific payload encoder for unsigned integer elements. """
         return encoding.encodeUInt(data, length)
 
 
-#===============================================================================
+# ==============================================================================
+
 
 class FloatElement(Element):
     """ Base class for an EBML floating point element. Schema-specific
         subclasses are generated when a `Schema` is loaded.
     """
+    __slots__ = ("stream", "offset", "size", "sizeLength", "payloadOffset", "_value")
     dtype = float
     precache = True
 
@@ -322,13 +315,11 @@ class FloatElement(Element):
             return False
         return self.value == other.value
 
-
     def parse(self, stream, size):
         """ Type-specific helper function for parsing the element's payload.
             It is assumed the file pointer is at the start of the payload.
         """
         return readFloat(stream, size)
-
 
     @classmethod
     def encodePayload(cls, data, length=None):
@@ -336,12 +327,14 @@ class FloatElement(Element):
         return encoding.encodeFloat(data, length)
 
 
-#===============================================================================
+# ==============================================================================
+
 
 class StringElement(Element):
     """ Base class for an EBML ASCII string element. Schema-specific
         subclasses are generated when a `Schema` is loaded.
     """
+    __slots__ = ("stream", "offset", "size", "sizeLength", "payloadOffset", "_value")
     dtype = str
 
     def __eq__(self, other):
@@ -349,10 +342,8 @@ class StringElement(Element):
             return False
         return self.value == other.value
 
-
     def __len__(self):
         return self.size
-
 
     def parse(self, stream, size):
         """ Type-specific helper function for parsing the element's payload.
@@ -360,25 +351,25 @@ class StringElement(Element):
         """
         return readString(stream, size)
 
-
     @classmethod
     def encodePayload(cls, data, length=None):
         """ Type-specific payload encoder for ASCII string elements. """
         return encoding.encodeString(data, length)
 
 
-#===============================================================================
+# ==============================================================================
+
 
 class UnicodeElement(StringElement):
     """ Base class for an EBML UTF-8 string element. Schema-specific subclasses
         are generated when a `Schema` is loaded.
     """
-    dtype = unicode
+    __slots__ = ("stream", "offset", "size", "sizeLength", "payloadOffset", "_value")
+    dtype = str
 
     def __len__(self):
         # Value may be multiple bytes per character
         return len(self.value)
-
 
     def parse(self, stream, size):
         """ Type-specific helper function for parsing the element's payload.
@@ -386,19 +377,20 @@ class UnicodeElement(StringElement):
         """
         return readUnicode(stream, size)
 
-
     @classmethod
     def encodePayload(cls, data, length=None):
         """ Type-specific payload encoder for Unicode string elements. """
         return encoding.encodeUnicode(data, length)
 
 
-#===============================================================================
+# ==============================================================================
+
 
 class DateElement(IntegerElement):
     """ Base class for an EBML 'date' element. Schema-specific subclasses are
         generated when a `Schema` is loaded.
     """
+    __slots__ = ("stream", "offset", "size", "sizeLength", "payloadOffset", "_value")
     dtype = datetime
 
     def parse(self, stream, size):
@@ -407,50 +399,56 @@ class DateElement(IntegerElement):
         """
         return readDate(stream, size)
 
-
     @classmethod
     def encodePayload(cls, data, length=None):
         """ Type-specific payload encoder for date elements. """
         return encoding.encodeDate(data, length)
 
 
-#===============================================================================
+# ==============================================================================
+
 
 class BinaryElement(Element):
     """ Base class for an EBML 'binary' element. Schema-specific subclasses
         are generated when a `Schema` is loaded.
     """
 
+    __slots__ = ("stream", "offset", "size", "sizeLength", "payloadOffset", "_value")
+
     def __len__(self):
         return self.size
 
 
-#===============================================================================
+# ==============================================================================
+
 
 class VoidElement(BinaryElement):
     """ Special case ``Void`` element. Its contents are ignored and not read;
         its `value` is always returned as ``0xFF`` times its length. To get
         the actual contents, use `getRawValue()`.
     """
+    __slots__ = ("stream", "offset", "size", "sizeLength", "payloadOffset", "_value")
 
     def parse(self, stream, size):
         return bytearray()
-
 
     @classmethod
     def encodePayload(cls, data, length=0):
         """ Type-specific payload encoder for Void elements. """
         length = 0 if length is None else length
-        return bytearray('\xff' * length)
+        return bytearray(b'\xff' * length)
 
 
-#===============================================================================
+# ==============================================================================
+
 
 class UnknownElement(BinaryElement):
     """ Special case ``Unknown`` element, used for elements with IDs not
         present in a schema. Unlike other elements, each instance has its own
         ID.
     """
+    __slots__ = ("stream", "offset", "size", "sizeLength", "payloadOffset", "_value", "id",
+                 "schema")
     name = "UnknownElement"
     precache = False
 
@@ -472,10 +470,10 @@ class UnknownElement(BinaryElement):
                 explicitly because `UnknownElement`s are not part of any
                 schema.
         """
-        super(UnknownElement, self).__init__(stream, offset, size, payloadOffset)
+        super(UnknownElement, self).__init__(stream, offset, size,
+                                             payloadOffset)
         self.id = eid
         self.schema = schema
-
 
     def __eq__(self, other):
         """ Equality check. Unknown elements are considered equal if they have
@@ -492,12 +490,15 @@ class UnknownElement(BinaryElement):
             return False
 
 
-#===============================================================================
+# ==============================================================================
+
 
 class MasterElement(Element):
     """ Base class for an EBML 'master' element, a container for other
         elements.
     """
+    __slots__ = ("stream", "offset", "sizeLength", "payloadOffset", "_value",
+                 "_size", "_length")
     dtype = list
 
     def parse(self):
@@ -506,7 +507,6 @@ class MasterElement(Element):
         # Special case; unlike other elements, value() property doesn't call
         # parse(). Used only when pre-caching.
         return self.value
-
 
     def parseElement(self, stream, nocache=False):
         """ Read the next element from a stream, instantiate a `MasterElement`
@@ -539,7 +539,6 @@ class MasterElement(Element):
 
         return el, payloadOffset + el.size
 
-
     @classmethod
     def _isValidChild(cls, elId):
         """ Is the given element ID represent a valid sub-element, i.e.
@@ -557,7 +556,6 @@ class MasterElement(Element):
             if cls.schema is not None:
                 cls._childIds.update(cls.schema.globals)
             return elId in cls._childIds
-
 
     @property
     def size(self):
@@ -593,14 +591,12 @@ class MasterElement(Element):
             self._length = numChildren
             return self._size
 
-
     @size.setter
     def size(self, esize):
         if esize is not None:
             # Only create the `_size` attribute for a real value. Don't
             # define it if it's `None`, so `size` will get calculated.
             self._size = esize
-
 
     def __iter__(self, nocache=False):
         """ x.__iter__() <==> iter(x)
@@ -609,6 +605,7 @@ class MasterElement(Element):
         # an infinite element iterates over it, so there's duplicated effort.)
         pos = self.payloadOffset
         payloadEnd = pos + self.size
+
         while pos < payloadEnd:
             self.stream.seek(pos)
             try:
@@ -619,7 +616,6 @@ class MasterElement(Element):
                     break
                 raise
 
-
     def __len__(self):
         """ x.__len__() <==> len(x)
         """
@@ -629,12 +625,11 @@ class MasterElement(Element):
             if self._value is not None:
                 self._length = len(self._value)
             else:
-                n = 0 # In case there's nothing to enumerate
+                n = 0  # In case there's nothing to enumerate
                 for n, _el in enumerate(self.__iter__(nocache=True), 1):
                     pass
                 self._length = n
         return self._length
-
 
     @property
     def value(self):
@@ -645,15 +640,13 @@ class MasterElement(Element):
         self._value = list(self)
         return self._value
 
-
     def __getitem__(self, *args):
         # TODO: Parse only the requested item(s), like `Document`
         return self.value.__getitem__(*args)
 
-
-    #===========================================================================
+    # ==========================================================================
     # Caching (experimental!)
-    #===========================================================================
+    # ==========================================================================
 
     def gc(self, recurse=False):
         """ Clear any cached values. To save memory and/or force values to be
@@ -666,10 +659,9 @@ class MasterElement(Element):
             self._value = None
         return cleared
 
-
-    #===========================================================================
+    # ==========================================================================
     # Encoding
-    #===========================================================================
+    # ==========================================================================
 
     @classmethod
     def encodePayload(cls, data, length=None):
@@ -683,14 +675,13 @@ class MasterElement(Element):
         elif not isinstance(data, (list, tuple)):
             raise TypeError("wrong type for %s payload: %s" % (cls.name,
                                                                type(data)))
-        for k,v in data:
+        for k, v in data:
             if k not in cls.schema:
                 raise TypeError("Element type %r not found in schema" % k)
             # TODO: Validation of hierarchy, multiplicity, mandate, etc.
             result.extend(cls.schema[k].encode(v))
 
         return result
-
 
     @classmethod
     def encode(cls, data, length=None, lengthSize=None, infinite=False):
@@ -706,7 +697,7 @@ class MasterElement(Element):
             @return: A bytearray containing the encoded EBML binary.
         """
         # TODO: Use 'length' to automatically generate `Void` element?
-        if isinstance(data, list) and len(data)>0 and isinstance(data[0],list):
+        if isinstance(data, list) and len(data) > 0 and isinstance(data[0], list):
             # List of lists: special case for 'master' elements.
             # Encode as multiple 'master' elements.
             result = bytearray()
@@ -721,7 +712,6 @@ class MasterElement(Element):
         return super(MasterElement, cls).encode(data, length=length,
                                                 lengthSize=lengthSize,
                                                 infinite=infinite)
-
 
     def dump(self):
         """ Dump this element's value as nested dictionaries, keyed by
@@ -743,9 +733,10 @@ class MasterElement(Element):
         return result
 
 
-#===============================================================================
+# ==============================================================================
 #
-#===============================================================================
+# ==============================================================================
+
 
 class Document(MasterElement):
     """ Base class for an EBML document, containing multiple 'root' elements.
@@ -762,7 +753,7 @@ class Document(MasterElement):
             @keyword name: The name of the document. Defaults to the filename
                 (if applicable).
             @keyword size: The size of the document, in bytes. Use if the
-                stream is neither a file or a `StringIO` object.
+                stream is neither a file or a `BytesIO` object.
             @keyword headers: If `False`, the file's ``EBML`` header element
                 (if present) will not appear as a root element in the document.
                 The contents of the ``EBML`` element will always be read,
@@ -777,14 +768,13 @@ class Document(MasterElement):
         self.stream = stream
         self.size = size
         self.name = name
-        self.id = None # Not applicable to Documents.
+        self.id = None  # Not applicable to Documents.
         self.offset = self.payloadOffset = self.stream.tell()
 
         try:
             self.filename = stream.name
         except AttributeError:
             self.filename = ""
-
 
         if name is None:
             if self.filename:
@@ -794,8 +784,8 @@ class Document(MasterElement):
 
         if size is None:
             # Note: this doesn't work for cStringIO!
-            if isinstance(stream, StringIO):
-                self.size = stream.len
+            if isinstance(stream, BytesIO):
+                self.size = len(stream.getvalue())
             elif self.filename and os.path.exists(self.filename):
                 self.size = os.path.getsize(self.stream.name)
 
@@ -814,7 +804,6 @@ class Document(MasterElement):
             # the Document is actually used.
             pass
 
-
     def __repr__(self):
         """ "x.__repr__() <==> repr(x) """
         if self.name == self.__class__.__name__:
@@ -822,13 +811,11 @@ class Document(MasterElement):
         return "<%s %r at 0x%08X>" % (self.__class__.__name__, self.name,
                                       id(self))
 
-
     def close(self):
         """ Close the EBML file. Should generally be used only if the object
             was created using a filename, rather than a stream.
         """
         self.stream.close()
-
 
     def __len__(self):
         """ x.__len__() <==> len(x)
@@ -837,12 +824,11 @@ class Document(MasterElement):
         try:
             return self._length
         except AttributeError:
-            n = 0 # in case there's nothing to enumerate
+            n = 0  # in case there's nothing to enumerate
             for n, _el in enumerate(self.__iter__(nocache=True), 1):
                 pass
             self._length = n
         return self._length
-
 
     def __iter__(self, nocache=False):
         """ Iterate root elements.
@@ -862,7 +848,6 @@ class Document(MasterElement):
                     raise
                 break
 
-
     @property
     def value(self):
         """ An iterator for iterating the document's root elements. Same as
@@ -871,12 +856,11 @@ class Document(MasterElement):
         # 'value' not really applicable to a document; return an iterator.
         return iter(self)
 
-
     def __getitem__(self, idx):
         """ Get one of the document's root elements by index.
         """
         # TODO: Cache parsed root elements, handle indexing dynamically.
-        if isinstance(idx, (int, long)):
+        if isinstance(idx, int):
             if idx < 0:
                 raise IndexError("Negative indices in a Document not (yet) supported")
             n = None
@@ -892,31 +876,27 @@ class Document(MasterElement):
         else:
             raise TypeError("list indices must be integers, not %s" % type(idx))
 
-
     @property
     def version(self):
         """ The document's type version (i.e. the EBML ``DocTypeVersion``). """
         return self.info.get('DocTypeVersion')
-
 
     @property
     def type(self):
         """ The document's type name (i.e. the EBML ``DocType``). """
         return self.info.get('DocType')
 
-
-    #===========================================================================
+    # ==========================================================================
     # Caching (experimental!)
-    #===========================================================================
+    # ==========================================================================
 
     def gc(self, recurse=False):
         # TODO: Implement this if/when caching of root elements is implemented.
         return 0
 
-
-    #===========================================================================
+    # ==========================================================================
     # Encoding
-    #===========================================================================
+    # ==========================================================================
 
     @classmethod
     def _createHeaders(cls):
@@ -943,7 +923,6 @@ class Document(MasterElement):
 
         return OrderedDict(EBML=headers)
 
-
     @classmethod
     def encode(cls, stream, data, headers=False, **kwargs):
         """ Encode an EBML document.
@@ -958,7 +937,7 @@ class Document(MasterElement):
             stream.write(cls.encodePayload(cls._createHeaders()))
 
         if isinstance(data, list):
-            if len(data)>0 and isinstance(data[0],list):
+            if len(data) > 0 and isinstance(data[0], list):
                 # List of lists: special case for Documents.
                 # Encode as multiple 'root' elements.
                 raise TypeError('Cannot encode multiple Documents')
@@ -969,9 +948,10 @@ class Document(MasterElement):
             stream.write(cls.encodePayload(data))
 
 
-#===============================================================================
+# ==============================================================================
 #
-#===============================================================================
+# ==============================================================================
+
 
 class Schema(object):
     """ An EBML schema, mapping element IDs to names and data types. Unlike
@@ -1039,14 +1019,14 @@ class Schema(object):
         self.source = source
         self.filename = None
 
-        if isinstance(source, basestring):
+        if isinstance(source, (str, bytes, bytearray)):
             self.filename = os.path.realpath(source)
         elif hasattr(source, "name"):
             self.filename = os.path.realpath(source.name)
 
         self.elements = {}    # Element types, keyed by ID
         self.elementsByName = {}  # Element types, keyed by element name
-        self.elementInfo = {} # Raw element schema attributes, keyed by ID
+        self.elementInfo = {}  # Raw element schema attributes, keyed by ID
 
         self.globals = {}   # Elements valid for any parent, by ID
         self.children = {}  # Valid root elements, by ID
@@ -1069,7 +1049,7 @@ class Schema(object):
         if 'Void' in self.elementsByName:
             el = self.elementsByName['Void']
             void = type('VoidElement', (VoidElement,),
-                        {'id':el.id, 'name':'Void', 'schema':self,
+                        {'id': el.id, 'name': 'Void', 'schema': self,
                          'mandatory': el.mandatory, 'multiple': el.multiple})
             self.elements[el.id] = void
             self.elementsByName['Void'] = void
@@ -1079,8 +1059,7 @@ class Schema(object):
 
         # Create the schema's Document subclass.
         self.document = type('%sDocument' % self.name.title(), (Document,),
-                             {'schema': self, 'children':self.children})
-
+                             {'schema': self, 'children': self.children})
 
     def _parseLegacySchema(self, schema):
         """ Parse a legacy python-ebml schema XML file.
@@ -1088,14 +1067,14 @@ class Schema(object):
         for el in schema.findall('element'):
             attribs = el.attrib.copy()
 
-            eid = int(attribs['id'],16) if 'id' in attribs else None
+            eid = int(attribs['id'], 16) if 'id' in attribs else None
             ename = attribs['name'].strip() if 'name' in attribs else None
             etype = attribs['type'].strip() if 'type' in attribs else None
 
             # Use text in the element as its docstring. Note: embedded HTML
             # tags (as in the Matroska schema) will cause the text to be
             # truncated.
-            docs = el.text.strip() if isinstance(el.text, basestring) else None
+            docs = el.text.strip() if isinstance(el.text, (str, bytes, bytearray)) else None
 
             if etype is None:
                 raise ValueError('Element "%s" (ID 0x%02X) missing required '
@@ -1107,7 +1086,6 @@ class Schema(object):
 
             self.addElement(eid, ename, self.ELEMENT_TYPES[etype], attribs,
                             docs=docs)
-
 
     def _parseSchema(self, el, parent=None):
         """ Recursively crawl a schema XML definition file.
@@ -1127,12 +1105,12 @@ class Schema(object):
             return
 
         attribs = el.attrib.copy()
-        eid = int(attribs['id'],16) if 'id' in attribs else None
+        eid = int(attribs['id'], 16) if 'id' in attribs else None
         ename = attribs['name'].strip() if 'name' in attribs else None
 
         # Use text in the element as its docstring. Note: embedded HTML tags
         # (as in the Matroska schema) will cause the text to be truncated.
-        docs = el.text.strip() if isinstance(el.text, basestring) else None
+        docs = el.text.strip() if isinstance(el.text, (str, bytes, bytearray)) else None
 
         baseClass = self.BASE_CLASSES[el.tag]
 
@@ -1141,7 +1119,6 @@ class Schema(object):
         if baseClass is MasterElement:
             for chEl in el:
                 self._parseSchema(chEl, cls)
-
 
     def addElement(self, eid, ename, baseClass, attribs={}, parent=None,
                    docs=None):
@@ -1172,7 +1149,7 @@ class Schema(object):
         """
 
         def _getBool(d, k, default):
-            " Helper function to get a dictionary value cast to bool. "
+            """ Helper function to get a dictionary value cast to bool. """
             try:
                 return str(d[k]).strip()[0] in 'Tt1'
             except (KeyError, TypeError, IndexError, ValueError):
@@ -1181,7 +1158,7 @@ class Schema(object):
             return default
 
         def _getInt(d, k, default):
-            " Helper function to get a dictionary value cast to int. "
+            """ Helper function to get a dictionary value cast to int. """
             try:
                 return int(literal_eval(d[k].strip()))
             except (KeyError, SyntaxError, TypeError, ValueError):
@@ -1201,7 +1178,7 @@ class Schema(object):
 
             if not issubclass(self.elements[eid], baseClass):
                 raise TypeError('%s %r (ID 0x%02X) redefined as %s' %
-                            (oldEl.__name__, ename, eid, baseClass.__name__))
+                                (oldEl.__name__, ename, eid, baseClass.__name__))
 
             newatts = self.elementInfo[eid].copy()
             newatts.update(attribs)
@@ -1216,16 +1193,16 @@ class Schema(object):
             if eid is None:
                 raise ValueError('Element definition missing required '
                                  '"id" attribute')
-            elif not isinstance(eid, (int, long)):
-                raise TypeError("Invalid type for element ID: " + \
+            elif not isinstance(eid, int):
+                raise TypeError("Invalid type for element ID: " +
                                 "{} ({})".format(eid, type(eid).__name__))
 
             if ename is None:
                 raise ValueError('Element definition missing required '
                                  '"name" attribute')
-            elif not isinstance(ename, basestring):
-                raise TypeError('Invalid type for element name: ' + \
-                                 '{} ({})'.format(ename, type(ename).__name__))
+            elif not isinstance(ename, (str, bytes, bytearray)):
+                raise TypeError('Invalid type for element name: ' +
+                                '{} ({})'.format(ename, type(ename).__name__))
             elif not (ename[0].isalpha() or ename[0] == "_"):
                 raise ValueError("Invalid element name: %r" % ename)
 
@@ -1247,10 +1224,11 @@ class Schema(object):
 
             # Create a new Element subclass
             eclass = type('%sElement' % ename, (baseClass,),
-                          {'id':eid, 'name':ename, 'schema':self,
+                          {'id': eid, 'name': ename, 'schema': self,
                            'mandatory': mandatory, 'multiple': multiple,
-                           'precache': precache, 'length':length,
-                           'children': dict(), '__doc__': docs})
+                           'precache': precache, 'length': length,
+                           'children': dict(), '__doc__': docs,
+                           '__slots__': baseClass.__slots__})
 
             self.elements[eid] = eclass
             self.elementInfo[eid] = attribs
@@ -1266,14 +1244,12 @@ class Schema(object):
 
         return eclass
 
-
     def __repr__(self):
         try:
             return "<%s %r from '%s'>" % (self.__class__.__name__, self.name,
-                                          self.filename or self.source)
+                                           self.filename or self.source)
         except AttributeError:
             return object.__repr__(self)
-
 
     def __eq__(self, other):
         """ Equality check. Schemata are considered equal if the attributes of
@@ -1284,11 +1260,9 @@ class Schema(object):
         except AttributeError:
             return False
 
-
     def __contains__(self, key):
         """ Does the Schema contain a given element name or ID? """
         return (key in self.elementsByName) or (key in self.elements)
-
 
     def __getitem__(self, key):
         """ Get an Element class from the schema, by name or by ID. """
@@ -1297,12 +1271,10 @@ class Schema(object):
         except KeyError:
             return self.elementsByName[key]
 
-
     def get(self, key, default=None):
         if key in self:
             return self[key]
         return default
-
 
     def load(self, fp, name=None, headers=False, **kwargs):
         """ Load an EBML file using this Schema.
@@ -1315,11 +1287,10 @@ class Schema(object):
                 document. The contents of the ``EBML`` element will always be
                 read.
         """
-        if isinstance(fp, basestring):
+        if isinstance(fp, (str, bytes, bytearray)):
             fp = open(fp, 'rb')
 
         return self.document(fp, name=name, headers=headers, **kwargs)
-
 
     def loads(self, data, name=None):
         """ Load EBML from a string using this Schema.
@@ -1328,8 +1299,7 @@ class Schema(object):
             @keyword name: The name of the document. Defaults to the Schema's
                 document class name.
         """
-        return self.load(StringIO(data), name=name)
-
+        return self.load(BytesIO(data), name=name)
 
     def __call__(self, fp, name=None):
         """ Load an EBML file using this Schema. Same as `Schema.load()`.
@@ -1343,10 +1313,9 @@ class Schema(object):
         """
         return self.load(fp, name=name)
 
-
-    #===========================================================================
+    # ==========================================================================
     # Schema info stuff. Uses python-ebml schema XML data. Refactor later.
-    #===========================================================================
+    # ==========================================================================
 
     def _getInfo(self, eid, dtype):
         """ Helper method to get the 'default' value of an element. """
@@ -1355,22 +1324,19 @@ class Schema(object):
         except (KeyError, ValueError):
             return None
 
-
     @property
     def version(self):
         """ Schema version, extracted from EBML ``DocTypeVersion`` default. """
-        return self._getInfo(0x4287, int) # ID of EBML 'DocTypeVersion'
-
+        return self._getInfo(0x4287, int)  # ID of EBML 'DocTypeVersion'
 
     @property
     def type(self):
         """ Schema type name, extracted from EBML ``DocType`` default. """
-        return self._getInfo(0x4282, str) # ID of EBML 'DocType'
+        return self._getInfo(0x4282, str)  # ID of EBML 'DocType'
 
-
-    #===========================================================================
+    # ==========================================================================
     # Encoding
-    #===========================================================================
+    # ==========================================================================
 
     def encode(self, stream, data, headers=False):
         """ Write an EBML document using this Schema to a file or file-like
@@ -1385,7 +1351,6 @@ class Schema(object):
         self.document.encode(stream, data, headers=headers)
         return stream
 
-
     def encodes(self, data, headers=False):
         """ Create an EBML document using this Schema, returned as a string.
 
@@ -1394,10 +1359,9 @@ class Schema(object):
                 individual items in a list of name/value pairs *must* be tuples!
             @return: A string containing the encoded EBML binary.
         """
-        stream = StringIO()
+        stream = BytesIO()
         self.encode(stream, data, headers=headers)
         return stream.getvalue()
-
 
     def verify(self, data):
         """ Perform basic tests on EBML binary data, ensuring it can be parsed
@@ -1419,9 +1383,10 @@ class Schema(object):
         return _crawl(self.loads(data))
 
 
-#===============================================================================
+# ==============================================================================
 #
-#===============================================================================
+# ==============================================================================
+
 
 def loadSchema(filename, reload=False, **kwargs):
     """ Import a Schema XML file. Loading the same file more than once will
@@ -1441,7 +1406,7 @@ def loadSchema(filename, reload=False, **kwargs):
     global SCHEMATA
 
     origName = filename
-    if not filename.startswith(('.','/','\\','~')):
+    if not filename.startswith(('.', '/', '\\', '~')):
         # Not a specific path and file not found: search paths in SCHEMA_PATH
         for p in SCHEMA_PATH:
             f = os.path.join(p, origName)

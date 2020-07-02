@@ -1,4 +1,4 @@
-'''
+"""
 Some utilities for manipulating EBML documents: translate to/from XML, etc.
 This module may be imported or used as a command-line utility.
 
@@ -9,11 +9,14 @@ Created on Aug 11, 2017
     directly to a file, allowing the conversion of huge EBML files.
 @todo: Add other options to command-line utility for the other arguments of
     `toXml()` and `xml2ebml()`.
-'''
-from StringIO import StringIO
+"""
+__author__ = "David Randall Stokes, Connor Flanigan"
+__copyright__ = "Copyright 2020, Mide Technology Corporation"
+__credits__ = "David Randall Stokes, Connor Flanigan, Becker Awqatty, Derek Witt"
 
-__author__ = "dstokes"
-__copyright__ = "Copyright 2017 Mide Technology Corporation"
+__all__ = ['toXml', 'xml2ebml', 'loadXml', 'pprint']
+
+from io import StringIO
 
 import ast
 from base64 import b64encode, b64decode
@@ -21,13 +24,12 @@ import sys
 import tempfile
 from xml.etree import ElementTree as ET
 
-import core, encoding
+from . import core, encoding
 
-__all__ = ['toXml', 'xml2ebml', 'loadXml', 'pprint']
-
-#===============================================================================
+# ==============================================================================
 #
-#===============================================================================
+# ==============================================================================
+
 
 def toXml(el, parent=None, offsets=True, sizes=True, types=True, ids=True):
     """ Convert an EBML Document to XML. Binary elements will contain
@@ -57,11 +59,11 @@ def toXml(el, parent=None, offsets=True, sizes=True, types=True, ids=True):
     else:
         xmlEl = ET.SubElement(parent, elname)
     if isinstance(el, core.Document):
-        xmlEl.set('source', str(el.filename))
-        xmlEl.set('schemaName', str(el.schema.name))
-        xmlEl.set('schemaFile', str(el.schema.filename))
+        xmlEl.set('source', el.filename)
+        xmlEl.set('schemaName', el.schema.name)
+        xmlEl.set('schemaFile', el.schema.filename)
     else:
-        if ids and isinstance(el.id, (int, long)):
+        if ids and isinstance(el.id, int):
             xmlEl.set('id', "0x%X" % el.id)
         if types:
             xmlEl.set('type', el.dtype.__name__)
@@ -69,15 +71,15 @@ def toXml(el, parent=None, offsets=True, sizes=True, types=True, ids=True):
     if offsets:
         xmlEl.set('offset', str(el.offset))
     if sizes:
-        xmlEl.set('size', str(el.size).strip('L'))
+        xmlEl.set('size', str(el.size))
 
     if isinstance(el, core.MasterElement):
         for chEl in el:
             toXml(chEl, xmlEl, offsets, sizes, types)
     elif isinstance(el, core.BinaryElement):
-        xmlEl.text = b64encode(el.value)
+        xmlEl.text = b64encode(el.value).decode()
     elif not isinstance(el, core.VoidElement):
-        xmlEl.set('value', unicode(el.value).encode('ascii', 'xmlcharrefreplace'))
+        xmlEl.set('value', str(el.value).encode('ascii', 'xmlcharrefreplace').decode())
 
     return xmlEl
 
@@ -104,7 +106,7 @@ def xmlElement2ebml(xmlEl, ebmlFile, schema, sizeLength=None, unknown=True):
         @raise NameError: raised if an xml element is not present in the schema and unknown is False, OR if the xml
             element does not have an ID.
     """
-    if not isinstance(xmlEl.tag, basestring):
+    if not isinstance(xmlEl.tag, (str, bytes, bytearray)):
         # (Probably) a comment; disregard.
         return 0
         
@@ -153,7 +155,7 @@ def xmlElement2ebml(xmlEl, ebmlFile, schema, sizeLength=None, unknown=True):
 
     elif issubclass(cls, core.BinaryElement):
         if xmlEl.text is None:
-            val = ""
+            val = b""
         else:
             val = b64decode(xmlEl.text)
     elif issubclass(cls, (core.IntegerElement, core.FloatElement)):
@@ -198,7 +200,7 @@ def xml2ebml(xmlFile, ebmlFile, schema, sizeLength=None, headers=True,
         @return: the size of the ebml file in bytes.
         @raise NameError: raises if an xml element is not present in the schema.
     """
-    if isinstance(ebmlFile, basestring):
+    if isinstance(ebmlFile, (str, bytes, bytearray)):
         ebmlFile = open(ebmlFile, 'wb')
         openedEbml = True
     else:
@@ -381,7 +383,7 @@ if __name__ == "__main__":
         root = toXml(doc)  # , offsets, sizes, types, ids)
         s = ET.tostring(root, encoding="utf-8")
         if args.pretty:
-            parseString(s).writexml(out, addindent='\t', newl='\n', encoding='utf-8')
+            parseString(s).writexml(out, addindent=b'\t', newl=b'\n', encoding=b'utf-8')
         else:
             out.write(s)
     else:
