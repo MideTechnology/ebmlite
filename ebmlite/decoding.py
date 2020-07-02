@@ -167,7 +167,8 @@ def readFloat(stream: BinaryIO, size: int) -> float:
         @param stream: The source file-like object.
         @param size: The number of bytes to read from the stream.
         @return: The decoded value.
-        @raise IOError: raised if the length of this floating point number is not valid (0, 4, 8 bytes)
+        @raise IOError: raised if the length of this floating point number is not
+            valid (0, 4, 8 bytes)
     """
     if size == 4:
         return _struct_float32_unpack(stream.read(size))[0]
