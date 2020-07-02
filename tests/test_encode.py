@@ -37,14 +37,16 @@ class testEncoding(unittest.TestCase):
         # Length paramater behavior
         #   unspecified length calls should truncate to smallest length possible
         self.assertEqual(encodeUInt(0x123), b'\x01\x23')
-        #   which for zero is an empty string
-        self.assertEqual(encodeUInt(0), b'')
+        #   but zero should still be a nonempty string
+        self.assertEqual(encodeUInt(0), b'\x00')
         
         #   specified length should pad to given length for all values
         self.assertEqual(encodeUInt(0x123, length=3), b'\x00\x01\x23')
         #   and specifying a length that's too small should result in a ValueError
         with self.assertRaises(ValueError):
             encodeUInt(0x123, length=1)
+        with self.assertRaises(ValueError):
+            encodeUInt(0, length=0)
 
 
 
@@ -76,8 +78,8 @@ class testEncoding(unittest.TestCase):
         #   unspecified length calls should truncate to smallest length possible
         self.assertEqual(encodeInt(0x123), b'\x01\x23')
         self.assertEqual(encodeInt(-0x123), b'\xfe\xdd')
-        #   which for zero is an empty string
-        self.assertEqual(encodeInt(0), b'')
+        #   but 0/(-1) should still be nonempty strings
+        self.assertEqual(encodeInt(0), b'\x00')
         self.assertEqual(encodeInt(-1), b'\xff')
         
         #   specified length should pad to given length for all values
@@ -88,6 +90,8 @@ class testEncoding(unittest.TestCase):
             encodeInt(0x123, length=1)
         with self.assertRaises(ValueError):
             encodeInt(-0x123, length=1)
+        with self.assertRaises(ValueError):
+            encodeInt(0, length=0)
         with self.assertRaises(ValueError):
             encodeInt(-1, length=0)
 

@@ -707,11 +707,11 @@ class testSchema(unittest.TestCase):
         """ Test loading EMBL files with a Schema. """
 
         ide = self.schema.load('./tests/SSX46714-doesnot.IDE')
-        self.assertEqual(dict(ide.info),
-                         {'DocTypeVersion':2, 'EBMLVersion':1,
-                          'EBMLMaxIDLength':4, 'EBMLReadVersion':1,
-                          'EBMLMaxSizeLength':8, 'DocTypeReadVersion':2,
-                          'DocType':b'mide'})
+        self.assertEqual({'DocTypeVersion': 2,    'EBMLVersion': 1,
+                          'EBMLMaxIDLength': 4,   'EBMLReadVersion': 1,
+                          'EBMLMaxSizeLength': 8, 'DocTypeReadVersion': 2,
+                          'DocType': b'mide'},
+                         dict(ide.info))
 
 
 
