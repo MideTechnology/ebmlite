@@ -6,21 +6,72 @@ python:
   - "3.6"
   - "3.7"
   - "3.8"
-install: pip install .
-script: python -m pytest
+
+before_install:
+  - python --version
+install: pip install .[test]
+script: python -m pytest --cov=ebmlite
+after_success:
+  - codecov
 
 matrix:
   include:
-
-    # Windows, which does not cooperate well
-
+    # This build is stalling after passing, not sure why.  Since python 3.5 is currently being tested, skip for now
+    # Windows doesn't support native python yet, so here we are - 3.5
+    # - os: windows
+    #   language: shell
+    #   env: PATH=/c/python35:/c/Python35/scripts:$PATH
+    #   before_install:
+    #     - choco install python3 --version=3.5.4
+    #     - python -m pip install virtualenv
+    #     - virtualenv $HOME/venv
+    #     - source $HOME/venv/Scripts/activate
+    # Windows doesn't support native python yet, so here we are - 3.6
     - os: windows
       language: shell
-      env: PATH=/c/Python37:/c/Python37/Scripts:$PATH
+      env: PATH=/c/python36:/c/Python36/scripts:$PATH
       before_install:
-        - choco install python --version=3.7.4
+        - choco install python3 --version=3.6.8
         - python -m pip install virtualenv
         - virtualenv $HOME/venv
         - source $HOME/venv/Scripts/activate
-        - pip install pytest numpy
+    # Windows doesn't support native python yet, so here we are - 3.7
+    - os: windows
+      language: shell
+      env: PATH=/c/python37:/c/Python37/scripts:$PATH
+      before_install:
+        - choco install python3 --version=3.7.8
+        - python -m pip install virtualenv
+        - virtualenv $HOME/venv
+        - source $HOME/venv/Scripts/activate
+    # Windows doesn't support native python yet, so here we are - 3.8
+    - os: windows
+      language: shell
+      env: PATH=/c/python38:/c/Python38/scripts:$PATH
+      before_install:
+        - choco install python3 --version=3.8.2
+        - python -m pip install virtualenv
+        - virtualenv $HOME/venv
+        - source $HOME/venv/Scripts/activate
+    # Windows doesn't support native python yet, so here we are - 3.9
+    - os: windows
+      language: shell
+      env:
+        - PATH=/c/python39:/c/Python39/scripts:$PATH
+        - ALLOW_FAILURES=TRUE
+      before_install:
+        - choco install python3 --pre
+        - python -m pip install virtualenv
+        - virtualenv $HOME/venv
+        - source $HOME/venv/Scripts/activate
+    - os: linux
+      language: python
+      python: "3.9-dev"
+      env: ALLOW_FAILURES=TRUE
+    - os: linux
+      language: python
+      python: "nightly"
+      env: ALLOW_FAILURES=TRUE
+  allow_failures:
+    - if: env(ALLOW_FAILURES)=TRUE
 

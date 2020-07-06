@@ -3,6 +3,16 @@ import setuptools
 with open('README.md', 'r') as fh:
     long_description = fh.read()
 
+INSTALL_REQUIRES = [
+    'numpy',
+    ]
+
+TEST_REQUIRES = [
+    'pytest>=4.6',
+    'codecov',
+    'pytest-cov',
+    ]
+
 setuptools.setup(
         name='ebmlite',
         version='3.0.1',
@@ -26,4 +36,8 @@ setuptools.setup(
             '': ['schemata/*', 'tests/*.ide', 'tests/*.mkv']
         },
         test_suite='tests',
+        install_requires=INSTALL_REQUIRES,
+        extras_require={
+            'test': INSTALL_REQUIRES + TEST_REQUIRES,
+            },
 )
