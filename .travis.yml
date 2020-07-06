@@ -72,6 +72,6 @@ matrix:
       language: python
       python: "nightly"
       env: ALLOW_FAILURES=TRUE
-    allow_failures:
-      - if: env(ALLOW_FAILURES)=TRUE
+  allow_failures:
+    - if: env(ALLOW_FAILURES)=TRUE
 
