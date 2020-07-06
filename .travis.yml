@@ -6,8 +6,13 @@ python:
   - "3.6"
   - "3.7"
   - "3.8"
-install: pip install .
-script: python -m pytest
+before_install:
+  - python --version
+  - pip install -U pip
+install: pip install .[test]
+after_success:
+  - codecov
+script: python -m pytest --cov=ebmlite
 
 matrix:
   include:
@@ -19,8 +24,10 @@ matrix:
       env: PATH=/c/Python37:/c/Python37/Scripts:$PATH
       before_install:
         - choco install python --version=3.7.4
-        - python -m pip install virtualenv
+        - python --version
+        - pip install -U pip
+        - pip install virtualenv
         - virtualenv $HOME/venv
         - source $HOME/venv/Scripts/activate
-        - pip install pytest numpy
+        - pip install .[test]
 
