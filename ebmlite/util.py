@@ -4,10 +4,10 @@ This module may be imported or used as a command-line utility.
 
 Created on Aug 11, 2017
 
-@todo: Clean up and standardize usage of the term 'size' versus 'length.'
-@todo: Modify (or create an alternate version of) `toXml()` that writes
+:todo: Clean up and standardize usage of the term 'size' versus 'length.'
+:todo: Modify (or create an alternate version of) `toXml()` that writes
     directly to a file, allowing the conversion of huge EBML files.
-@todo: Add other options to command-line utility for the other arguments of
+:todo: Add other options to command-line utility for the other arguments of
     `toXml()` and `xml2ebml()`.
 """
 __author__ = "David Randall Stokes, Connor Flanigan"
@@ -36,18 +36,18 @@ def toXml(el, parent=None, offsets=True, sizes=True, types=True, ids=True):
         base64-encoded data in their body. Other non-master elements will
         contain their value in a ``value`` attribute.
 
-        @param el: An instance of an EBML Element or Document subclass.
-        @keyword parent: The resulting XML element's parent element, if any.
-        @keyword offsets: If `True`, create a ``offset`` attributes for each
+        :param el: An instance of an EBML Element or Document subclass.
+        :keyword parent: The resulting XML element's parent element, if any.
+        :keyword offsets: If `True`, create a ``offset`` attributes for each
             generated XML element, containing the corresponding EBML element's
             offset.
-        @keyword sizes: If `True`, create ``size`` attributes containing the
+        :keyword sizes: If `True`, create ``size`` attributes containing the
             corresponding EBML element's size.
-        @keyword types: If `True`, create ``type`` attributes containing the
+        :keyword types: If `True`, create ``type`` attributes containing the
             name of the corresponding EBML element type.
-        @keyword ids: If `True`, create ``id`` attributes containing the
+        :keyword ids: If `True`, create ``id`` attributes containing the
             corresponding EBML element's EBML ID.
-        @return The root XML element of the file.
+        :returns: The root XML element of the file.
     """
     if isinstance(el, core.Document):
         elname = el.__class__.__name__
@@ -92,19 +92,21 @@ def xmlElement2ebml(xmlEl, ebmlFile, schema, sizeLength=None, unknown=True):
     """ Convert an XML element to EBML, recursing if necessary. For converting
         an entire XML document, use `xml2ebml()`.
 
-        @param xmlEl: The XML element. Its tag must match an element defined
+        :param xmlEl: The XML element. Its tag must match an element defined
             in the `schema`.
-        @param ebmlFile: An open file-like stream, to which the EBML data will
+        :param ebmlFile: An open file-like stream, to which the EBML data will
             be written.
-        @param schema: An `ebmlite.core.Schema` instance to use when
+        :param schema: An `ebmlite.core.Schema` instance to use when
             writing the EBML document.
-        @keyword sizeLength:
-        @param unknown: If `True`, unknown element names will be allowed,
+        :keyword sizeLength:
+        :param unknown: If `True`, unknown element names will be allowed,
             provided their XML elements include an ``id`` attribute with the
             EBML ID (in hexadecimal).
-        @return The length of the encoded element, including header and children.
-        @raise NameError: raised if an xml element is not present in the schema and unknown is False, OR if the xml
-            element does not have an ID.
+        :returns: The length of the encoded element, including header and
+            children.
+        :raises NameError: raised if an xml element is not present in the
+            schema and unknown is `False`, OR if the XML element does not have
+            an ID.
     """
     if not isinstance(xmlEl.tag, (str, bytes, bytearray)):
         # (Probably) a comment; disregard.
@@ -179,26 +181,27 @@ def xml2ebml(xmlFile, ebmlFile, schema, sizeLength=None, headers=True,
              unknown=True):
     """ Convert an XML file to EBML.
 
-        @todo: Convert XML on the fly, rather than parsing it first, allowing
+        :todo: Convert XML on the fly, rather than parsing it first, allowing
             for the conversion of arbitrarily huge files.
 
-        @param xmlFile: The XML source. Can be a filename, an open file-like
+        :param xmlFile: The XML source. Can be a filename, an open file-like
             stream, or a parsed XML document.
-        @param ebmlFile: The EBML file to write. Can be a filename or an open
+        :param ebmlFile: The EBML file to write. Can be a filename or an open
             file-like stream.
-        @param schema: The EBML schema to use. Can be a filename or an
+        :param schema: The EBML schema to use. Can be a filename or an
             instance of a `Schema`.
-        @keyword sizeLength: The default length of each element's size
+        :keyword sizeLength: The default length of each element's size
             descriptor. Must be large enough to store the largest 'master'
             element. If an XML element has a ``sizeLength`` attribute, it will
             override this.
-        @keyword headers: If `True`, generate the standard ``EBML`` EBML
+        :keyword headers: If `True`, generate the standard ``EBML`` EBML
             element if the XML document does not contain one.
-        @param unknown: If `True`, unknown element names will be allowed,
+        :param unknown: If `True`, unknown element names will be allowed,
             provided their XML elements include an ``id`` attribute with the
             EBML ID (in hexadecimal).
-        @return: the size of the ebml file in bytes.
-        @raise NameError: raises if an xml element is not present in the schema.
+        :returns: the size of the ebml file in bytes.
+        :raises NameError: raises if an xml element is not present in the
+            schema.
     """
     if isinstance(ebmlFile, (str, bytes, bytearray)):
         ebmlFile = open(ebmlFile, 'wb')
@@ -252,14 +255,14 @@ def xml2ebml(xmlFile, ebmlFile, schema, sizeLength=None, headers=True,
 def loadXml(xmlFile, schema, ebmlFile=None):
     """ Helpful utility to load an EBML document from an XML file.
 
-        @param xmlFile: The XML source. Can be a filename, an open file-like
+        :param xmlFile: The XML source. Can be a filename, an open file-like
             stream, or a parsed XML document.
-        @param schema: The EBML schema to use. Can be a filename or an
+        :param schema: The EBML schema to use. Can be a filename or an
             instance of a `Schema`.
-        @keyword ebmlFile: The name of the temporary EBML file to write, or
+        :keyword ebmlFile: The name of the temporary EBML file to write, or
             ``:memory:`` to use RAM (like `sqlite3`). Defaults to an
             automatically-generated temporary file.
-        @return The root node of the specified EBML file.
+        :returns: The root node of the specified EBML file.
     """
     if ebmlFile == ":memory:":
         ebmlFile = StringIO()
@@ -280,10 +283,10 @@ def pprint(el, values=True, out=sys.stdout, indent="  ", _depth=0):
     """ Test function to recursively crawl an EBML document or element and
         print its structure, with child elements shown indented.
 
-        @param el: An instance of a `Document` or `Element` subclass.
-        @keyword values: If `True`, show elements' values.
-        @keyword out: A file-like stream to which to write.
-        @keyword indent: The string containing the character(s) used for each
+        :param el: An instance of a `Document` or `Element` subclass.
+        :keyword values: If `True`, show elements' values.
+        :keyword out: A file-like stream to which to write.
+        :keyword indent: The string containing the character(s) used for each
             indentation.
     """
     tab = indent * _depth
