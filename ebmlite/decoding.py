@@ -16,9 +16,9 @@ __all__ = ['readElementID', 'readElementSize', 'readFloat', 'readInt',
 from datetime import datetime, timedelta
 import struct
 
-# ==============================================================================
+# =============================================================================
 #
-# ==============================================================================
+# =============================================================================
 
 # Pre-built structs for packing/unpacking various data types
 _struct_uint32 = struct.Struct(">I")
@@ -37,14 +37,14 @@ _struct_float32_unpack = _struct_float32.unpack
 _struct_float64_unpack = _struct_float64.unpack
 
 
-# ==============================================================================
+# =============================================================================
 # --- Reading and Decoding
-# ==============================================================================
+# =============================================================================
 
 def decodeIntLength(byte):
     """ Extract the encoded size from an initial byte.
 
-        @return: The size, and the byte with the size removed (it is the first
+        :returns: The size, and the byte with the size removed (it is the first
             byte of the value).
     """
     # An inelegant implementation, but it's fast.
@@ -69,8 +69,8 @@ def decodeIntLength(byte):
 def decodeIDLength(byte):
     """ Extract the encoded ID size from an initial byte.
 
-        @return: The size and the original byte (it is part of the ID).
-        @raise IOError: raise if the length of an ID is invalid.
+        :returns: The size and the original byte (it is part of the ID).
+        :raises IOError: raise if the length of an ID is invalid.
     """
     if byte >= 128:
         return 1, byte
@@ -88,9 +88,10 @@ def decodeIDLength(byte):
 def readElementID(stream):
     """ Read an element ID from a file (or file-like stream).
 
-        @param stream: The source file-like object.
-        @return: The decoded element ID and its length in bytes.
-        @raise IOError: raised if the length of the ID of an element is greater than 4 bytes.
+        :param stream: The source file-like object.
+        :returns: The decoded element ID and its length in bytes.
+        :raises IOError: raised if the length of the ID of an element is
+            greater than 4 bytes.
     """
     ch = stream.read(1)
     length, eid = decodeIDLength(ord(ch))
@@ -106,8 +107,8 @@ def readElementID(stream):
 def readElementSize(stream):
     """ Read an element size from a file (or file-like stream).
 
-        @param stream: The source file-like object.
-        @return: The decoded size (or `None`) and the length of the
+        :param stream: The source file-like object.
+        :returns: The decoded size (or `None`) and the length of the
             descriptor in bytes.
     """
     ch = stream.read(1)
@@ -128,9 +129,9 @@ def readElementSize(stream):
 def readUInt(stream, size):
     """ Read an unsigned integer from a file (or file-like stream).
 
-        @param stream: The source file-like object.
-        @param size: The number of bytes to read from the stream.
-        @return: The decoded value.
+        :param stream: The source file-like object.
+        :param size: The number of bytes to read from the stream.
+        :returns: The decoded value.
     """
 
     if size == 0:
@@ -143,9 +144,9 @@ def readUInt(stream, size):
 def readInt(stream, size):
     """ Read a signed integer from a file (or file-like stream).
 
-        @param stream: The source file-like object.
-        @param size: The number of bytes to read from the stream.
-        @return: The decoded value.
+        :param stream: The source file-like object.
+        :param size: The number of bytes to read from the stream.
+        :returns: The decoded value.
     """
 
     if size == 0:
@@ -162,11 +163,11 @@ def readInt(stream, size):
 def readFloat(stream, size):
     """ Read an floating point value from a file (or file-like stream).
 
-        @param stream: The source file-like object.
-        @param size: The number of bytes to read from the stream.
-        @return: The decoded value.
-        @raise IOError: raised if the length of this floating point number is not
-            valid (0, 4, 8 bytes)
+        :param stream: The source file-like object.
+        :param size: The number of bytes to read from the stream.
+        :returns: The decoded value.
+        :raises IOError: raised if the length of this floating point number is
+            not valid (0, 4, 8 bytes)
     """
     if size == 4:
         return _struct_float32_unpack(stream.read(size))[0]
@@ -182,9 +183,9 @@ def readFloat(stream, size):
 def readString(stream, size):
     """ Read an ASCII string from a file (or file-like stream).
 
-        @param stream: The source file-like object.
-        @param size: The number of bytes to read from the stream.
-        @return: The decoded value.
+        :param stream: The source file-like object.
+        :param size: The number of bytes to read from the stream.
+        :returns: The decoded value.
     """
     if size == 0:
         return b''
@@ -197,9 +198,9 @@ def readString(stream, size):
 def readUnicode(stream, size):
     """ Read an UTF-8 encoded string from a file (or file-like stream).
 
-        @param stream: The source file-like object.
-        @param size: The number of bytes to read from the stream.
-        @return: The decoded value.
+        :param stream: The source file-like object.
+        :param size: The number of bytes to read from the stream.
+        :returns: The decoded value.
     """
 
     if size == 0:
@@ -214,10 +215,10 @@ def readDate(stream, size=8):
     """ Read an EBML encoded date (nanoseconds since UTC 2001-01-01T00:00:00)
         from a file (or file-like stream).
 
-        @param stream: The source file-like object.
-        @param size: The number of bytes to read from the stream.
-        @return: The decoded value (as `datetime.datetime`).
-        @raise IOError: raised if the length of the date is not 8 bytes.
+        :param stream: The source file-like object.
+        :param size: The number of bytes to read from the stream.
+        :returns: The decoded value (as `datetime.datetime`).
+        :raises IOError: raised if the length of the date is not 8 bytes.
     """
     if size != 8:
         raise IOError("Cannot read date value of length %d, only 8." % size)

@@ -27,7 +27,7 @@ class ThreadAwareFile(file):
         the standard attributes and properties. Most of these affect only
         the current thread.
         
-        @var timeout: A value (in seconds) for blocking operations to wait.
+        :var timeout: A value (in seconds) for blocking operations to wait.
             Very few operations block; specifically, only those that do
             (or depend upon) internal housekeeping. Timeout should only occur
             in certain extreme conditions (e.g. filesystem-related file

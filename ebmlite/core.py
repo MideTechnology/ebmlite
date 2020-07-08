@@ -2,33 +2,33 @@
 EBMLite: A lightweight EBML parsing library. It is designed to crawl through
 EBML files quickly and efficiently, and that's about it.
 
-@todo: Complete EBML encoding. Specifically, make 'master' elements write
+:todo: Complete EBML encoding. Specifically, make 'master' elements write
     directly to the stream, rather than build bytearrays, so huge 'master'
     elements can be handled. It appears that the official spec may prohibit
     (or at least counter-indicate) multiple root elements. Possible
     compromise until proper fix: handle root 'master' elements differently
     than deeper ones, more like the current `Document`.
-@todo: Validation. Enforce the hierarchy defined in each schema.
-@todo: Optimize 'infinite' master elements (i.e `size` is `None`). See notes
+:todo: Validation. Enforce the hierarchy defined in each schema.
+:todo: Optimize 'infinite' master elements (i.e `size` is `None`). See notes
     in `MasterElement` class' method definitions.
-@todo: Improved `MasterElement.__eq__()` method, possibly doing a recursive
+:todo: Improved `MasterElement.__eq__()` method, possibly doing a recursive
     crawl of both elements and comparing the actual contents, or iterating
     over chunks of the raw binary data. Current implementation doesn't check
     element contents, just ID and payload size (for speed).
-@todo: Document-wide caching, for future handling of streamed data. Affects
+:todo: Document-wide caching, for future handling of streamed data. Affects
     the longer-term streaming TODO (listed below) and optimization of
     'infinite' elements (listed above).
-@todo: Clean up and standardize usage of the term 'size' versus 'length.'
-@todo: General documentation (more detailed than the README) and examples.
-@todo: Document the best way to load schemata in a PyInstaller executable.
+:todo: Clean up and standardize usage of the term 'size' versus 'length.'
+:todo: General documentation (more detailed than the README) and examples.
+:todo: Document the best way to load schemata in a PyInstaller executable.
 
-@todo: (longer term) Consider making schema loading automatic based on the EBML
+:todo: (longer term) Consider making schema loading automatic based on the EBML
     DocType, DocTypeVersion, and DocTypeReadVersion. Would mean a refactoring
     of how schemata are loaded.
-@todo: (longer term) Refactor to support streaming data. This will require
+:todo: (longer term) Refactor to support streaming data. This will require
     modifying the indexing and iterating methods of `Document`. Also affects
     the document-wide caching TODO item, listed above.
-@todo: (longer term) Support the official Schema definition format. Start by
+:todo: (longer term) Support the official Schema definition format. Start by
     adopting some of the attributes, specifically ``minOccurs`` and
     ``maxOccurs`` (they serve the function provided by the current
     ``mandatory`` and ``multiple`` attributes). Add ``range`` later.
@@ -58,9 +58,9 @@ from .decoding import readString, readUnicode
 from . import encoding
 from . import schemata
 
-# ==============================================================================
+# =============================================================================
 #
-# ==============================================================================
+# =============================================================================
 
 # SCHEMA_PATH: A list of paths for schema XML files, similar to `sys.path`.
 # When `loadSchema()` is used, it will search these paths, in order, to find
@@ -73,29 +73,29 @@ SCHEMA_PATH = ['',
 SCHEMATA = {}
 
 
-# ==============================================================================
+# =============================================================================
 #
-# ==============================================================================
+# =============================================================================
 
 class Element(object):
     """ Base class for all EBML elements. Each data type has its own subclass,
         and these subclasses get subclassed when a Schema is read.
 
-        @cvar id: The element's EBML ID.
-        @cvar name: The element's name.
-        @cvar schema: The `Schema` to which this element belongs.
-        @cvar multiple: Can this element be appear multiple times? Note:
+        :cvar id: The element's EBML ID.
+        :cvar name: The element's name.
+        :cvar schema: The `Schema` to which this element belongs.
+        :cvar multiple: Can this element be appear multiple times? Note:
             Currently only enforced for encoding.
-        @cvar mandatory: Must this element appear in all EBML files using
+        :cvar mandatory: Must this element appear in all EBML files using
             this element's schema? Note: Not currently enforced.
-        @cvar children: A list of valid child element types. Only applicable to
+        :cvar children: A list of valid child element types. Only applicable to
             `Document` and `Master` subclasses. Note: Not currently enforced.
-        @cvar dtype: The element's native Python data type.
-        @cvar precache: If `True`, the Element's value is read when the Element
+        :cvar dtype: The element's native Python data type.
+        :cvar precache: If `True`, the Element's value is read when the Element
             is parsed. if `False`, the value is lazy-loaded when needed.
             Numeric element types default to `True`. Can be used to reduce
             the number of file seeks, potentially speeding things up.
-        @cvar length: An explicit length (in bytes) of the element when
+        :cvar length: An explicit length (in bytes) of the element when
             encoding. `None` will use standard EBML variable-length encoding.
     """
     __slots__ = ("stream", "offset", "size", "sizeLength", "payloadOffset", "_value")
@@ -133,10 +133,10 @@ class Element(object):
             elements should be created when a `Document` is loaded, rather
             than instantiated explicitly.
 
-            @keyword stream: A file-like object containing EBML data.
-            @keyword offset: The element's starting location in the file.
-            @keyword size: The size of the whole element.
-            @keyword payloadOffset: The starting location of the element's
+            :keyword stream: A file-like object containing EBML data.
+            :keyword offset: The element's starting location in the file.
+            :keyword size: The size of the whole element.
+            :keyword payloadOffset: The starting location of the element's
                 payload (i.e. immediately after the element's header).
         """
         self.stream = stream
@@ -214,15 +214,15 @@ class Element(object):
     def encode(cls, value, length=None, lengthSize=None, infinite=False):
         """ Encode an EBML element.
 
-            @param value: The value to encode, or a list of values to encode.
+            :param value: The value to encode, or a list of values to encode.
                 If a list is provided, each item will be encoded as its own
                 element.
-            @keyword length: An explicit length for the encoded data,
+            :keyword length: An explicit length for the encoded data,
                 overriding the variable length encoding. For producing
                 byte-aligned structures.
-            @keyword lengthSize: An explicit length for the encoded element
+            :keyword lengthSize: An explicit length for the encoded element
                 size, overriding the variable length encoding.
-            @return: A bytearray containing the encoded EBML data.
+            :returns: A bytearray containing the encoded EBML data.
         """
         if infinite and not issubclass(cls, MasterElement):
             raise ValueError("Only Master elements can have 'infinite' lengths")
@@ -248,7 +248,7 @@ class Element(object):
         return self.value
 
 
-# ==============================================================================
+# =============================================================================
 
 
 class IntegerElement(Element):
@@ -276,7 +276,7 @@ class IntegerElement(Element):
         return encoding.encodeInt(data, length)
 
 
-# ==============================================================================
+# =============================================================================
 
 
 class UIntegerElement(IntegerElement):
@@ -299,7 +299,7 @@ class UIntegerElement(IntegerElement):
         return encoding.encodeUInt(data, length)
 
 
-# ==============================================================================
+# =============================================================================
 
 
 class FloatElement(Element):
@@ -327,7 +327,7 @@ class FloatElement(Element):
         return encoding.encodeFloat(data, length)
 
 
-# ==============================================================================
+# =============================================================================
 
 
 class StringElement(Element):
@@ -357,7 +357,7 @@ class StringElement(Element):
         return encoding.encodeString(data, length)
 
 
-# ==============================================================================
+# =============================================================================
 
 
 class UnicodeElement(StringElement):
@@ -383,7 +383,7 @@ class UnicodeElement(StringElement):
         return encoding.encodeUnicode(data, length)
 
 
-# ==============================================================================
+# =============================================================================
 
 
 class DateElement(IntegerElement):
@@ -405,7 +405,7 @@ class DateElement(IntegerElement):
         return encoding.encodeDate(data, length)
 
 
-# ==============================================================================
+# =============================================================================
 
 
 class BinaryElement(Element):
@@ -419,7 +419,7 @@ class BinaryElement(Element):
         return self.size
 
 
-# ==============================================================================
+# =============================================================================
 
 
 class VoidElement(BinaryElement):
@@ -439,7 +439,7 @@ class VoidElement(BinaryElement):
         return bytearray(b'\xff' * length)
 
 
-# ==============================================================================
+# =============================================================================
 
 
 class UnknownElement(BinaryElement):
@@ -458,15 +458,15 @@ class UnknownElement(BinaryElement):
             most cases, elements should be created when a `Document` is loaded,
             rather than instantiated explicitly.
 
-            @keyword stream: A file-like object containing EBML data.
-            @keyword offset: The element's starting location in the file.
-            @keyword size: The size of the whole element.
-            @keyword payloadOffset: The starting location of the element's
+            :keyword stream: A file-like object containing EBML data.
+            :keyword offset: The element's starting location in the file.
+            :keyword size: The size of the whole element.
+            :keyword payloadOffset: The starting location of the element's
                 payload (i.e. immediately after the element's header).
-            @keyword id: The unknown element's ID. Unlike 'normal' elements,
+            :keyword id: The unknown element's ID. Unlike 'normal' elements,
                 in which ID is a class attribute, each UnknownElement instance
                 explicitly defines this.
-            @keyword schema: The schema used to load the element. Specified
+            :keyword schema: The schema used to load the element. Specified
                 explicitly because `UnknownElement`s are not part of any
                 schema.
         """
@@ -490,7 +490,7 @@ class UnknownElement(BinaryElement):
             return False
 
 
-# ==============================================================================
+# =============================================================================
 
 
 class MasterElement(Element):
@@ -513,12 +513,12 @@ class MasterElement(Element):
             object, and then return it and the offset of the next element
             (this element's position + size).
 
-            @param stream: The source file-like stream.
-            @keyword nocache: If `True`, the parsed element's `precache`
+            :param stream: The source file-like stream.
+            :keyword nocache: If `True`, the parsed element's `precache`
                 attribute is ignored, and the element's value will not be
                 cached. For faster iteration when the element value doesn't
                 matter (e.g. counting child elements).
-            @return: The parsed element and the offset of the next element
+            :returns: The parsed element and the offset of the next element
                 (i.e. the end of the parsed element).
         """
         offset = stream.tell()
@@ -687,14 +687,14 @@ class MasterElement(Element):
     def encode(cls, data, length=None, lengthSize=None, infinite=False):
         """ Encode an EBML master element.
 
-            @param data: The data to encode, provided as a dictionary keyed by
+            :param data: The data to encode, provided as a dictionary keyed by
                 element name, a list of two-item name/value tuples, or a list
                 of either. Note: individual items in a list of name/value
                 pairs *must* be tuples!
-            @keyword infinite: If `True`, the element will be written with an
+            :keyword infinite: If `True`, the element will be written with an
                 undefined size. When parsed, its end will be determined by the
                 occurrence of an invalid child element (or end-of-file).
-            @return: A bytearray containing the encoded EBML binary.
+            :returns: A bytearray containing the encoded EBML binary.
         """
         # TODO: Use 'length' to automatically generate `Void` element?
         if isinstance(data, list) and len(data) > 0 and isinstance(data[0], list):
@@ -720,7 +720,7 @@ class MasterElement(Element):
             will be lost; a file containing elements ``A1 B1 A2 B2 A3 B3`` will
             result in``[A1 A2 A3][B1 B2 B3]``.
 
-            @todo: Decide if this should be in the `util` submodule. It is
+            :todo: Decide if this should be in the `util` submodule. It is
                 very specific, and it isn't totally necessary for the core
                 library.
         """
@@ -733,9 +733,9 @@ class MasterElement(Element):
         return result
 
 
-# ==============================================================================
+# =============================================================================
 #
-# ==============================================================================
+# =============================================================================
 
 
 class Document(MasterElement):
@@ -748,13 +748,13 @@ class Document(MasterElement):
             In most cases, `Schema.load()` should be used instead of
             explicitly instantiating a `Document`.
 
-            @param stream: A stream object (e.g. a file) from which to read
+            :param stream: A stream object (e.g. a file) from which to read
                 the EBML content.
-            @keyword name: The name of the document. Defaults to the filename
+            :keyword name: The name of the document. Defaults to the filename
                 (if applicable).
-            @keyword size: The size of the document, in bytes. Use if the
+            :keyword size: The size of the document, in bytes. Use if the
                 stream is neither a file or a `BytesIO` object.
-            @keyword headers: If `False`, the file's ``EBML`` header element
+            :keyword headers: If `False`, the file's ``EBML`` header element
                 (if present) will not appear as a root element in the document.
                 The contents of the ``EBML`` element will always be read,
                 regardless, and stored in the Document's `info` attribute.
@@ -903,7 +903,7 @@ class Document(MasterElement):
         """ Create the default EBML 'header' elements for a Document, using
             the default values in the schema.
 
-            @return: A dictionary containing a single key (``EBML``) with a
+            :returns: A dictionary containing a single key (``EBML``) with a
                 dictionary as its value. The child dictionary contains
                 element names and values.
         """
@@ -927,11 +927,11 @@ class Document(MasterElement):
     def encode(cls, stream, data, headers=False, **kwargs):
         """ Encode an EBML document.
 
-            @param value: The data to encode, provided as a dictionary keyed
+            :param value: The data to encode, provided as a dictionary keyed
                 by element name, or a list of two-item name/value tuples.
                 Note: individual items in a list of name/value pairs *must*
                 be tuples!
-            @return: A bytearray containing the encoded EBML binary.
+            :returns: A bytearray containing the encoded EBML binary.
         """
         if headers is True:
             stream.write(cls.encodePayload(cls._createHeaders()))
@@ -948,9 +948,9 @@ class Document(MasterElement):
             stream.write(cls.encodePayload(data))
 
 
-# ==============================================================================
+# =============================================================================
 #
-# ==============================================================================
+# =============================================================================
 
 
 class Schema(object):
@@ -958,23 +958,23 @@ class Schema(object):
         the document and element types, this is not a base class; all schemata
         are actual instances of this class.
 
-        @ivar document: The schema's Document subclass.
-        @ivar elements: A dictionary mapping element IDs to the schema's
+        :ivar document: The schema's Document subclass.
+        :ivar elements: A dictionary mapping element IDs to the schema's
             corresponding `Element` subclasses.
-        @ivar elementsByName: A dictionary mapping element names to the
+        :ivar elementsByName: A dictionary mapping element names to the
             schema's corresponding `Element` subclasses.
-        @ivar elementInfo: A dictionary mapping IDs to the raw schema
+        :ivar elementInfo: A dictionary mapping IDs to the raw schema
             attribute data. It may have additional items not present in the
             created element class' attributes.
 
-        @ivar UNKNOWN: A class/function that handles unknown element IDs. By
+        :ivar UNKNOWN: A class/function that handles unknown element IDs. By
             default, this is the `UnknownElement` class. Special-case handling
             can be done by substituting a different class, or an
             element-producing factory function.
 
-        @ivar source: The source from which the Schema was loaded; either a
+        :ivar source: The source from which the Schema was loaded; either a
             filename or a file-like stream.
-        @ivar filename: The absolute path of the source file, if the source
+        :ivar filename: The absolute path of the source file, if the source
             was a file or a filename.
     """
 
@@ -1011,9 +1011,9 @@ class Schema(object):
     def __init__(self, source, name=None):
         """ Constructor. Creates a new Schema from a schema description XML.
 
-            @param source: The Schema's source, either a string with the full
+            :param source: The Schema's source, either a string with the full
                 path and name of the schema XML file, or a file-like stream.
-            @keyword name: The schema's name. Defaults to the document type
+            :keyword name: The schema's name. Defaults to the document type
                 element's default value (if defined) or the base file name.
         """
         self.source = source
@@ -1130,21 +1130,21 @@ class Schema(object):
             schema must contain the required ID, name, and type; successive
             appearances only need the ID and/or name.
 
-            @param eid: The element's EBML ID.
-            @param ename: The element's name.
-            @keyword multiple: If `True`, an EBML document can contain more
+            :param eid: The element's EBML ID.
+            :param ename: The element's name.
+            :keyword multiple: If `True`, an EBML document can contain more
                 than one of this element. Not currently enforced.
-            @keyword mandatory: If `True`, a valid EBML document requires one
+            :keyword mandatory: If `True`, a valid EBML document requires one
                 (or more) of this element. Not currently enforced.
-            @keyword length: A fixed length to use when writing the element.
+            :keyword length: A fixed length to use when writing the element.
                 `None` will use the minimum length required.
-            @keyword precache: If `True`, the element's value will be read
+            :keyword precache: If `True`, the element's value will be read
                 when the element is parsed, rather than when the value is
                 explicitly accessed. Can save time for small elements.
-            @keyword attribs: A dictionary of raw element attributes, as read
+            :keyword attribs: A dictionary of raw element attributes, as read
                 from the schema file.
-            @keyword parent: The new element's parent element class.
-            @keyword docs: The new element's docstring (e.g. the defining XML
+            :keyword parent: The new element's parent element class.
+            :keyword docs: The new element's docstring (e.g. the defining XML
                 element's text content).
         """
 
@@ -1279,10 +1279,10 @@ class Schema(object):
     def load(self, fp, name=None, headers=False, **kwargs):
         """ Load an EBML file using this Schema.
 
-            @param fp: A file-like object containing the EBML to load, or the
+            :param fp: A file-like object containing the EBML to load, or the
                 name of an EBML file.
-            @keyword name: The name of the document. Defaults to filename.
-            @keyword headers: If `False`, the file's ``EBML`` header element
+            :keyword name: The name of the document. Defaults to filename.
+            :keyword headers: If `False`, the file's ``EBML`` header element
                 (if present) will not appear as a root element in the
                 document. The contents of the ``EBML`` element will always be
                 read.
@@ -1295,8 +1295,8 @@ class Schema(object):
     def loads(self, data, name=None):
         """ Load EBML from a string using this Schema.
 
-            @param data: A string or bytearray containing raw EBML data.
-            @keyword name: The name of the document. Defaults to the Schema's
+            :param data: A string or bytearray containing raw EBML data.
+            :keyword name: The name of the document. Defaults to the Schema's
                 document class name.
         """
         return self.load(BytesIO(data), name=name)
@@ -1304,12 +1304,12 @@ class Schema(object):
     def __call__(self, fp, name=None):
         """ Load an EBML file using this Schema. Same as `Schema.load()`.
 
-            @todo: Decide if this is worth keeping. It exists for historical
+            :todo: Decide if this is worth keeping. It exists for historical
                 reasons that may have been refactored out.
 
-            @param fp: A file-like object containing the EBML to load, or the
+            :param fp: A file-like object containing the EBML to load, or the
                 name of an EBML file.
-            @keyword name: The name of the document. Defaults to filename.
+            :keyword name: The name of the document. Defaults to filename.
         """
         return self.load(fp, name=name)
 
@@ -1342,9 +1342,9 @@ class Schema(object):
         """ Write an EBML document using this Schema to a file or file-like
             stream.
 
-            @param stream: The file (or ``.write()``-supporting file-like
+            :param stream: The file (or ``.write()``-supporting file-like
                 object) to which to write the encoded EBML.
-            @param value: The data to encode, provided as a dictionary keyed by
+            :param value: The data to encode, provided as a dictionary keyed by
                 element name, or a list of two-item name/value tuples. Note:
                 individual items in a list of name/value pairs *must* be tuples!
         """
@@ -1354,10 +1354,10 @@ class Schema(object):
     def encodes(self, data, headers=False):
         """ Create an EBML document using this Schema, returned as a string.
 
-            @param value: The data to encode, provided as a dictionary keyed by
+            :param value: The data to encode, provided as a dictionary keyed by
                 element name, or a list of two-item name/value tuples. Note:
                 individual items in a list of name/value pairs *must* be tuples!
-            @return: A string containing the encoded EBML binary.
+            :returns: A string containing the encoded EBML binary.
         """
         stream = BytesIO()
         self.encode(stream, data, headers=headers)
@@ -1383,20 +1383,20 @@ class Schema(object):
         return _crawl(self.loads(data))
 
 
-# ==============================================================================
+# =============================================================================
 #
-# ==============================================================================
+# =============================================================================
 
 
 def loadSchema(filename, reload=False, **kwargs):
     """ Import a Schema XML file. Loading the same file more than once will
         return the initial instantiation, unless `reload` is `True`.
 
-        @param filename: The name of the Schema XML file. If the file cannot
+        :param filename: The name of the Schema XML file. If the file cannot
             be found and file's path is not absolute, the paths listed in
             `SCHEMA_PATH` will be searched (similar to `sys.path` when importing
             modules).
-        @keyword reload: If `True`, the resulting Schema is guaranteed to be
+        :keyword reload: If `True`, the resulting Schema is guaranteed to be
             new. Note: existing references to previous instances of the Schema
             and/or its elements will not update.
 
