@@ -6,6 +6,9 @@
 Welcome to ebmlite's documentation!
 ===================================
 
+EBMLite: A lightweight EBML parsing library. It is designed to crawl through EBML
+files quickly and efficiently, and that’s about it.
+
 .. toctree::
    :maxdepth: 2
    :caption: Readme:
@@ -19,7 +22,7 @@ Welcome to ebmlite's documentation!
    ebmlite/core
    ebmlite/decoding
    ebmlite/encoding
-   ebmlite/utils
+   ebmlite/util
 
 
 

@@ -1,5 +1,5 @@
 utils
 ===================
 
-.. automodule:: ebmlite.utils
+.. automodule:: ebmlite.util
    :members:

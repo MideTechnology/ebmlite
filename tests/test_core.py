@@ -8,6 +8,8 @@ from ebmlite.core import loadSchema, BinaryElement, DateElement, Element, FloatE
         IntegerElement, MasterElement, StringElement, UIntegerElement, \
         UnicodeElement, VoidElement, UnknownElement
 
+from .file_streams import makeStreamLike, FILE_DICT
+
 
 
 class testCoreElement(unittest.TestCase):
@@ -612,7 +614,7 @@ class testDocument(unittest.TestCase):
         """ Set up a Schema from mide_ide.xml and create a Document from an IDE file. """
 
         self.schema = loadSchema('./ebmlite/schemata/mide_ide.xml')
-        self.doc = self.schema.load('./tests/SSX46714-doesnot.IDE')
+        self.doc = self.schema.load(makeStreamLike('./tests/SSX46714-doesnot.IDE'))
 
         self.stream = BytesIO(b'test')
 
@@ -706,7 +708,7 @@ class testSchema(unittest.TestCase):
     def testLoad(self):
         """ Test loading EMBL files with a Schema. """
 
-        ide = self.schema.load('./tests/SSX46714-doesnot.IDE')
+        ide = self.schema.load(makeStreamLike('./tests/SSX46714-doesnot.IDE'))
         self.assertEqual({'DocTypeVersion': 2,    'EBMLVersion': 1,
                           'EBMLMaxIDLength': 4,   'EBMLReadVersion': 1,
                           'EBMLMaxSizeLength': 8, 'DocTypeReadVersion': 2,
@@ -718,9 +720,7 @@ class testSchema(unittest.TestCase):
     def testLoads(self):
         """ Test laoding EBML strings with a Schema. """
 
-        with open('./tests/SSX46714-doesnot.IDE', 'rb') as f:
-            s = f.read()
-        ide = self.schema.loads(s)
+        ide = self.schema.loads(FILE_DICT['./tests/SSX46714-doesnot.IDE'][0])
         self.assertEqual(dict(ide.info),
                          {'DocTypeVersion':2, 'EBMLVersion':1,
                           'EBMLMaxIDLength':4, 'EBMLReadVersion':1,
