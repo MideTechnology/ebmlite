@@ -105,7 +105,7 @@ def xml2ebml():
     args = argparser.parse_args()
 
     with load_files(args) as (schema, out):
-        xml2ebml(args.input, out, schema)  # , sizeLength=4, headers=True, unknown=True)
+        util.xml2ebml(args.input, out, schema)  # , sizeLength=4, headers=True, unknown=True)
 
 
 def view_ebml():
