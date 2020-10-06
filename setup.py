@@ -38,6 +38,11 @@ setuptools.setup(
         package_data={
             '': ['schemata/*']
         },
+        entry_points={'console_scripts': [
+            'view-ebml=ebmlite.cli:view_ebml',
+            'ebml2xml=ebmlite.cli:ebml2xml',
+            'xml2ebml=ebmlite.cli:xml2ebml',
+        ]},
         test_suite='tests',
         install_requires=INSTALL_REQUIRES,
         extras_require={
