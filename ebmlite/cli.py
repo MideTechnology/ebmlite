@@ -18,34 +18,6 @@ def errPrint(msg):
     exit(1)
 
 
-def add_common_argparser_params(argparser):
-    argparser.add_argument(
-        'input',
-        metavar="[FILE.ebml|FILE.xml]",
-        help="The source file: XML for 'xml2ebml,' EBML for 'ebml2xml' or 'view.'",
-    )
-    argparser.add_argument(
-        'schema',
-        metavar="SCHEMA.xml",
-        help=(
-          "The name of the schema file. Only the name itself is required if the "
-          "schema file is in the standard schema directory."
-        ),
-    )
-    argparser.add_argument(
-        '-o', '--output',
-        metavar="[FILE.xml|FILE.ebml]",
-        help="The output file.",
-    )
-    argparser.add_argument(
-        '-c', '--clobber',
-        action="store_true",
-        help="Clobber (overwrite) existing files.",
-    )
-
-    return argparser
-
-
 @contextlib.contextmanager
 def load_files(args):
     if not os.path.exists(args.input):
@@ -75,11 +47,26 @@ def ebml2xml():
     argparser = argparse.ArgumentParser(
         description="A tool for converting ebml to xml."
     )
-    add_common_argparser_params(argparser)
     argparser.add_argument(
-        '-p', '--pretty',
-        action="store_true",
-        help="Generate 'pretty' XML with ebml2xml.",
+        'schema',
+        metavar="SCHEMA.xml",
+        help=(
+          "The name of the schema file. Only the name itself is required if"
+          " the schema file is in the standard schema directory."
+        ),
+    )
+    argparser.add_argument(
+        'input', metavar="FILE.ebml", help="The source EBML file.",
+    )
+    argparser.add_argument(
+        '-o', '--output', metavar="FILE.xml", help="The output file.",
+    )
+    argparser.add_argument(
+        '-c', '--clobber', action="store_true",
+        help="Clobber (overwrite) existing files.",
+    )
+    argparser.add_argument(
+        '-p', '--pretty', action="store_true", help="Generate 'pretty' XML.",
     )
     args = argparser.parse_args()
 
@@ -97,7 +84,24 @@ def xml2ebml():
     argparser = argparse.ArgumentParser(
         description="A tool for converting xml to ebml."
     )
-    add_common_argparser_params(argparser)
+    argparser.add_argument(
+        'input', metavar="FILE.xml", help="The source XML file.",
+    )
+    argparser.add_argument(
+        'schema',
+        metavar="SCHEMA.xml",
+        help=(
+          "The name of the schema file. Only the name itself is required if"
+          " the schema file is in the standard schema directory."
+        ),
+    )
+    argparser.add_argument(
+        '-o', '--output', metavar="FILE.ebml", help="The output file.",
+    )
+    argparser.add_argument(
+        '-c', '--clobber', action="store_true",
+        help="Clobber (overwrite) existing files.",
+    )
     args = argparser.parse_args()
 
     with load_files(args) as (schema, out):
@@ -108,7 +112,24 @@ def view_ebml():
     argparser = argparse.ArgumentParser(
         description="A tool for reading ebml file content."
     )
-    add_common_argparser_params(argparser)
+    argparser.add_argument(
+        'input', metavar="FILE.xml", help="The source XML file.",
+    )
+    argparser.add_argument(
+        'schema',
+        metavar="SCHEMA.xml",
+        help=(
+          "The name of the schema file. Only the name itself is required if"
+          " the schema file is in the standard schema directory."
+        ),
+    )
+    argparser.add_argument(
+        '-o', '--output', metavar="FILE.ebml", help="The output file.",
+    )
+    argparser.add_argument(
+        '-c', '--clobber', action="store_true",
+        help="Clobber (overwrite) existing files.",
+    )
     args = argparser.parse_args()
 
     with load_files(args) as (schema, out):
