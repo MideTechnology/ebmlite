@@ -19,7 +19,7 @@ def errPrint(msg):
 
 
 @contextlib.contextmanager
-def load_files(args):
+def load_files(args, binary_output=False):
     if not os.path.exists(args.input):
         sys.stderr.write("Input file does not exist: %s\n" % args.input)
         exit(1)
@@ -36,7 +36,7 @@ def load_files(args):
     output = os.path.realpath(os.path.expanduser(args.output))
     if os.path.exists(output) and not args.clobber:
         errPrint("Output file exists: %s" % args.output)
-    with open(output, 'wb') as out:
+    with open(output, ('wb' if binary_output else 'w')) as out:
         yield (schema, out)
 
 
@@ -76,7 +76,7 @@ def ebml2xml():
 
     args = argparser.parse_args()
 
-    with load_files(args) as (schema, out):
+    with load_files(args, binary_output=not args.pretty) as (schema, out):
         doc = schema.load(args.input, headers=True)
         if args.min:
             root = util.toXml(doc, offsets=False, sizes=False, types=False, ids=False)
@@ -113,7 +113,7 @@ def xml2ebml():
     )
     args = argparser.parse_args()
 
-    with load_files(args) as (schema, out):
+    with load_files(args, binary_output=True) as (schema, out):
         util.xml2ebml(args.input, out, schema)  # , sizeLength=4, headers=True, unknown=True)
 
 
@@ -141,6 +141,6 @@ def view_ebml():
     )
     args = argparser.parse_args()
 
-    with load_files(args) as (schema, out):
+    with load_files(args, binary_output=True) as (schema, out):
         doc = schema.load(args.input, headers=True)
         util.pprint(doc, out=out)
