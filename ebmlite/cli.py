@@ -2,7 +2,7 @@ import contextlib
 import sys
 from xml.etree import ElementTree as ET
 
-import ebmlite
+from . import core, util
 
 import argparse
 import os.path
@@ -25,7 +25,7 @@ def load_files(args):
         exit(1)
 
     try:
-        schema = ebmlite.core.loadSchema(args.schema)
+        schema = core.loadSchema(args.schema)
     except IOError as err:
         errPrint("Error loading schema: %s\n" % err)
 
@@ -72,7 +72,7 @@ def ebml2xml():
 
     with load_files(args) as (schema, out):
         doc = schema.load(args.input, headers=True)
-        root = ebmlite.util.toXml(doc)  # , offsets, sizes, types, ids)
+        root = util.toXml(doc)  # , offsets, sizes, types, ids)
         s = ET.tostring(root, encoding="utf-8")
         if args.pretty:
             parseString(s).writexml(out, addindent=b'\t', newl=b'\n', encoding=b'utf-8')
@@ -134,4 +134,4 @@ def view_ebml():
 
     with load_files(args) as (schema, out):
         doc = schema.load(args.input, headers=True)
-        ebmlite.util.pprint(doc, out=out)
+        util.pprint(doc, out=out)
