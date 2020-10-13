@@ -113,7 +113,7 @@ def view_ebml():
         description="A tool for reading ebml file content."
     )
     argparser.add_argument(
-        'input', metavar="FILE.xml", help="The source XML file.",
+        'input', metavar="FILE.ebml", help="The source XML file.",
     )
     argparser.add_argument(
         'schema',
@@ -124,7 +124,7 @@ def view_ebml():
         ),
     )
     argparser.add_argument(
-        'output', metavar="FILE.ebml", help="The output file.",
+        'output', metavar="FILE.xml", help="The output file.",
     )
     argparser.add_argument(
         '-c', '--clobber', action="store_true",
