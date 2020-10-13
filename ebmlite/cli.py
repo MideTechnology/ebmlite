@@ -96,7 +96,7 @@ def xml2ebml():
         ),
     )
     argparser.add_argument(
-        'output', metavar="FILE.ebml", help="The output file.",
+        '-o', '--output', metavar="FILE.ebml", help="The output file.",
     )
     argparser.add_argument(
         '-c', '--clobber', action="store_true",
@@ -124,7 +124,7 @@ def view_ebml():
         ),
     )
     argparser.add_argument(
-        'output', metavar="FILE.xml", help="The output file.",
+        '-o', '--output', metavar="FILE.xml", help="The output file.",
     )
     argparser.add_argument(
         '-c', '--clobber', action="store_true",
