@@ -166,6 +166,14 @@ class Element(object):
         except AttributeError:
             return False
 
+    def iter_hierarchy(self):
+        """
+        Iterate over all elements, including each elements ancestry.
+
+        This function is recursively called by `Master.iter_hierarchy`.
+        """
+        yield [self]
+
     @property
     def value(self):
         """ Parse and cache the element's value. """
@@ -615,6 +623,12 @@ class MasterElement(Element):
                 if "ord()" in str(err):
                     break
                 raise
+
+    def iter_hierarchy(self):
+        should_skip = yield [self]
+        if not should_skip:
+            for subelements in self.iter_hierarchy():
+                yield [self] + subelements
 
     def __len__(self):
         """ x.__len__() <==> len(x)
