@@ -645,11 +645,11 @@ class MasterElement(Element):
             iter_subhierarchy = subelement.iter_hierarchy()
 
             should_skip = None  # must start an iterator by sending `None`
-            while True:
-                try:
+            try:
+                while True:
                     should_skip = yield [self] + iter_subhierarchy.send(should_skip)
-                except StopIteration:
-                    break
+            except StopIteration:
+                continue
 
     def __len__(self):
         """ x.__len__() <==> len(x)
