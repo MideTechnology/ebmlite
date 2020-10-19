@@ -625,11 +625,23 @@ class MasterElement(Element):
                 raise
 
     def iter_hierarchy(self):
-        yield [self]
+        should_skip = yield [self]
+        if should_skip:
+            return
 
         for subelement in self:
-            for subhierarchy in subelement.iter_hierarchy():
-                yield [self] + subhierarchy
+            iter_subhierarchy = subelement.iter_hierarchy()
+
+            try:
+                should_skip = yield [self] + next(iter_subhierarchy)
+            except StopIteration:
+                continue
+
+            while True:
+                try:
+                    should_skip = yield [self] + iter_subhierarchy.send(should_skip)
+                except StopIteration:
+                    break
 
     def __len__(self):
         """ x.__len__() <==> len(x)
