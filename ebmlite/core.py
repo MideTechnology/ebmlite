@@ -811,6 +811,14 @@ class Document(MasterElement):
         return "<%s %r at 0x%08X>" % (self.__class__.__name__, self.name,
                                       id(self))
 
+    def __enter__(self):
+        """Enter context manager for this document."""
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        """Close this document on exiting context manager."""
+        self.close()
+
     def close(self):
         """ Close the EBML file. Should generally be used only if the object
             was created using a filename, rather than a stream.
