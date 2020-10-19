@@ -644,7 +644,7 @@ class MasterElement(Element):
         for subelement in self:
             iter_subhierarchy = subelement.iter_hierarchy()
 
-            should_skip = yield [self] + next(iter_subhierarchy)  # always yields at least one item (i.e., `subelement`)
+            should_skip = None  # must start an iterator by sending `None`
             while True:
                 try:
                     should_skip = yield [self] + iter_subhierarchy.send(should_skip)
