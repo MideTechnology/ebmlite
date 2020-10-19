@@ -168,9 +168,10 @@ class Element(object):
 
     def iter_hierarchy(self):
         """
-        Iterate over all elements, including each elements ancestry.
+        Iterate over all elements, yielding each element's ancestry.
 
-        This function is recursively called by `Master.iter_hierarchy`.
+        This function is recursively called by `Master.iter_hierarchy`; see
+        docstring for `Master.iter_hierarchy` for more details.
         """
         yield [self]
 
@@ -625,6 +626,17 @@ class MasterElement(Element):
                 raise
 
     def iter_hierarchy(self):
+        """
+        Iterate depth-first over all elements, yielding for each element its
+        hierarchical path from the root document.
+
+        :send: whether the current element's descendants should be skipped;
+            defaults to None -> False
+        :send type: bool
+        :yield: the hierarchical path to an element from the document root for
+            every element in the document
+        :yield type: list
+        """
         should_skip = yield [self]
         if should_skip:
             return
