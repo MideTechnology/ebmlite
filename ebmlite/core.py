@@ -51,6 +51,7 @@ import errno
 import os.path
 from io import BytesIO
 from xml.etree import ElementTree as ET
+import warnings
 
 from .decoding import readElementID, readElementSize
 from .decoding import readFloat, readInt, readUInt, readDate
@@ -819,10 +820,10 @@ class Document(MasterElement):
         object needs no such cleanup.
         """
         if not hasattr(self.stream, 'close'):
-            raise TypeError(
+            warnings.warn(UserWarning(
                 "invalid stream object for context management"
                 " (expected a stream object with a `close` method)"
-            )
+            ))
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
