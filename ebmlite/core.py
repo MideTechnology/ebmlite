@@ -632,11 +632,7 @@ class MasterElement(Element):
         for subelement in self:
             iter_subhierarchy = subelement.iter_hierarchy()
 
-            try:
-                should_skip = yield [self] + next(iter_subhierarchy)
-            except StopIteration:
-                continue
-
+            should_skip = yield [self] + next(iter_subhierarchy)  # always yields at least one item (i.e., `subelement`)
             while True:
                 try:
                     should_skip = yield [self] + iter_subhierarchy.send(should_skip)
