@@ -166,12 +166,12 @@ class Element(object):
         except AttributeError:
             return False
 
-    def iter_hierarchy(self):
+    def iterHierarchy(self):
         """
         Iterate over all elements, yielding each element's ancestry.
 
-        This function is recursively called by `Master.iter_hierarchy`; see
-        docstring for `Master.iter_hierarchy` for more details.
+        This function is recursively called by `Master.iterHierarchy`; see
+        docstring for `Master.iterHierarchy` for more details.
         """
         yield [self]
 
@@ -625,7 +625,7 @@ class MasterElement(Element):
                     break
                 raise
 
-    def iter_hierarchy(self):
+    def iterHierarchy(self):
         """
         Iterate depth-first over all elements, yielding for each element its
         hierarchical path from the root document.
@@ -642,7 +642,7 @@ class MasterElement(Element):
             return
 
         for subelement in self:
-            iter_subhierarchy = subelement.iter_hierarchy()
+            iter_subhierarchy = subelement.iterHierarchy()
 
             should_skip = None  # must start an iterator by sending `None`
             try:
