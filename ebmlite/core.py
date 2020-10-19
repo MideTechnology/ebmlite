@@ -166,7 +166,7 @@ class Element(object):
         except AttributeError:
             return False
 
-    def iterHierarchy(self):
+    def iterHierarchy(self, nocache=False):
         """
         Iterate over all elements, yielding each element's ancestry.
 
@@ -625,11 +625,12 @@ class MasterElement(Element):
                     break
                 raise
 
-    def iterHierarchy(self):
+    def iterHierarchy(self, nocache=False):
         """
         Iterate depth-first over all elements, yielding for each element its
         hierarchical path from the root document.
 
+        :param nocache: whether to skip parser caching (defaults to False)
         :send: whether the current element's descendants should be skipped;
             defaults to None -> False
         :send type: bool
@@ -641,8 +642,8 @@ class MasterElement(Element):
         if should_skip:
             return
 
-        for subelement in self:
-            iter_subhierarchy = subelement.iterHierarchy()
+        for subelement in self.__iter__(nocache=nocache):
+            iter_subhierarchy = subelement.iterHierarchy(nocache=nocache)
 
             should_skip = None  # must start an iterator by sending `None`
             try:
