@@ -621,8 +621,14 @@ class testDocument(unittest.TestCase):
     def testEnterExit(self):
         """Test using the document in a context manager."""
 
+        class CustomException(Exception):
+            pass
+
         self.assertFalse(self.doc.stream.closed)
-        with self.doc:
+        try:
+            with self.doc:
+                raise CustomException()
+        except CustomException:
             pass
         self.assertTrue(self.doc.stream.closed)
 
