@@ -618,6 +618,16 @@ class testDocument(unittest.TestCase):
 
 
 
+    def testEnterExit(self):
+        """Test using the document in a context manager."""
+
+        self.assertFalse(self.doc.stream.closed)
+        with self.doc:
+            pass
+        self.assertTrue(self.doc.stream.closed)
+
+
+
     def testClose(self):
         """ Test closing the stream in a Document """
 
