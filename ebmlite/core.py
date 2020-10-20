@@ -812,17 +812,7 @@ class Document(MasterElement):
                                       id(self))
 
     def __enter__(self):
-        """
-        Enter context manager for this document.
-
-        Expects to clean up `self.stream` object; raises an error if stream
-        object needs no such cleanup.
-        """
-        if not hasattr(self.stream, 'close'):
-            raise TypeError(
-                "invalid stream object for context management"
-                " (expected a stream object with a `close` method)"
-            )
+        """Enter context manager for this document."""
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
