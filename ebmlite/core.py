@@ -812,11 +812,13 @@ class Document(MasterElement):
                                       id(self))
 
     def __enter__(self):
-        """Enter context manager for this document."""
+        """ Enter context manager for this document.
+        """
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
-        """Close this document on exiting context manager."""
+        """ Close this document on exiting context manager.
+        """
         self.close()
 
     def close(self):
