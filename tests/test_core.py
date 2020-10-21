@@ -641,6 +641,11 @@ class testDocument(unittest.TestCase):
         self.doc.close()
         self.assertTrue(self.doc.stream.closed)
 
+        with open('./tests/SSX46714-doesnot.IDE', 'rb') as file:
+            doc = self.schema.load(file)
+            self.assertFalse(file.closed)
+            doc.close()
+            self.assertFalse(file.closed)
 
 
     def testValue(self):
