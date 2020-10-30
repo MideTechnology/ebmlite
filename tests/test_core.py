@@ -646,6 +646,7 @@ class testDocument(unittest.TestCase):
             self.assertFalse(file.closed)
             doc.close()
             self.assertFalse(file.closed)
+            doc.close()
 
 
     def testValue(self):
