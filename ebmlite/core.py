@@ -743,7 +743,7 @@ class Document(MasterElement):
         Loading a `Schema` generates a subclass.
     """
 
-    def __init__(self, stream, name=None, size=None, headers=True, ownsStream=False):
+    def __init__(self, stream, name=None, size=None, headers=True):
         """ Constructor. Instantiate a `Document` from a file-like stream.
             In most cases, `Schema.load()` should be used instead of
             explicitly instantiating a `Document`.
@@ -760,6 +760,11 @@ class Document(MasterElement):
                 regardless, and stored in the Document's `info` attribute.
             @keyword ownsStream: whether to close stream object on `close()`.
         """
+        self._ownsStream = False
+        if isinstance(stream, (str, bytes, bytearray)):
+            stream = open(stream, 'rb')
+            self._ownsStream = True
+
         if not all((hasattr(stream, 'read'),
                     hasattr(stream, 'tell'),
                     hasattr(stream, 'seek'))):
@@ -771,7 +776,6 @@ class Document(MasterElement):
         self.name = name
         self.id = None  # Not applicable to Documents.
         self.offset = self.payloadOffset = self.stream.tell()
-        self._ownsStream = ownsStream
 
         try:
             self.filename = stream.name
@@ -824,8 +828,8 @@ class Document(MasterElement):
         self.close()
 
     def close(self):
-        """ Close the EBML file. If the object doesn't own its data stream,
-            do nothing.
+        """ Close the EBML file. Close the underlying stream object only if it
+            was *not* provided explicitly in the constructor.
         """
         if self._ownsStream:
             self.stream.close()
@@ -1300,10 +1304,6 @@ class Schema(object):
                 document. The contents of the ``EBML`` element will always be
                 read.
         """
-        if isinstance(fp, (str, bytes, bytearray)):
-            fp = open(fp, 'rb')
-            kwargs['ownsStream'] = True
-
         return self.document(fp, name=name, headers=headers, **kwargs)
 
     def loads(self, data, name=None):
@@ -1313,7 +1313,7 @@ class Schema(object):
             @keyword name: The name of the document. Defaults to the Schema's
                 document class name.
         """
-        return self.load(BytesIO(data), name=name, ownsStream=True)
+        return self.load(BytesIO(data), name=name)
 
     def __call__(self, fp, name=None):
         """ Load an EBML file using this Schema. Same as `Schema.load()`.
