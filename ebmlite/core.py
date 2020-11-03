@@ -828,8 +828,9 @@ class Document(MasterElement):
         self.close()
 
     def close(self):
-        """ Close the EBML file. Close the underlying stream object only if it
-            was *not* provided explicitly in the constructor.
+        """ Closes the EBML file. If the `Document` was created using a
+            file/stream (as opposed to a filename), the source file/stream is
+            not closed.
         """
         if self._ownsStream:
             self.stream.close()
