@@ -618,13 +618,35 @@ class testDocument(unittest.TestCase):
 
 
 
+    def testEnterExit(self):
+        """Test using the document in a context manager."""
+
+        class CustomException(Exception):
+            pass
+
+        self.assertFalse(self.doc.stream.closed)
+        try:
+            with self.doc:
+                raise CustomException()
+        except CustomException:
+            pass
+        self.assertTrue(self.doc.stream.closed)
+
+
+
     def testClose(self):
         """ Test closing the stream in a Document """
 
         self.assertFalse(self.doc.stream.closed)
         self.doc.close()
         self.assertTrue(self.doc.stream.closed)
+        self.doc.close()
 
+        with open('./tests/SSX46714-doesnot.IDE', 'rb') as file:
+            doc = self.schema.load(file)
+            self.assertFalse(file.closed)
+            doc.close()
+            self.assertFalse(file.closed)
 
 
     def testValue(self):

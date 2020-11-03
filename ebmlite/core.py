@@ -758,7 +758,13 @@ class Document(MasterElement):
                 (if present) will not appear as a root element in the document.
                 The contents of the ``EBML`` element will always be read,
                 regardless, and stored in the Document's `info` attribute.
+            @keyword ownsStream: whether to close stream object on `close()`.
         """
+        self._ownsStream = False
+        if isinstance(stream, (str, bytes, bytearray)):
+            stream = open(stream, 'rb')
+            self._ownsStream = True
+
         if not all((hasattr(stream, 'read'),
                     hasattr(stream, 'tell'),
                     hasattr(stream, 'seek'))):
@@ -811,11 +817,23 @@ class Document(MasterElement):
         return "<%s %r at 0x%08X>" % (self.__class__.__name__, self.name,
                                       id(self))
 
-    def close(self):
-        """ Close the EBML file. Should generally be used only if the object
-            was created using a filename, rather than a stream.
+    def __enter__(self):
+        """ Enter context manager for this document.
         """
-        self.stream.close()
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        """ Close this document on exiting context manager.
+        """
+        self.close()
+
+    def close(self):
+        """ Closes the EBML file. If the `Document` was created using a
+            file/stream (as opposed to a filename), the source file/stream is
+            not closed.
+        """
+        if self._ownsStream:
+            self.stream.close()
 
     def __len__(self):
         """ x.__len__() <==> len(x)
@@ -1287,9 +1305,6 @@ class Schema(object):
                 document. The contents of the ``EBML`` element will always be
                 read.
         """
-        if isinstance(fp, (str, bytes, bytearray)):
-            fp = open(fp, 'rb')
-
         return self.document(fp, name=name, headers=headers, **kwargs)
 
     def loads(self, data, name=None):
