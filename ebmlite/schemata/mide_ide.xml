@@ -151,6 +151,9 @@
                     <!-- Elements unique to Plot -->
                     <StringElement name="SubChannelAxisName" id="0x5302" multiple="0" minver="2">Text name of the axis(?).</StringElement>
                     <UIntegerElement name="SubChannelAxisXRef" id="0x5303" multiple="0" minver="2">Reference to an Axis.</UIntegerElement>
+                    <StringElement name="SubChannelUnitsName" id="0x5304" multiple="0" minver="2">Text name of the sensor output units.</StringElement>
+                    <UIntegerElement name="SubChannelUnitsXRef" id="0x5305" multiple="0" minver="2">Reference to a numbered, standardized SI unit.</UIntegerElement>
+
                     <MasterElement name="PlotSource" id="0x5320" multiple="1" minver="2">List of channels/subchannels used by this Plot
                         <IntegerElement name="PlotChannelRef" id="0x5221" multiple="0" minver="2">SubChannelID</IntegerElement>
                         <IntegerElement name="PlotSubChannelRef" id="0x5222" multiple="0" minver="2">SubChannelID</IntegerElement>
@@ -279,9 +282,10 @@
         </MasterElement>
     </MasterElement>
 
-    <!-- New configuration data: pairs of config IDs and values. Duplicated from the config_ui.xml schema,
-    rather than attempting to parse one element with a different schema.. -->
     <MasterElement name="RecorderConfigurationList" id="0x18436668" global="1" multiple="0" mandatory="0">
+        New configuration data: pairs of config IDs and values. Duplicated from
+        the config_ui.xml schema, rather than attempting to parse one element
+        with a different schema.
         <MasterElement name="RecorderConfigurationItem" id="0x5008" multiple="1">
             <UIntegerElement name="ConfigID" id="0x5001" multiple="0"></UIntegerElement>
             <UIntegerElement name="BooleanValue" id="0x5100" multiple="0"></UIntegerElement>
@@ -293,6 +297,18 @@
         </MasterElement>
     </MasterElement>
 
+    <!-- Exported configuration data. Also not part of an IDE, but here for convenience. -->
+    <MasterElement name="ExportedConfigurationData" id="0x18436669" multiple="0" mandatory="0">
+        Exported configuration data. Also contains device information and
+        CONFIG.UI for compatibility.
+        <MasterElement name="RecorderConfigurationList" />
+        <MasterElement name="RecordingProperties" />
+        <BinaryElement name="ConfigUI" id="0x7777" mandatory="0" multiple="0">
+            Actually from the CONFIG.UI schema. Read as binary in this schema,
+            then parsed with the other one.
+        </BinaryElement>
+        <MasterElement name="Attribute" />
+    </MasterElement>
 
   <!-- Elements of the actual recording(s) (Session branch(es) of the file) -->
 
