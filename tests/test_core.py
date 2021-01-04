@@ -28,11 +28,11 @@ class testCoreElement(unittest.TestCase):
         self.mockStream = BytesIO(b'\x4f\x56\x71\xea')
 
         GenericElement = type('GenericElement', (Element,),
-                              {'id':0x4343, 'name':b'Generic Element',
+                              {'id': 0x4343, 'name': 'Generic Element',
                                'schema':loadSchema('./ebmlite/schemata/mide_ide.xml'),
-                               'mandatory':False, 'multiple':False,
-                               'precache':False, 'length':4, 'children':dict(),
-                               '__doc__':b'no'})
+                               'mandatory': False, 'multiple': False,
+                               'precache': False, 'length': 4, 'children': dict(),
+                               '__doc__': 'no'})
 
         self.element = GenericElement(stream=self.mockStream, offset=0, size=4,
                                payloadOffset=2)
@@ -126,11 +126,11 @@ class testIntElements(unittest.TestCase):
 
         mide_schema = loadSchema('mide_ide.xml')
         eclass1 = type('IntEl1Element', (IntegerElement,),
-                      {'id':0x7c, 'name':b'IntEl1', 'schema':mide_schema,
+                      {'id':0x7c, 'name': 'IntEl1', 'schema':mide_schema,
                        '__slots__': IntegerElement.__slots__})
 
         eclass2 = type('UIntEl1Element', (UIntegerElement,),
-                      {'id':0x7c, 'name':b'UIntEl1', 'schema':mide_schema,
+                      {'id':0x7c, 'name': 'UIntEl1', 'schema':mide_schema,
                        '__slots__': UIntegerElement.__slots__})
 
         self.intEl1 = eclass1(stream=self.mockStream, offset=0, size=4,
@@ -166,13 +166,13 @@ class testIntElements(unittest.TestCase):
         # Create IntegerElements
         mide_schema = loadSchema('mide_ide.xml')
         eclass1 = type('IntEl1Element', (IntegerElement,),
-                      {'id':0x7c, 'name':b'IntEl1', 'schema':mide_schema,
+                      {'id':0x7c, 'name': 'IntEl1', 'schema':mide_schema,
                        '__slots__': IntegerElement.__slots__})
         eclass2 = type('IntEl2Element', (IntegerElement,),
-                      {'id':0x7c, 'name':b'IntEl2', 'schema':mide_schema,
+                      {'id':0x7c, 'name': 'IntEl2', 'schema':mide_schema,
                        '__slots__': IntegerElement.__slots__})
         eclass3 = type('IntEl3Element', (IntegerElement,),
-                      {'id':0x7c, 'name':b'IntEl3', 'schema':mide_schema,
+                      {'id':0x7c, 'name': 'IntEl3', 'schema':mide_schema,
                        '__slots__': IntegerElement.__slots__})
 
         intEl1 = eclass1(stream=m1, offset=0, size=4, payloadOffset=2)
@@ -217,7 +217,7 @@ class testFloatElements(unittest.TestCase):
 
         mide_schema = loadSchema('mide_ide.xml')
         eclass1 = type('FloatEl1Element', (FloatElement,),
-                      {'id':0x7c, 'name':b'FloatEl1', 'schema':mide_schema,
+                      {'id':0x7c, 'name': 'FloatEl1', 'schema':mide_schema,
                        '__slots__': FloatElement.__slots__})
 
         self.floatEl = eclass1(stream=self.mockStream, offset=0, size=4,
@@ -264,15 +264,15 @@ class testStringElements(unittest.TestCase):
         matroska_schema = loadSchema('matroska.xml')
 
         eclass1 = type('StrEl1Element', (StringElement,),
-                      {'id':0x7c, 'name':b'StrEl1', 'schema':mide_schema,
+                      {'id':0x7c, 'name': 'StrEl1', 'schema': mide_schema,
                        '__slots__': StringElement.__slots__})
 
         eclass2 = type('StrEl2Element', (StringElement,),
-                      {'id':0x7c, 'name':b'StrEl2', 'schema':mide_schema,
+                      {'id':0x7c, 'name': 'StrEl2', 'schema': mide_schema,
                        '__slots__': StringElement.__slots__})
 
         eclass3 = type('StrEl3Element', (StringElement,),
-                      {'id':0x5e, 'name':b'StrEl3', 'schema':matroska_schema,
+                      {'id':0x5e, 'name': 'StrEl3', 'schema': matroska_schema,
                        '__slots__': StringElement.__slots__})
 
         self.strEl1 = eclass1(stream=self.mockStream, offset=0, size=4,
@@ -310,7 +310,7 @@ class testStringElements(unittest.TestCase):
         """ Test parsing StringElements. """
 
         self.mockStream.seek(2)
-        self.assertEqual(self.strEl1.parse(self.mockStream, 4), b'bork')
+        self.assertEqual(self.strEl1.parse(self.mockStream, 4), 'bork')
 
 
 
@@ -500,7 +500,7 @@ class testMasterElements(unittest.TestCase):
         """ Test parsing MasterElements. """
 
         eclass1 = type('MasterEl1Element', (MasterElement,),
-                      {'id':0x1A45DFA3, 'name':b'MasterEl1',
+                      {'id':0x1A45DFA3, 'name': 'MasterEl1',
                        'schema':self.element.schema,
                        '__slots__': MasterElement.__slots__})
 
@@ -669,9 +669,9 @@ class testDocument(unittest.TestCase):
     def testType(self):
         """ Test getting the type of a Document. """
 
-        self.assertEqual(self.doc.type, b'mide')
-        self.doc.info['DocType'] = b'bork'
-        self.assertEqual(self.doc.type, b'bork')
+        self.assertEqual(self.doc.type, 'mide')
+        self.doc.info['DocType'] = 'bork'
+        self.assertEqual(self.doc.type, 'bork')
 
 
 
@@ -732,7 +732,7 @@ class testSchema(unittest.TestCase):
         self.assertEqual({'DocTypeVersion': 2,    'EBMLVersion': 1,
                           'EBMLMaxIDLength': 4,   'EBMLReadVersion': 1,
                           'EBMLMaxSizeLength': 8, 'DocTypeReadVersion': 2,
-                          'DocType': b'mide'},
+                          'DocType': 'mide'},
                          dict(ide.info))
 
 
@@ -747,7 +747,7 @@ class testSchema(unittest.TestCase):
                          {'DocTypeVersion':2, 'EBMLVersion':1,
                           'EBMLMaxIDLength':4, 'EBMLReadVersion':1,
                           'EBMLMaxSizeLength':8, 'DocTypeReadVersion':2,
-                          'DocType': b'mide'})
+                          'DocType': 'mide'})
 
 
 
