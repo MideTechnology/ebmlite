@@ -349,7 +349,7 @@ class StringElement(Element):
         """ Type-specific helper function for parsing the element's payload.
             It is assumed the file pointer is at the start of the payload.
         """
-        return readString(stream, size)
+        return readUnicode(stream, size)
 
     @classmethod
     def encodePayload(cls, data, length=None):
