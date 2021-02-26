@@ -49,7 +49,7 @@ from collections import OrderedDict
 from datetime import datetime
 import errno
 import os.path
-from io import BytesIO, StringIO
+from io import BytesIO, StringIO, IOBase
 from xml.etree import ElementTree as ET
 
 from .decoding import readElementID, readElementSize
@@ -1448,14 +1448,13 @@ def loadSchema(filename, reload=False, **kwargs):
     return schema
 
 
-def parseSchema(string, name=None, reload=False, **kwargs):
-    """ Read Schema XML data from a string. Loading one with the same
-        `name` will return the initial instantiation, unless `reload`
-        is `True`. Calls to `loadSchema()` using a name previously
-        used with `parseSchema()` will also return the previously
-        instantiated Schema.
+def parseSchema(src, name=None, reload=False, **kwargs):
+    """ Read Schema XML data from a string or stream. Loading one with the
+        same `name` will return the initial instantiation, unless `reload`
+        is `True`. Calls to `loadSchema()` using a name previously used with
+        `parseSchema()` will also return the previously instantiated Schema.
 
-        @param string: The XML string.
+        @param src: The XML string, or a stream containing XML.
         @param name: The name of the schema. If none is supplied,
             the name defined within the schema will be used.
         @param reload: If `True`, the resulting Schema is guaranteed to be
@@ -1470,7 +1469,11 @@ def parseSchema(string, name=None, reload=False, **kwargs):
     if name in SCHEMATA and not reload:
         return SCHEMATA[name]
 
-    stream = StringIO(string)
+    if isinstance(src, IOBase):
+        stream = src
+    else:
+        stream = StringIO(src)
+
     schema = Schema(stream, **kwargs)
     name = name or schema.name
     SCHEMATA[name] = schema
