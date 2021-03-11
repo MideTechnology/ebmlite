@@ -178,7 +178,8 @@ class Test(unittest.TestCase):
         # Test IDs not already in schema
         for idClass in ranges.keys():
             ids = util.createID(schema, idClass, count=1000)
-            self.assertTrue(all(eid not in schema for eid in ids), f"createID() produced a used class {idClass} ID")
+            self.assertTrue(all(eid not in schema for eid in ids), "createID() produced a used class %s ID"
+                            % idClass)
 
         self.assertRaises(KeyError, util.createID, schema, 'E')
 
@@ -194,10 +195,12 @@ class Test(unittest.TestCase):
         # Test ID class range restrictions
         for idClass, (minId, maxId) in ranges.items():
             m = min(util.createID(schema, idClass, min=minId-50, count=100))
-            self.assertGreaterEqual(m, minId, "createID() generated out-of-range value ID for class {idClass}: {m}")
+            self.assertGreaterEqual(m, minId, "createID() generated out-of-range value ID for class %s: %s"
+                                    % (idClass, m))
 
             m = max(util.createID(schema, idClass, min=maxId-50, count=100))
-            self.assertLessEqual(m, maxId, "createID() generated out-of-range value ID for class {idClass}: {m}")
+            self.assertLessEqual(m, maxId, "createID() generated out-of-range value ID for class %s: %s"
+                                 % (idClass, m))
 
 
 if __name__ == "__main__":
