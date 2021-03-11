@@ -1,8 +1,9 @@
-'''
+"""
 Created on Aug 14, 2017
 
 @author: dstokes
-'''
+"""
+
 import unittest
 import pytest
 from xml.dom.minidom import parseString
@@ -164,6 +165,39 @@ class Test(unittest.TestCase):
         # Compare as lists to narrow the location of any differences
         self.assertListEqual(xmlLines1[1:], xmlLines2[1:],
                              'One or more lines are different in the xml documents')
+
+    def testCreateID(self):
+        """ Test the EBML ID generation utility function. """
+        schema = core.loadSchema('matroska.xml')
+
+        ranges = dict(A=(0x80, 0xFF),
+                      B=(0x4000, 0x7FFF),
+                      C=(0x200000, 0x3FFFFF),
+                      D=(0x10000000, 0x1FFFFFFF))
+
+        # Test IDs not already in schema
+        for idClass in ranges.keys():
+            ids = util.createID(schema, idClass, count=1000)
+            self.assertTrue(all(eid not in schema for eid in ids), f"createID() produced a used class {idClass} ID")
+
+        self.assertRaises(KeyError, util.createID, schema, 'E')
+
+        # Test exclusion of indicated IDs
+        ids = util.createID(schema, 'A', count=100)
+        ids2 = util.createID(schema, 'A', count=100, exclude=ids)
+        self.assertTrue(len(ids2) == 0, "createID() failed to exclude specified IDs")
+
+        # Test count restriction.
+        # Note: May need changing if the Matroska schema is modified
+        self.assertTrue(4 < len(util.createID(schema, 'A', count=5)) <= 5)
+
+        # Test ID class range restrictions
+        for idClass, (minId, maxId) in ranges.items():
+            m = min(util.createID(schema, idClass, min=minId-50, count=100))
+            self.assertGreaterEqual(m, minId, "createID() generated out-of-range value ID for class {idClass}: {m}")
+
+            m = max(util.createID(schema, idClass, min=maxId-50, count=100))
+            self.assertLessEqual(m, maxId, "createID() generated out-of-range value ID for class {idClass}: {m}")
 
 
 if __name__ == "__main__":

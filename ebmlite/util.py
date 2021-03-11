@@ -31,16 +31,16 @@ from . import core, encoding
 # ==============================================================================
 
 
-def createID(idClass, schema, exclude=(), min=0x80, max=0x1FFFFFFF, count=1):
+def createID(schema, idClass, exclude=(), min=0x80, max=0x1FFFFFFF, count=1):
     """ Generate unique EBML IDs. Primarily intended for use 'offline' by
         humans creating EBML schemata.
 
+        :param schema: The `Schema` in which the new IDs must coexist.
         :param idClass: The EBML class of ID, one of (case-insensitive):
             * `'a'`: Class A (1 octet, base 0x8X)
             * `'b'`: Class B (2 octets, base 0x4000)
             * `'c'`: Class C (3 octets, base 0x200000)
             * `'d'`: Class D (4 octets, base 0x10000000)
-        :param schema: The `Schema` in which the new IDs must coexist.
         :param exclude: A list of additional IDs to avoid.
         :param min: The minimum ID value, within the ID class' range.
         :param max: The maximum ID value, within the ID class' range.
@@ -48,27 +48,23 @@ def createID(idClass, schema, exclude=(), min=0x80, max=0x1FFFFFFF, count=1):
             fewer than specified if too few meet the given criteria.
         :returns: A list of EBML IDs that match the given criteria.
     """
-    ranges = dict(a = (0x80, 0xFF),
-                   b = (0x4000, 0x7FFF),
-                   c = (0x200000, 0x3FFFFF),
-                   d = (0x10000000, 0x1FFFFFFF))
-    idc = idClass.lower()
+    ranges = dict(A=(0x80, 0xFF),
+                  B=(0x4000, 0x7FFF),
+                  C=(0x200000, 0x3FFFFF),
+                  D=(0x10000000, 0x1FFFFFFF))
+    idc = idClass.upper()
     if idc not in ranges:
         raise KeyError('Invalid ID class %r: must be one of %r' %
                        (idClass, list(ranges)))
 
     # Keep range within the one specified and the one imposed by the ID class
-    idrange = ranges[idc]
-    idrange = (__builtins__['max'](idrange[0], min),
-               __builtins__['min'](idrange[1], max))
+    idrange = (__builtins__['max'](ranges[idc][0], min),
+               __builtins__['min'](ranges[idc][1], max))
 
-    exclude = list(exclude)
-    exclude.extend(schema.elements.keys())
+    exclude = set(exclude).union(schema.elements.keys())
 
     result = []
-    for i in range(*idrange):
-        if i in exclude:
-            continue
+    for i in (x for x in range(*idrange) if x not in exclude):
         if len(result) == count:
             break
         result.append(i)
