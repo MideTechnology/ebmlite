@@ -20,11 +20,13 @@ from io import StringIO
 
 import ast
 from base64 import b64encode, b64decode
+from io import BytesIO
+import struct
 import sys
 import tempfile
 from xml.etree import ElementTree as ET
 
-from . import core, encoding
+from . import core, encoding, decoding
 
 # ==============================================================================
 #
@@ -35,18 +37,18 @@ def createID(schema, idClass, exclude=(), min=0x80, max=0x1FFFFFFF, count=1):
     """ Generate unique EBML IDs. Primarily intended for use 'offline' by
         humans creating EBML schemata.
 
-        :param schema: The `Schema` in which the new IDs must coexist.
-        :param idClass: The EBML class of ID, one of (case-insensitive):
+        @param schema: The `Schema` in which the new IDs must coexist.
+        @param idClass: The EBML class of ID, one of (case-insensitive):
             * `'a'`: Class A (1 octet, base 0x8X)
             * `'b'`: Class B (2 octets, base 0x4000)
             * `'c'`: Class C (3 octets, base 0x200000)
             * `'d'`: Class D (4 octets, base 0x10000000)
-        :param exclude: A list of additional IDs to avoid.
-        :param min: The minimum ID value, within the ID class' range.
-        :param max: The maximum ID value, within the ID class' range.
-        :param count: The maximum number of IDs to generate. The result may be
+        @param exclude: A list of additional IDs to avoid.
+        @param min: The minimum ID value, within the ID class' range.
+        @param max: The maximum ID value, within the ID class' range.
+        @param count: The maximum number of IDs to generate. The result may be
             fewer than specified if too few meet the given criteria.
-        :returns: A list of EBML IDs that match the given criteria.
+        @return: A list of EBML IDs that match the given criteria.
     """
     ranges = dict(A=(0x80, 0xFF),
                   B=(0x4000, 0x7FFF),
@@ -71,6 +73,42 @@ def createID(schema, idClass, exclude=(), min=0x80, max=0x1FFFFFFF, count=1):
 
     return result
 
+
+def validateID(elementId):
+    """ Verify that a number is a valid EBML element ID. A `ValueError`
+        will be raised if the element ID is invalid.
+
+        Valid ranges for the four classes of EBML ID are:
+          * A: 0x80 to 0xFF
+          * B: 0x4000 to 0x7FFF
+          * C: 0x200000 to 0x3FFFFF
+          * D: 0x10000000 to 0x1FFFFFFF
+
+        @param elementId: The element ID to validate
+        @raises: `ValueError`, although certain edge cases may raise
+            another type.
+    """
+    msg = "Invalid element ID"  # Default error message
+
+    # Basic check: is the ID within the bounds of the total ID range?
+    if not 0x80 <= elementId <= 0x1FFFFFFF:
+        raise ValueError("Element ID out of range", elementId)
+
+    try:
+        # See if the first byte properly encodes the length of the ID.
+        s = struct.pack(">i", elementId).lstrip(b'\x00')
+        length, _ = decoding.decodeIDLength(s[0])
+        valid = len(s) == length  # Should always be True if decoding worked
+
+    # Note: Change this if decoding changes the exceptions it raises
+    except OSError as err:
+        valid = False
+        msg = err.args[0] if err.args else msg
+
+    if not valid:
+        raise ValueError(msg, elementId)
+    
+    return True
 
 # ==============================================================================
 #
@@ -413,6 +451,7 @@ if __name__ == "__main__":
         schema = core.loadSchema(args.schema)
     except IOError as err:
         errPrint("Error loading schema: %s\n" % err)
+        sys.exit(1)
 
     if args.output:
         output = os.path.realpath(os.path.expanduser(args.output))
