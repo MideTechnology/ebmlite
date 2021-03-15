@@ -203,6 +203,26 @@ class Test(unittest.TestCase):
                                  % (idClass, m))
 
 
+    def testValidateID(self):
+        """ Test EBML ID validation utility function. """
+        ranges = dict(A=(0x80, 0xFF),
+                      B=(0x4000, 0x7FFF),
+                      C=(0x200000, 0x3FFFFF),
+                      D=(0x10000000, 0x1FFFFFFF))
+
+        for lo, hi in ranges.values():
+            # Test valid IDs (in range)
+            self.assertTrue(util.validateID(lo))
+            self.assertTrue(util.validateID(int((lo + hi) / 2)))
+            self.assertTrue(util.validateID(hi))
+
+            self.assertRaises(ValueError, util.validateID, lo - 1)
+            self.assertRaises(ValueError, util.validateID, hi + 1)
+
+            self.assertRaises(TypeError, util.validateID, '0x80')
+            self.assertRaises(Exception, util.validateID, 128.1)
+
+
 if __name__ == "__main__":
     testsuite = unittest.TestLoader().discover('.')
     unittest.TextTestRunner(verbosity=1).run(testsuite)
