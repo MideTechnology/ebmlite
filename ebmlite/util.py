@@ -11,16 +11,14 @@ Created on Aug 11, 2017
     `toXml()` and `xml2ebml()`.
 """
 __author__ = "David Randall Stokes, Connor Flanigan"
-__copyright__ = "Copyright 2020, Mide Technology Corporation"
+__copyright__ = "Copyright 2021, Mide Technology Corporation"
 __credits__ = "David Randall Stokes, Connor Flanigan, Becker Awqatty, Derek Witt"
 
-__all__ = ['toXml', 'xml2ebml', 'loadXml', 'pprint']
-
-from io import StringIO
+__all__ = ['createID', 'validateID', 'toXml', 'xml2ebml', 'loadXml', 'pprint']
 
 import ast
 from base64 import b64encode, b64decode
-from io import BytesIO
+from io import StringIO
 import struct
 import sys
 import tempfile
