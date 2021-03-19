@@ -96,7 +96,7 @@ def validateID(elementId):
 
     try:
         # See if the first byte properly encodes the length of the ID.
-        s = struct.pack(">i", elementId).lstrip(b'\x00')
+        s = struct.pack(">I", elementId).lstrip(b'\x00')
         length, _ = decoding.decodeIDLength(s[0])
         valid = len(s) == length  # Should always be True if decoding worked
 
