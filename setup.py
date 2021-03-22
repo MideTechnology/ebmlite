@@ -11,6 +11,7 @@ TEST_REQUIRES = [
     'pytest>=4.6',
     'codecov',
     'pytest-cov',
+    'pytest-flake8',
     ]
 
 setuptools.setup(
