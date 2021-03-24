@@ -56,13 +56,13 @@ matrix:
         - source $HOME/venv/Scripts/activate
     # Windows doesn't support native python yet, so here we are - 3.8
     - os: windows
-    language: shell
-    env: PATH=/c/python39:/c/Python39/scripts:$PATH
-    before_install:
-      - choco install python3 --version=3.9.2
-      - python -m pip install virtualenv
-      - virtualenv $HOME/venv
-      - source $HOME/venv/Scripts/activate
+      language: shell
+      env: PATH=/c/python39:/c/Python39/scripts:$PATH
+      before_install:
+        - choco install python3 --version=3.9.2
+        - python -m pip install virtualenv
+        - virtualenv $HOME/venv
+        - source $HOME/venv/Scripts/activate
     # Windows doesn't support native python yet, so here we are - 3.9
     - os: windows
       language: shell
