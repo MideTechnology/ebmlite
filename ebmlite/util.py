@@ -31,7 +31,7 @@ from . import core, encoding, decoding
 # ==============================================================================
 
 
-def createID(schema, idClass, exclude=(), min=0x80, max=0x1FFFFFFF, count=1):
+def createID(schema, idClass, exclude=(), minId=0x80, maxId=0x1FFFFFFF, count=1):
     """ Generate unique EBML IDs. Primarily intended for use 'offline' by
         humans creating EBML schemata.
 
@@ -42,8 +42,8 @@ def createID(schema, idClass, exclude=(), min=0x80, max=0x1FFFFFFF, count=1):
             * `'c'`: Class C (3 octets, base 0x200000)
             * `'d'`: Class D (4 octets, base 0x10000000)
         @param exclude: A list of additional IDs to avoid.
-        @param min: The minimum ID value, within the ID class' range.
-        @param max: The maximum ID value, within the ID class' range.
+        @param minId: The minimum ID value, within the ID class' range.
+        @param maxId: The maximum ID value, within the ID class' range.
         @param count: The maximum number of IDs to generate. The result may be
             fewer than specified if too few meet the given criteria.
         @return: A list of EBML IDs that match the given criteria.
@@ -58,8 +58,8 @@ def createID(schema, idClass, exclude=(), min=0x80, max=0x1FFFFFFF, count=1):
                        (idClass, list(ranges)))
 
     # Keep range within the one specified and the one imposed by the ID class
-    idrange = (__builtins__['max'](ranges[idc][0], min),
-               __builtins__['min'](ranges[idc][1], max))
+    idrange = (max(ranges[idc][0], minId),
+               min(ranges[idc][1], maxId))
 
     exclude = set(exclude).union(schema.elements.keys())
 

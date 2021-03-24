@@ -194,11 +194,11 @@ class Test(unittest.TestCase):
 
         # Test ID class range restrictions
         for idClass, (minId, maxId) in ranges.items():
-            m = min(util.createID(schema, idClass, min=minId-50, count=100))
+            m = min(util.createID(schema, idClass, minId=minId-50, count=100))
             self.assertGreaterEqual(m, minId, "createID() generated out-of-range value ID for class %s: %s"
                                     % (idClass, m))
 
-            m = max(util.createID(schema, idClass, min=maxId-50, count=100))
+            m = max(util.createID(schema, idClass, minId=maxId-50, count=100))
             self.assertLessEqual(m, maxId, "createID() generated out-of-range value ID for class %s: %s"
                                  % (idClass, m))
 
