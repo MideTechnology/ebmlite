@@ -163,5 +163,11 @@
         <MasterElement name="DigitalPowerMAX77801" id="0x4DD1" mandatory="0" multiple="0" minver="1">Indicates the presence of a MAX77801 power management IC on the I2C1 bus.</MasterElement>
         <MasterElement name="DigitalLedThree" id="0x4DD2" mandatory="0" multiple="0" minver="1">Indicates that the membrane has a 3rd LED driven by the MCU.</MasterElement>
         <MasterElement name="DigitalSensorSI1133" id="0x4DD3" mandatory="0" multiple="0" minver="1">Indicates the presence of a SI1133 light sensor on the I2C1 bus.</MasterElement>
+        
+        <!-- Analog Out -->
+        <MasterElement name="PeripheralHeater" id="0x4F00" mandatory="0" multiple="0" minver="1">Indicates the presence of an analog heater device.
+            <UIntegerElement name="PeripheralConfig" id="0x4F01" mandatory="0" multiple="0" minver="1">Configuration data for non-sensor peripherals. For the heater, it is the output power in milliwatts.</UIntegerElement>
+        </MasterElement>
+
 </MasterElement>
 </Schema>
