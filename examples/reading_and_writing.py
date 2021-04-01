@@ -18,7 +18,7 @@ elements: a `ConfigID` and one of several types of value (`IntValue`,
 This example converts a configuration EBML file to a dictionary, which it
 then crawls to find and modify a specific configuration value.
 
-Python 3.5 or later required.
+Python 3.6 or later required.
 """
 import ebmlite
 
