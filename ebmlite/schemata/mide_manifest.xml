@@ -165,9 +165,9 @@
         <MasterElement name="DigitalSensorSI1133" id="0x4DD3" mandatory="0" multiple="0" minver="1">Indicates the presence of a SI1133 light sensor on the I2C1 bus.</MasterElement>
         
         <!-- Analog Out -->
-        <MasterElement name="PeriphHeater" id="0x4D90" mandatory="0" multiple="0" minver="1">Indicates the presence of an analog heater device.
-            <UIntegerElement name="PeriphHeaterPower" id="0x4D91" mandatory="0" multiple="0" minver="1">Output power of the heater in milliwats.</UIntegerElement>
+        <MasterElement name="PeripheralHeater" id="0x4F00" mandatory="0" multiple="0" minver="1">Indicates the presence of an analog heater device.
+            <UIntegerElement name="PeripheralConfig" id="0x4F01" mandatory="0" multiple="0" minver="1">Configuration data for non-sensor peripherals. For the heater, it is the output power in milliwatts.</UIntegerElement>
         </MasterElement>
-        
+
 </MasterElement>
 </Schema>
