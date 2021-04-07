@@ -31,7 +31,7 @@ from . import core, encoding, decoding
 # ==============================================================================
 
 
-def createID(schema, idClass, exclude=(), minId=0x80, maxId=0x1FFFFFFF, count=1):
+def createID(schema, idClass, exclude=(), minId=0x81, maxId=0x1FFFFFFE, count=1):
     """ Generate unique EBML IDs. Primarily intended for use 'offline' by
         humans creating EBML schemata.
 
@@ -48,10 +48,10 @@ def createID(schema, idClass, exclude=(), minId=0x80, maxId=0x1FFFFFFF, count=1)
             fewer than specified if too few meet the given criteria.
         @return: A list of EBML IDs that match the given criteria.
     """
-    ranges = dict(A=(0x80, 0xFF),
-                  B=(0x4000, 0x7FFF),
-                  C=(0x200000, 0x3FFFFF),
-                  D=(0x10000000, 0x1FFFFFFF))
+    ranges = dict(A=(0x81, 0xFE),
+                  B=(0x407F, 0x7FFE),
+                  C=(0x203FFF, 0x3FFFFE),
+                  D=(0x101FFFFF, 0x1FFFFFFE))
     idc = idClass.upper()
     if idc not in ranges:
         raise KeyError('Invalid ID class %r: must be one of %r' %
@@ -77,19 +77,21 @@ def validateID(elementId):
         will be raised if the element ID is invalid.
 
         Valid ranges for the four classes of EBML ID are:
-          * A: 0x80 to 0xFF
-          * B: 0x4000 to 0x7FFF
-          * C: 0x200000 to 0x3FFFFF
-          * D: 0x10000000 to 0x1FFFFFFF
+          * A: 0x81 to 0xFE
+          * B: 0x407F to 0x7FFE
+          * C: 0x203FFF to 0x3FFFFE
+          * D: 0x101FFFFF to 0x1FFFFFFE
 
         @param elementId: The element ID to validate
         @raises: `ValueError`, although certain edge cases may raise
             another type.
     """
+    ranges = ((0x81, 0xFE), (0x407F, 0x7FFE), (0x203FFF, 0x3FFFFE), (0x101FFFFF, 0x1FFFFFFE))
+
     msg = "Invalid element ID"  # Default error message
 
     # Basic check: is the ID within the bounds of the total ID range?
-    if not 0x80 <= elementId <= 0x1FFFFFFF:
+    if not 0x81 <= elementId <= 0x1FFFFFFE:
         raise ValueError("Element ID out of range", elementId)
 
     try:
@@ -97,6 +99,11 @@ def validateID(elementId):
         s = struct.pack(">I", elementId).lstrip(b'\x00')
         length, _ = decoding.decodeIDLength(s[0])
         valid = len(s) == length  # Should always be True if decoding worked
+        if valid:
+            minId, maxId = ranges[length-1]
+            if not minId <= elementId <= maxId:
+                msg = "ID out of range for class %s %s" % (" ABCD"[length], ranges[length-1])
+                valid = False
 
     # Note: Change this if decoding changes the exceptions it raises
     except OSError as err:

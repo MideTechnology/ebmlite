@@ -170,10 +170,10 @@ class Test(unittest.TestCase):
         """ Test the EBML ID generation utility function. """
         schema = core.loadSchema('matroska.xml')
 
-        ranges = dict(A=(0x80, 0xFF),
-                      B=(0x4000, 0x7FFF),
-                      C=(0x200000, 0x3FFFFF),
-                      D=(0x10000000, 0x1FFFFFFF))
+        ranges = dict(A=(0x81, 0xFE),
+                      B=(0x407F, 0x7FFE),
+                      C=(0x203FFF, 0x3FFFFE),
+                      D=(0x101FFFFF, 0x1FFFFFFE))
 
         # Test IDs not already in schema
         for idClass in ranges.keys():
@@ -205,10 +205,10 @@ class Test(unittest.TestCase):
 
     def testValidateID(self):
         """ Test EBML ID validation utility function. """
-        ranges = dict(A=(0x80, 0xFF),
-                      B=(0x4000, 0x7FFF),
-                      C=(0x200000, 0x3FFFFF),
-                      D=(0x10000000, 0x1FFFFFFF))
+        ranges = dict(A=(0x81, 0xFE),
+                      B=(0x407F, 0x7FFE),
+                      C=(0x203FFF, 0x3FFFFE),
+                      D=(0x101FFFFF, 0x1FFFFFFE))
 
         for lo, hi in ranges.values():
             # Test valid IDs (in range)
