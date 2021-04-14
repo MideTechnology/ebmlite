@@ -5,7 +5,6 @@ Created on Aug 14, 2017
 """
 
 import unittest
-import pytest
 from xml.dom.minidom import parseString
 from xml.etree import ElementTree as ET
 
