@@ -13,10 +13,11 @@ __credits__ = "David Randall Stokes, Connor Flanigan, Becker Awqatty, Derek Witt
 
 __all__ = ['ThreadAwareFile']
 
+import io
 import platform
 from threading import currentThread, Event
 
-class ThreadAwareFile(file):
+class ThreadAwareFile(io.IOBase):
     """ A 'replacement' for a standard read-only file stream that supports
         simultaneous access by multiple threads without (explicit) blocking.
         Each thread actually gets its own stream, so it can perform its own
@@ -91,7 +92,7 @@ class ThreadAwareFile(file):
         """
         if isinstance(fileStream, cls):
             return fileStream
-        elif not isinstance(fileStream, file):
+        elif not isinstance(fileStream, io.IOBase):
             raise TypeError("Not a file: %r" % fileStream)
 
         f = cls(fileStream.name, fileStream.mode, _new=False)
@@ -107,7 +108,7 @@ class ThreadAwareFile(file):
         ident = currentThread().ident
         if ident not in self.threads:
             # First access from this thread. Open the file.
-            fp = file(*self.initArgs, **self.initKwargs)
+            fp = io.IOBase(*self.initArgs, **self.initKwargs)
             self.threads[ident] = fp
             return fp
         return self.threads[ident]
