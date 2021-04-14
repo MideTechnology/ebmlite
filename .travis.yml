@@ -11,7 +11,7 @@ python:
 before_install:
   - python --version
 install: pip install .[test]
-script: python -m pytest --cov=ebmlite
+script: python -m pytest --cov=ebmlite --flake8
 after_success:
   - codecov
 

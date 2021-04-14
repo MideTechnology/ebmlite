@@ -54,7 +54,7 @@ from xml.etree import ElementTree as ET
 
 from .decoding import readElementID, readElementSize
 from .decoding import readFloat, readInt, readUInt, readDate
-from .decoding import readString, readUnicode
+from .decoding import readUnicode
 from . import encoding
 from . import schemata
 
