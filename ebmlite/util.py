@@ -164,7 +164,7 @@ def toXml(el, parent=None, offsets=True, sizes=True, types=True, ids=True):
 
     if isinstance(el, core.MasterElement):
         for chEl in el:
-            toXml(chEl, xmlEl, offsets, sizes, types)
+            toXml(chEl, xmlEl, offsets, sizes, types, ids)
     elif isinstance(el, core.BinaryElement):
         xmlEl.text = b64encode(el.value).decode()
     elif not isinstance(el, core.VoidElement):
@@ -445,6 +445,9 @@ if __name__ == "__main__":
     argparser.add_argument('-p', '--pretty',
                            action="store_true",
                            help="Generate 'pretty' XML with ebml2xml.")
+    argparser.add_argument('--min',
+                           action="store_true",
+                           help="Generate minimal XML with ebml2xml. Just element nama and value")
 
     args = argparser.parse_args()
 
@@ -470,10 +473,17 @@ if __name__ == "__main__":
         xml2ebml(args.input, out, schema)  # , sizeLength=4, headers=True, unknown=True)
     elif args.mode == "ebml2xml":
         doc = schema.load(args.input, headers=True)
+        if args.min:
+            root = toXml(doc, offsets=False, sizes=False, types=False, ids=False)
+        else:
         root = toXml(doc)  # , offsets, sizes, types, ids)
         s = ET.tostring(root, encoding="utf-8")
         if args.pretty:
-            parseString(s).writexml(out, addindent=b'\t', newl=b'\n', encoding=b'utf-8')
+            if 'b' in out.mode and out != sys.stdout:   # writexml wants to ooperate on a string, not binary output, file
+                out_name = out.name
+                out.close()
+                out = open(out_name, 'w')
+            parseString(s).writexml(out, addindent='\t', newl='\n', encoding='utf-8')
         else:
             out.write(s)
     else:
