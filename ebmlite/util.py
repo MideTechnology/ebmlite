@@ -447,7 +447,7 @@ if __name__ == "__main__":
                            help="Generate 'pretty' XML with ebml2xml.")
     argparser.add_argument('--min',
                            action="store_true",
-                           help="Generate minimal XML with ebml2xml. Just element nama and value")
+                           help="Generate minimal XML with ebml2xml. Just element name and value")
 
     args = argparser.parse_args()
 
@@ -476,10 +476,10 @@ if __name__ == "__main__":
         if args.min:
             root = toXml(doc, offsets=False, sizes=False, types=False, ids=False)
         else:
-        root = toXml(doc)  # , offsets, sizes, types, ids)
+            root = toXml(doc)  # , offsets, sizes, types, ids)
         s = ET.tostring(root, encoding="utf-8")
         if args.pretty:
-            if 'b' in out.mode and out != sys.stdout:   # writexml wants to ooperate on a string, not binary output, file
+            if 'b' in out.mode and out != sys.stdout:   # writexml wants to operate on a string, not binary output, file
                 out_name = out.name
                 out.close()
                 out = open(out_name, 'w')
