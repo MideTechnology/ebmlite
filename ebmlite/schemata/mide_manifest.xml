@@ -154,7 +154,7 @@
         <!-- Battery charger ICs -->
         <MasterElement name="ChargerMCP73837" id="0x4D60" mandatory="0" multiple="0" minver="1">Indicates the presence of a MCP73837 battery charger.</MasterElement>
         <MasterElement name="ChargerMAX14747" id="0x4D61" mandatory="0" multiple="0" minver="1">Indicates the presence of a MAX14747 battery charger.</MasterElement>
-		<MasterElement name="NoCharger" id="0x4D61" mandatory="0" multiple="0" minver="1">Indicates the presence of no battery charger or just a single cell battery.</MasterElement>
+        <MasterElement name="NoCharger" id="0x4D61" mandatory="0" multiple="0" minver="1">Indicates the presence of no battery charger or just a single cell battery.</MasterElement>
 
 
         <!-- Communication -->
