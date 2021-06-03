@@ -32,10 +32,10 @@ setuptools.setup(
                      'Programming Language :: Python :: 3.8',
                      'Programming Language :: Python :: 3.9'],
         keywords='ebml binary matroska webm',
-        packages=setuptools.find_packages(),
+        packages=setuptools.find_packages(exclude="tests"),
         package_dir={'': '.'},
         package_data={
-            '': ['schemata/*', 'tests/*.ide', 'tests/*.mkv']
+            '': ['schemata/*']
         },
         test_suite='tests',
         install_requires=INSTALL_REQUIRES,
