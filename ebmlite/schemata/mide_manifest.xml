@@ -154,6 +154,8 @@
         <!-- Battery charger ICs -->
         <MasterElement name="ChargerMCP73837" id="0x4D60" mandatory="0" multiple="0" minver="1">Indicates the presence of a MCP73837 battery charger.</MasterElement>
         <MasterElement name="ChargerMAX14747" id="0x4D61" mandatory="0" multiple="0" minver="1">Indicates the presence of a MAX14747 battery charger.</MasterElement>
+        <MasterElement name="ChargerNONE"     id="0x4D6F" mandatory="0" multiple="0" minver="1">Indicates the presence of no battery charger or just a single cell battery.</MasterElement>
+
 
         <!-- Communication -->
         <MasterElement name="CommunicationWiFi_ESP32" id="0x4D70" mandatory="0" multiple="0" minver="1">Indicates the presence of an ESP32 Wi-Fi module.</MasterElement>
@@ -168,6 +170,8 @@
         <MasterElement name="PeripheralHeater" id="0x4F00" mandatory="0" multiple="0" minver="1">Indicates the presence of an analog heater device.
             <UIntegerElement name="PeripheralConfig" id="0x4F01" mandatory="0" multiple="0" minver="1">Configuration data for non-sensor peripherals. For the heater, it is the output power in milliwatts.</UIntegerElement>
         </MasterElement>
+		
+		
 
 </MasterElement>
 </Schema>
