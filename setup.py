@@ -4,18 +4,19 @@ with open('README.md', 'r') as fh:
     long_description = fh.read()
 
 INSTALL_REQUIRES = [
-    'numpy',
+#    'numpy',
     ]
 
 TEST_REQUIRES = [
     'pytest>=4.6',
     'codecov',
     'pytest-cov',
+    'pytest-flake8',
     ]
 
 setuptools.setup(
         name='ebmlite',
-        version='3.0.1',
+        version='3.1.0',
         author='Mide Technology',
         author_email='help@mide.com',
         description='A lightweight, "pure Python" library for parsing EBML (Extensible Binary Markup Language) data.',
@@ -28,12 +29,13 @@ setuptools.setup(
                      'Natural Language :: English',
                      'Programming Language :: Python :: 3.6',
                      'Programming Language :: Python :: 3.7',
-                     'Programming Language :: Python :: 3.8',],
+                     'Programming Language :: Python :: 3.8',
+                     'Programming Language :: Python :: 3.9'],
         keywords='ebml binary matroska webm',
-        packages=setuptools.find_packages(),
+        packages=setuptools.find_packages(exclude="tests"),
         package_dir={'': '.'},
         package_data={
-            '': ['schemata/*', 'tests/*.ide', 'tests/*.mkv']
+            '': ['schemata/*']
         },
         test_suite='tests',
         install_requires=INSTALL_REQUIRES,

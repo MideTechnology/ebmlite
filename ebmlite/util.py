@@ -11,20 +11,109 @@ Created on Aug 11, 2017
     `toXml()` and `xml2ebml()`.
 """
 __author__ = "David Randall Stokes, Connor Flanigan"
-__copyright__ = "Copyright 2020, Mide Technology Corporation"
+__copyright__ = "Copyright 2021, Mide Technology Corporation"
 __credits__ = "David Randall Stokes, Connor Flanigan, Becker Awqatty, Derek Witt"
 
-__all__ = ['toXml', 'xml2ebml', 'loadXml', 'pprint']
-
-from io import StringIO
+__all__ = ['createID', 'validateID', 'toXml', 'xml2ebml', 'loadXml', 'pprint']
 
 import ast
 from base64 import b64encode, b64decode
+from io import StringIO
+import struct
 import sys
 import tempfile
 from xml.etree import ElementTree as ET
 
-from . import core, encoding
+from . import core, encoding, decoding
+
+# ==============================================================================
+#
+# ==============================================================================
+
+
+def createID(schema, idClass, exclude=(), minId=0x81, maxId=0x1FFFFFFE, count=1):
+    """ Generate unique EBML IDs. Primarily intended for use 'offline' by
+        humans creating EBML schemata.
+
+        @param schema: The `Schema` in which the new IDs must coexist.
+        @param idClass: The EBML class of ID, one of (case-insensitive):
+            * `'a'`: Class A (1 octet, base 0x8X)
+            * `'b'`: Class B (2 octets, base 0x4000)
+            * `'c'`: Class C (3 octets, base 0x200000)
+            * `'d'`: Class D (4 octets, base 0x10000000)
+        @param exclude: A list of additional IDs to avoid.
+        @param minId: The minimum ID value, within the ID class' range.
+        @param maxId: The maximum ID value, within the ID class' range.
+        @param count: The maximum number of IDs to generate. The result may be
+            fewer than specified if too few meet the given criteria.
+        @return: A list of EBML IDs that match the given criteria.
+    """
+    ranges = dict(A=(0x81, 0xFE),
+                  B=(0x407F, 0x7FFE),
+                  C=(0x203FFF, 0x3FFFFE),
+                  D=(0x101FFFFF, 0x1FFFFFFE))
+    idc = idClass.upper()
+    if idc not in ranges:
+        raise KeyError('Invalid ID class %r: must be one of %r' %
+                       (idClass, list(ranges)))
+
+    # Keep range within the one specified and the one imposed by the ID class
+    idrange = (max(ranges[idc][0], minId),
+               min(ranges[idc][1], maxId))
+
+    exclude = set(exclude).union(schema.elements.keys())
+
+    result = []
+    for i in (x for x in range(*idrange) if x not in exclude):
+        if len(result) == count:
+            break
+        result.append(i)
+
+    return result
+
+
+def validateID(elementId):
+    """ Verify that a number is a valid EBML element ID. A `ValueError`
+        will be raised if the element ID is invalid.
+
+        Valid ranges for the four classes of EBML ID are:
+          * A: 0x81 to 0xFE
+          * B: 0x407F to 0x7FFE
+          * C: 0x203FFF to 0x3FFFFE
+          * D: 0x101FFFFF to 0x1FFFFFFE
+
+        @param elementId: The element ID to validate
+        @raises: `ValueError`, although certain edge cases may raise
+            another type.
+    """
+    ranges = ((0x81, 0xFE), (0x407F, 0x7FFE), (0x203FFF, 0x3FFFFE), (0x101FFFFF, 0x1FFFFFFE))
+
+    msg = "Invalid element ID"  # Default error message
+
+    # Basic check: is the ID within the bounds of the total ID range?
+    if not 0x81 <= elementId <= 0x1FFFFFFE:
+        raise ValueError("Element ID out of range", elementId)
+
+    try:
+        # See if the first byte properly encodes the length of the ID.
+        s = struct.pack(">I", elementId).lstrip(b'\x00')
+        length, _ = decoding.decodeIDLength(s[0])
+        valid = len(s) == length  # Should always be True if decoding worked
+        if valid:
+            minId, maxId = ranges[length-1]
+            if not minId <= elementId <= maxId:
+                msg = "ID out of range for class %s %s" % (" ABCD"[length], ranges[length-1])
+                valid = False
+
+    # Note: Change this if decoding changes the exceptions it raises
+    except OSError as err:
+        valid = False
+        msg = err.args[0] if err.args else msg
+
+    if not valid:
+        raise ValueError(msg, elementId)
+    
+    return True
 
 # ==============================================================================
 #
@@ -75,7 +164,7 @@ def toXml(el, parent=None, offsets=True, sizes=True, types=True, ids=True):
 
     if isinstance(el, core.MasterElement):
         for chEl in el:
-            toXml(chEl, xmlEl, offsets, sizes, types)
+            toXml(chEl, xmlEl, offsets, sizes, types, ids)
     elif isinstance(el, core.BinaryElement):
         xmlEl.text = b64encode(el.value).decode()
     elif not isinstance(el, core.VoidElement):
@@ -109,7 +198,7 @@ def xmlElement2ebml(xmlEl, ebmlFile, schema, sizeLength=None, unknown=True):
     if not isinstance(xmlEl.tag, (str, bytes, bytearray)):
         # (Probably) a comment; disregard.
         return 0
-        
+
     try:
         cls = schema[xmlEl.tag]
         encId = encoding.encodeId(cls.id)
@@ -356,6 +445,9 @@ if __name__ == "__main__":
     argparser.add_argument('-p', '--pretty',
                            action="store_true",
                            help="Generate 'pretty' XML with ebml2xml.")
+    argparser.add_argument('--min',
+                           action="store_true",
+                           help="Generate minimal XML with ebml2xml. Just element name and value")
 
     args = argparser.parse_args()
 
@@ -367,6 +459,7 @@ if __name__ == "__main__":
         schema = core.loadSchema(args.schema)
     except IOError as err:
         errPrint("Error loading schema: %s\n" % err)
+        sys.exit(1)
 
     if args.output:
         output = os.path.realpath(os.path.expanduser(args.output))
@@ -380,10 +473,17 @@ if __name__ == "__main__":
         xml2ebml(args.input, out, schema)  # , sizeLength=4, headers=True, unknown=True)
     elif args.mode == "ebml2xml":
         doc = schema.load(args.input, headers=True)
-        root = toXml(doc)  # , offsets, sizes, types, ids)
+        if args.min:
+            root = toXml(doc, offsets=False, sizes=False, types=False, ids=False)
+        else:
+            root = toXml(doc)  # , offsets, sizes, types, ids)
         s = ET.tostring(root, encoding="utf-8")
         if args.pretty:
-            parseString(s).writexml(out, addindent=b'\t', newl=b'\n', encoding=b'utf-8')
+            if 'b' in out.mode and out != sys.stdout:   # writexml wants to operate on a string, not binary output, file
+                out_name = out.name
+                out.close()
+                out = open(out_name, 'w')
+            parseString(s).writexml(out, addindent='\t', newl='\n', encoding='utf-8')
         else:
             out.write(s)
     else:
@@ -394,3 +494,4 @@ if __name__ == "__main__":
         out.close()
 
     exit(0)
+    

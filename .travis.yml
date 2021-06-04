@@ -6,13 +6,14 @@ python:
   - "3.6"
   - "3.7"
   - "3.8"
+  - "3.9"
 
 before_install:
   - python --version
 install: pip install .[test]
-script: python -m pytest --cov=ebmlite
+script: python -m pytest --cov=ebmlite --flake8
 after_success:
-  - codecov
+  - bash <(curl -s https://codecov.io/bash)
 
 matrix:
   include:
@@ -40,7 +41,7 @@ matrix:
       language: shell
       env: PATH=/c/python37:/c/Python37/scripts:$PATH
       before_install:
-        - choco install python3 --version=3.7.8
+        - choco install python3 --version=3.7.9
         - python -m pip install virtualenv
         - virtualenv $HOME/venv
         - source $HOME/venv/Scripts/activate
@@ -49,7 +50,16 @@ matrix:
       language: shell
       env: PATH=/c/python38:/c/Python38/scripts:$PATH
       before_install:
-        - choco install python3 --version=3.8.2
+        - choco install python3 --version=3.8.8
+        - python -m pip install virtualenv
+        - virtualenv $HOME/venv
+        - source $HOME/venv/Scripts/activate
+    # Windows doesn't support native python yet, so here we are - 3.8
+    - os: windows
+      language: shell
+      env: PATH=/c/python39:/c/Python39/scripts:$PATH
+      before_install:
+        - choco install python3 --version=3.9.2
         - python -m pip install virtualenv
         - virtualenv $HOME/venv
         - source $HOME/venv/Scripts/activate
@@ -57,7 +67,7 @@ matrix:
     - os: windows
       language: shell
       env:
-        - PATH=/c/python39:/c/Python39/scripts:$PATH
+        - PATH=/c/python310:/c/Python310/scripts:$PATH
         - ALLOW_FAILURES=TRUE
       before_install:
         - choco install python3 --pre
@@ -66,7 +76,7 @@ matrix:
         - source $HOME/venv/Scripts/activate
     - os: linux
       language: python
-      python: "3.9-dev"
+      python: "3.10-dev"
       env: ALLOW_FAILURES=TRUE
     - os: linux
       language: python

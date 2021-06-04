@@ -36,7 +36,7 @@ EBML files quickly and efficiently, and that's about it.
     currently handles legacy ``python-ebml`` schemata.
 """
 __author__ = "David Randall Stokes, Connor Flanigan"
-__copyright__ = "Copyright 2020, Mide Technology Corporation"
+__copyright__ = "Copyright 2021, Mide Technology Corporation"
 __credits__ = "David Randall Stokes, Connor Flanigan, Becker Awqatty, Derek Witt"
 
 __all__ = ['BinaryElement', 'DateElement', 'Document', 'Element',
@@ -54,7 +54,7 @@ from xml.etree import ElementTree as ET
 
 from .decoding import readElementID, readElementSize
 from .decoding import readFloat, readInt, readUInt, readDate
-from .decoding import readString, readUnicode
+from .decoding import readUnicode
 from . import encoding
 from . import schemata
 
@@ -349,7 +349,7 @@ class StringElement(Element):
         """ Type-specific helper function for parsing the element's payload.
             It is assumed the file pointer is at the start of the payload.
         """
-        return readString(stream, size)
+        return readUnicode(stream, size)
 
     @classmethod
     def encodePayload(cls, data, length=None):
@@ -759,6 +759,11 @@ class Document(MasterElement):
                 The contents of the ``EBML`` element will always be read,
                 regardless, and stored in the Document's `info` attribute.
         """
+        self._ownsStream = False
+        if isinstance(stream, (str, bytes, bytearray)):
+            stream = open(stream, 'rb')
+            self._ownsStream = True
+
         if not all((hasattr(stream, 'read'),
                     hasattr(stream, 'tell'),
                     hasattr(stream, 'seek'))):
@@ -811,11 +816,23 @@ class Document(MasterElement):
         return "<%s %r at 0x%08X>" % (self.__class__.__name__, self.name,
                                       id(self))
 
-    def close(self):
-        """ Close the EBML file. Should generally be used only if the object
-            was created using a filename, rather than a stream.
+    def __enter__(self):
+        """ Enter context manager for this document.
         """
-        self.stream.close()
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        """ Close this document on exiting context manager.
+        """
+        self.close()
+
+    def close(self):
+        """ Closes the EBML file. If the `Document` was created using a
+            file/stream (as opposed to a filename), the source file/stream is
+            not closed.
+        """
+        if self._ownsStream:
+            self.stream.close()
 
     def __len__(self):
         """ x.__len__() <==> len(x)
@@ -1287,9 +1304,6 @@ class Schema(object):
                 document. The contents of the ``EBML`` element will always be
                 read.
         """
-        if isinstance(fp, (str, bytes, bytearray)):
-            fp = open(fp, 'rb')
-
         return self.document(fp, name=name, headers=headers, **kwargs)
 
     def loads(self, data, name=None):
