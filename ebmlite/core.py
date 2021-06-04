@@ -36,7 +36,7 @@ EBML files quickly and efficiently, and that's about it.
     currently handles legacy ``python-ebml`` schemata.
 """
 __author__ = "David Randall Stokes, Connor Flanigan"
-__copyright__ = "Copyright 2020, Mide Technology Corporation"
+__copyright__ = "Copyright 2021, Mide Technology Corporation"
 __credits__ = "David Randall Stokes, Connor Flanigan, Becker Awqatty, Derek Witt"
 
 __all__ = ['BinaryElement', 'DateElement', 'Document', 'Element',
