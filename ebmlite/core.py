@@ -758,7 +758,6 @@ class Document(MasterElement):
                 (if present) will not appear as a root element in the document.
                 The contents of the ``EBML`` element will always be read,
                 regardless, and stored in the Document's `info` attribute.
-            @keyword ownsStream: whether to close stream object on `close()`.
         """
         self._ownsStream = False
         if isinstance(stream, (str, bytes, bytearray)):
