@@ -54,7 +54,7 @@ from xml.etree import ElementTree as ET
 
 from .decoding import readElementID, readElementSize
 from .decoding import readFloat, readInt, readUInt, readDate
-from .decoding import readUnicode
+from .decoding import readString, readUnicode
 from . import encoding
 from . import schemata
 
@@ -349,7 +349,7 @@ class StringElement(Element):
         """ Type-specific helper function for parsing the element's payload.
             It is assumed the file pointer is at the start of the payload.
         """
-        return readUnicode(stream, size)
+        return readString(stream, size)
 
     @classmethod
     def encodePayload(cls, data, length=None):

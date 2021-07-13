@@ -178,12 +178,12 @@ class testDecoding(unittest.TestCase):
         """ Test reading strings. """
         
         self.mockStream = BytesIO(b'')
-        self.assertEqual(readString(self.mockStream, 0), b'')
+        self.assertEqual(readString(self.mockStream, 0), u'')
         
         self.mockStream = BytesIO(b'test')
         mockLen = len(self.mockStream.getvalue())
         self.assertEqual(readString(self.mockStream, mockLen),
-                         b'test')
+                         u'test')
             
     
     

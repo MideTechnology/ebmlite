@@ -187,11 +187,11 @@ def readString(stream, size):
         @return: The decoded value.
     """
     if size == 0:
-        return b''
+        return u''
 
     value = stream.read(size)
     value = value.partition(b'\x00')[0]
-    return value
+    return str(value, 'ascii')
 
 
 def readUnicode(stream, size):
