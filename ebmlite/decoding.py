@@ -15,6 +15,7 @@ __all__ = ['readElementID', 'readElementSize', 'readFloat', 'readInt',
 
 from datetime import datetime, timedelta
 import struct
+import warnings
 
 # ==============================================================================
 #
@@ -191,7 +192,12 @@ def readString(stream, size):
 
     value = stream.read(size)
     value = value.partition(b'\x00')[0]
-    return str(value, 'ascii')
+
+    try:
+        return str(value, 'ascii')
+    except UnicodeDecodeError as ex:
+        warnings.warn(str(ex), UnicodeWarning)
+        return str(value, 'ascii', 'replace')
 
 
 def readUnicode(stream, size):
