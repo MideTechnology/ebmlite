@@ -49,7 +49,7 @@ from collections import OrderedDict
 from datetime import datetime
 import errno
 import os.path
-from io import BytesIO
+from io import BytesIO, StringIO, IOBase
 from xml.etree import ElementTree as ET
 
 from .decoding import readElementID, readElementSize
@@ -1263,8 +1263,12 @@ class Schema(object):
 
     def __repr__(self):
         try:
-            return "<%s %r from '%s'>" % (self.__class__.__name__, self.name,
-                                           self.filename or self.source)
+            if isinstance(self.source, (BytesIO, StringIO)):
+                source = "string"
+            else:
+                source = "'%s'" % (self.filename or self.source)
+            return "<%s %r from %s>" % (self.__class__.__name__, self.name,
+                                        source)
         except AttributeError:
             return object.__repr__(self)
 
@@ -1358,7 +1362,7 @@ class Schema(object):
 
             @param stream: The file (or ``.write()``-supporting file-like
                 object) to which to write the encoded EBML.
-            @param value: The data to encode, provided as a dictionary keyed by
+            @param data: The data to encode, provided as a dictionary keyed by
                 element name, or a list of two-item name/value tuples. Note:
                 individual items in a list of name/value pairs *must* be tuples!
         """
@@ -1368,7 +1372,7 @@ class Schema(object):
     def encodes(self, data, headers=False):
         """ Create an EBML document using this Schema, returned as a string.
 
-            @param value: The data to encode, provided as a dictionary keyed by
+            @param data: The data to encode, provided as a dictionary keyed by
                 element name, or a list of two-item name/value tuples. Note:
                 individual items in a list of name/value pairs *must* be tuples!
             @return: A string containing the encoded EBML binary.
@@ -1408,16 +1412,19 @@ def loadSchema(filename, reload=False, **kwargs):
 
         @param filename: The name of the Schema XML file. If the file cannot
             be found and file's path is not absolute, the paths listed in
-            `SCHEMA_PATH` will be searched (similar to `sys.path` when importing
-            modules).
+            `SCHEMA_PATH` will be searched (similar to `sys.path` when
+            importing modules).
         @keyword reload: If `True`, the resulting Schema is guaranteed to be
-            new. Note: existing references to previous instances of the Schema
-            and/or its elements will not update.
+            new. Note: existing references to previous instances of the
+            Schema and/or its elements will not update.
 
         Additional keyword arguments are sent verbatim to the `Schema`
         constructor.
     """
     global SCHEMATA
+
+    if filename in SCHEMATA and not reload:
+        return SCHEMATA[filename]
 
     origName = filename
     if not filename.startswith(('.', '/', '\\', '~')):
@@ -1437,4 +1444,36 @@ def loadSchema(filename, reload=False, **kwargs):
 
     schema = Schema(filename, **kwargs)
     SCHEMATA[filename] = schema
+    return schema
+
+
+def parseSchema(src, name=None, reload=False, **kwargs):
+    """ Read Schema XML data from a string or stream. Loading one with the
+        same `name` will return the initial instantiation, unless `reload`
+        is `True`. Calls to `loadSchema()` using a name previously used with
+        `parseSchema()` will also return the previously instantiated Schema.
+
+        @param src: The XML string, or a stream containing XML.
+        @param name: The name of the schema. If none is supplied,
+            the name defined within the schema will be used.
+        @param reload: If `True`, the resulting Schema is guaranteed to be
+            new. Note: existing references to previous instances of the
+            Schema and/or its elements will not update.
+
+        Additional keyword arguments are sent verbatim to the `Schema`
+        constructor.
+    """
+    global SCHEMATA
+
+    if name in SCHEMATA and not reload:
+        return SCHEMATA[name]
+
+    if isinstance(src, IOBase):
+        stream = src
+    else:
+        stream = StringIO(src)
+
+    schema = Schema(stream, **kwargs)
+    name = name or schema.name
+    SCHEMATA[name] = schema
     return schema
