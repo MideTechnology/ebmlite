@@ -5,7 +5,7 @@ Note: this module does not encode Document or MasterElement objects; they are
 special cases, handled in `core.py`.
 """
 __author__ = "David Randall Stokes, Connor Flanigan"
-__copyright__ = "Copyright 2020, Mide Technology Corporation"
+__copyright__ = "Copyright 2021, Mide Technology Corporation"
 __credits__ = "David Randall Stokes, Connor Flanigan, Becker Awqatty, Derek Witt"
 
 __all__ = ['encodeBinary', 'encodeDate', 'encodeFloat', 'encodeId', 'encodeInt',
@@ -126,7 +126,7 @@ def encodeUInt(val: int, length: Optional[int] = None) -> bytes:
         @raise ValueError: raised if val is longer than length.
     """
     pad = b'\x00'
-    packed = _struct_uint64.pack(val).lstrip(pad)
+    packed = _struct_uint64.pack(val).lstrip(pad) or pad
 
     if length is None:
         return packed
@@ -147,12 +147,9 @@ def encodeInt(val: int, length: Optional[int] = None) -> bytes:
             (for negative) if `length` is not `None`.
         @raise ValueError: raised if val is longer than length.
     """
-    if val == 0:
-        packed = b''
+    if val >= 0:
         pad = b'\x00'
-    elif val > 0:
-        pad = b'\x00'
-        packed = _struct_int64.pack(val).lstrip(pad)
+        packed = _struct_int64.pack(val).lstrip(pad) or pad
         if packed[0] & 0b10000000:
             packed = pad + packed
     else:

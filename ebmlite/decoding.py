@@ -7,7 +7,7 @@ and `MasterElement` objects are special cases, and `BinaryElement` objects do
 not require special decoding. 
 """
 __author__ = "David Randall Stokes, Connor Flanigan"
-__copyright__ = "Copyright 2020, Mide Technology Corporation"
+__copyright__ = "Copyright 2021, Mide Technology Corporation"
 __credits__ = "David Randall Stokes, Connor Flanigan, Becker Awqatty, Derek Witt"
 
 __all__ = ['readElementID', 'readElementSize', 'readFloat', 'readInt',

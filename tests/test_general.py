@@ -1,10 +1,10 @@
-'''
+"""
 Created on Aug 14, 2017
 
 @author: dstokes
-'''
+"""
+
 import unittest
-import pytest
 from xml.dom.minidom import parseString
 from xml.etree import ElementTree as ET
 
@@ -164,6 +164,62 @@ class Test(unittest.TestCase):
         # Compare as lists to narrow the location of any differences
         self.assertListEqual(xmlLines1[1:], xmlLines2[1:],
                              'One or more lines are different in the xml documents')
+
+    def testCreateID(self):
+        """ Test the EBML ID generation utility function. """
+        schema = core.loadSchema('matroska.xml')
+
+        ranges = dict(A=(0x81, 0xFE),
+                      B=(0x407F, 0x7FFE),
+                      C=(0x203FFF, 0x3FFFFE),
+                      D=(0x101FFFFF, 0x1FFFFFFE))
+
+        # Test IDs not already in schema
+        for idClass in ranges.keys():
+            ids = util.createID(schema, idClass, count=1000)
+            self.assertTrue(all(eid not in schema for eid in ids), "createID() produced a used class %s ID"
+                            % idClass)
+
+        self.assertRaises(KeyError, util.createID, schema, 'E')
+
+        # Test exclusion of indicated IDs
+        ids = util.createID(schema, 'A', count=100)
+        ids2 = util.createID(schema, 'A', count=100, exclude=ids)
+        self.assertTrue(len(ids2) == 0, "createID() failed to exclude specified IDs")
+
+        # Test count restriction.
+        # Note: May need changing if the Matroska schema is modified
+        self.assertTrue(4 < len(util.createID(schema, 'A', count=5)) <= 5)
+
+        # Test ID class range restrictions
+        for idClass, (minId, maxId) in ranges.items():
+            m = min(util.createID(schema, idClass, minId=minId-50, count=100))
+            self.assertGreaterEqual(m, minId, "createID() generated out-of-range value ID for class %s: %s"
+                                    % (idClass, m))
+
+            m = max(util.createID(schema, idClass, minId=maxId-50, count=100))
+            self.assertLessEqual(m, maxId, "createID() generated out-of-range value ID for class %s: %s"
+                                 % (idClass, m))
+
+
+    def testValidateID(self):
+        """ Test EBML ID validation utility function. """
+        ranges = dict(A=(0x81, 0xFE),
+                      B=(0x407F, 0x7FFE),
+                      C=(0x203FFF, 0x3FFFFE),
+                      D=(0x101FFFFF, 0x1FFFFFFE))
+
+        for lo, hi in ranges.values():
+            # Test valid IDs (in range)
+            self.assertTrue(util.validateID(lo))
+            self.assertTrue(util.validateID(int((lo + hi) / 2)))
+            self.assertTrue(util.validateID(hi))
+
+            self.assertRaises(ValueError, util.validateID, lo - 1)
+            self.assertRaises(ValueError, util.validateID, hi + 1)
+
+            self.assertRaises(TypeError, util.validateID, '0x80')
+            self.assertRaises(Exception, util.validateID, 128.1)
 
 
 if __name__ == "__main__":
