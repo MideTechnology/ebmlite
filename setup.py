@@ -1,5 +1,6 @@
 import setuptools
 
+
 with open('README.md', 'r') as fh:
     long_description = fh.read()
 
@@ -39,9 +40,9 @@ setuptools.setup(
             '': ['schemata/*']
         },
         entry_points={'console_scripts': [
-            'view-ebml=ebmlite.cli:view_ebml',
-            'ebml2xml=ebmlite.cli:ebml2xml',
-            'xml2ebml=ebmlite.cli:xml2ebml',
+            'view-ebml=ebmlite.tools.view_ebml:main',
+            'ebml2xml=ebmlite.tools.ebml2xml:main',
+            'xml2ebml=ebmlite.tools.xml2ebml:main',
         ]},
         test_suite='tests',
         install_requires=INSTALL_REQUIRES,
