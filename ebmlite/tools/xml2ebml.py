@@ -4,7 +4,7 @@ from ebmlite.console_scripts import utils
 import ebmlite.util
 
 
-def parseArgs():
+def main():
     argparser = argparse.ArgumentParser(
         description="A tool for converting xml to ebml."
     )
@@ -26,19 +26,10 @@ def parseArgs():
         '-c', '--clobber', action="store_true",
         help="Clobber (overwrite) existing files.",
     )
+    args = argparser.parse_args()
 
-    return argparser.parse_args()
-
-
-def run(filein, schema, fileout=None, clobber=True):
-    with utils.load_files(
-        filein, schema, fileout, clobber, binary_output=True
-    ) as (schema, out):
-        ebmlite.util.xml2ebml(filein, out, schema)  # , sizeLength=4, headers=True, unknown=True)
-
-
-def main():
-    run(**utils.formatArgs(parseArgs()))
+    with utils.load_files(args, binary_output=True) as (schema, out):
+        ebmlite.util.xml2ebml(args.input, out, schema)  # , sizeLength=4, headers=True, unknown=True)
 
 
 if __name__ == "__main__":

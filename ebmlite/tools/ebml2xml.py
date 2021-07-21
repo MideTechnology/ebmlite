@@ -6,7 +6,7 @@ from ebmlite.console_scripts import utils
 import ebmlite.util
 
 
-def parseArgs():
+def main():
     argparser = argparse.ArgumentParser(
         description="A tool for converting ebml to xml."
     )
@@ -25,8 +25,7 @@ def parseArgs():
         '-o', '--output', metavar="FILE.xml", help="The output file.",
     )
     argparser.add_argument(
-        '-c', '--clobber',
-        action="store_true",
+        '-c', '--clobber', action="store_true",
         help="Clobber (overwrite) existing files.",
     )
     argparser.add_argument(
@@ -38,27 +37,19 @@ def parseArgs():
         help="Generate minimal XML with ebml2xml. Just element name and value",
     )
 
-    return argparser.parse_args()
+    args = argparser.parse_args()
 
-
-def run(filein, schema, fileout=None, clobber=True, pretty=True, minXml=True):
-    with utils.load_files(
-        filein, schema, fileout, clobber, binary_output=not pretty
-    ) as (schema, out):
-        doc = schema.load(filein, headers=True)
-        if minXml:
+    with utils.load_files(args, binary_output=not args.pretty) as (schema, out):
+        doc = schema.load(args.input, headers=True)
+        if args.min:
             root = ebmlite.util.toXml(doc, offsets=False, sizes=False, types=False, ids=False)
         else:
             root = ebmlite.util.toXml(doc)  # , offsets, sizes, types, ids)
         s = ET.tostring(root, encoding="utf-8")
-        if pretty:
+        if args.pretty:
             parseString(s).writexml(out, addindent='\t', newl='\n', encoding='utf-8')
         else:
             out.write(s)
-
-
-def main():
-    run(**utils.formatArgs(parseArgs()))
 
 
 if __name__ == "__main__":
