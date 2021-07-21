@@ -4,7 +4,7 @@ from ebmlite.console_scripts import utils
 import ebmlite.util
 
 
-def main():
+def parseArgs():
     argparser = argparse.ArgumentParser(
         description="A tool for reading ebml file content."
     )
@@ -26,11 +26,20 @@ def main():
         '-c', '--clobber', action="store_true",
         help="Clobber (overwrite) existing files.",
     )
-    args = argparser.parse_args()
+    
+    return argparser.parse_args()
 
-    with utils.load_files(args, binary_output=True) as (schema, out):
-        doc = schema.load(args.input, headers=True)
+
+def run(filein, schema, fileout=None, clobber=True):
+    with utils.load_files(
+        filein, schema, fileout, clobber, binary_output=True
+    ) as (schema, out):
+        doc = schema.load(filein, headers=True)
         ebmlite.util.pprint(doc, out=out)
+
+
+def main():
+    run(**utils.formatArgs(parseArgs()))
 
 
 if __name__ == "__main__":
