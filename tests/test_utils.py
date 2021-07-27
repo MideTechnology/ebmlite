@@ -1,6 +1,6 @@
-import os
 import filecmp
-import re
+import os
+import xml.etree.ElementTree as ET
 
 import pytest
 
@@ -24,18 +24,19 @@ def test_ebml2xml(script_runner):
     assert result.success
 
     try:
+        root_out = ET.parse(path_out).getroot()
+        root_expt = ET.parse(path_expt).getroot()
         # Replace schema location, which varies based on project location on disk
-        with open(path_out, "r") as file_out:
-            text_out = file_out.read()
-        text_out = re.sub(
-            pattern=r'schemaFile=".*\/ebmlite\/schemata\/matroska.xml"',
-            repl='schemaFile="./ebmlite/schemata/matroska.xml"',
-            string=text_out,
-        )
-        with open(path_out, "w") as file_out:
-            text_out = file_out.write(text_out)
+        root_out.set("schemaFile", "./ebmlite/schemata/matroska.xml")
 
-        assert filecmp.cmp(path_out, path_expt, shallow=False)
+        # Output file is not in canonical form (see Py3.8+: ET.canonicalize)
+        # -> compare key properties of each element
+        def elements_are_equiv(e1, e2):
+            return e1.tag == e2.tag and e1.attrib == e2.attrib
+
+        assert elements_are_equiv(root_out, root_expt)
+        for e_out, e_expt in zip(root_out.iter(), root_expt.iter()):
+            assert elements_are_equiv(e_out, e_expt)
 
     finally:
         # Remove the output file in all cases
