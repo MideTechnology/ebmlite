@@ -1,11 +1,12 @@
 import filecmp
 import os
+from pathlib import Path, PurePosixPath
 import xml.etree.ElementTree as ET
 
 import pytest
 
 
-SCHEMA_PATH = os.path.join(".", "ebmlite", "schemata", "matroska.xml")
+SCHEMA_PATH = Path("./ebmlite/schemata/matroska.xml")
 
 @pytest.mark.script_launch_mode('subprocess')
 def test_ebml2xml(script_runner):
@@ -28,6 +29,7 @@ def test_ebml2xml(script_runner):
         root_expt = ET.parse(path_expt).getroot()
         # Replace schema location, which varies based on project location on disk
         root_out.set("schemaFile", "./ebmlite/schemata/matroska.xml")
+        root_out.set("source", "./" + str(PurePosixPath(Path(root_out.attrib["source"]))))
 
         # Output file is not in canonical form (see Py3.8+: ET.canonicalize)
         # -> compare key properties of each element
