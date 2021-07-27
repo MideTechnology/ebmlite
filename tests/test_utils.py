@@ -55,7 +55,6 @@ def test_xml2ebml(script_runner):
     finally:
         # Remove the output file in all cases
         try:
-            pass
             os.remove(path_out)
         except FileNotFoundError:
             pass
