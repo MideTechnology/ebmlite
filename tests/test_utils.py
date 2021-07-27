@@ -31,12 +31,12 @@ def test_ebml2xml(script_runner):
 
         # Output file is not in canonical form (see Py3.8+: ET.canonicalize)
         # -> compare key properties of each element
-        def elements_are_equiv(e1, e2):
-            return e1.tag == e2.tag and e1.attrib == e2.attrib
+        def assert_elements_are_equiv(e1, e2):
+            assert e1.tag == e2.tag and e1.attrib == e2.attrib
 
-        assert elements_are_equiv(root_out, root_expt)
+        assert_elements_are_equiv(root_out, root_expt)
         for e_out, e_expt in zip(root_out.iter(), root_expt.iter()):
-            assert elements_are_equiv(e_out, e_expt)
+            assert_elements_are_equiv(e_out, e_expt)
 
     finally:
         # Remove the output file in all cases
