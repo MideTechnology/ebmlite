@@ -1,5 +1,6 @@
 import os
 import filecmp
+import re
 
 import pytest
 
@@ -23,6 +24,17 @@ def test_ebml2xml(script_runner):
     assert result.success
 
     try:
+        # Replace schema location, which varies based on project location on disk
+        with open(path_out, "r") as file_out:
+            text_out = file_out.read()
+        text_out = re.sub(
+            pattern=r'schemaFile=".*\/ebmlite\/schemata\/matroska.xml"',
+            repl='schemaFile="./ebmlite/schemata/matroska.xml"',
+            string=text_out,
+        )
+        with open(path_out, "w") as file_out:
+            text_out = file_out.write(text_out)
+
         assert filecmp.cmp(path_out, path_expt, shallow=False)
 
     finally:
