@@ -1,6 +1,6 @@
 import argparse
 
-from ebmlite.console_scripts import utils
+from ebmlite.tools import utils
 import ebmlite.util
 
 

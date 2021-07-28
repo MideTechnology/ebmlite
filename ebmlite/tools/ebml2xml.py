@@ -2,7 +2,7 @@ import argparse
 from xml.dom.minidom import parseString
 from xml.etree import ElementTree as ET
 
-from ebmlite.console_scripts import utils
+from ebmlite.tools import utils
 import ebmlite.util
 
 
