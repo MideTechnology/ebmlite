@@ -11,15 +11,15 @@ def main():
         description="A tool for converting ebml to xml."
     )
     argparser.add_argument(
+        'input', metavar="FILE.ebml", help="The source EBML file.",
+    )
+    argparser.add_argument(
         'schema',
         metavar="SCHEMA.xml",
         help=(
           "The name of the schema file. Only the name itself is required if"
           " the schema file is in the standard schema directory."
         ),
-    )
-    argparser.add_argument(
-        'input', metavar="FILE.ebml", help="The source EBML file.",
     )
     argparser.add_argument(
         '-o', '--output', metavar="FILE.xml", help="The output file.",
