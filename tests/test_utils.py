@@ -6,7 +6,8 @@ import xml.etree.ElementTree as ET
 import pytest
 
 
-SCHEMA_PATH = Path("./ebmlite/schemata/matroska.xml")
+SCHEMA_PATH = os.path.join(".", "ebmlite", "schemata", "matroska.xml")
+
 
 @pytest.mark.script_launch_mode('subprocess')
 def test_ebml2xml(script_runner):
