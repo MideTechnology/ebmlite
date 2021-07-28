@@ -28,7 +28,7 @@ def main():
     )
     args = argparser.parse_args()
 
-    with utils.load_files(args, binary_output=True) as (schema, out):
+    with utils.load_files(args, binary_output=False) as (schema, out):
         doc = schema.load(args.input, headers=True)
         ebmlite.util.pprint(doc, out=out)
 
