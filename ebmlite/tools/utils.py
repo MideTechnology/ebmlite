@@ -31,5 +31,3 @@ def load_files(args, binary_output=False):
         errPrint("Output file exists: %s" % args.output)
     with open(output, ('wb' if binary_output else 'w')) as out:
         yield (schema, out)
-
-
