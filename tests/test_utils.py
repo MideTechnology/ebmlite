@@ -74,3 +74,30 @@ def test_xml2ebml(script_runner):
             os.remove(path_out)
         except FileNotFoundError:
             pass
+
+
+@pytest.mark.script_launch_mode('subprocess')
+def test_view(script_runner):
+    path_base = os.path.join(".", "tests", "video-4{ext}")
+    path_in = path_base.format(ext=".ebml")
+    path_out = path_base.format(ext=".xml.txt")
+    path_expt = path_base.format(ext=".txt")
+
+    result = script_runner.run(
+        "python", "-m", "ebmlite.util", "view",
+        path_in,
+        SCHEMA_PATH,
+        "--output=" + path_out,
+        "--clobber",
+    )
+    assert result.success
+
+    try:
+        assert filecmp.cmp(path_out, path_expt, shallow=False)
+
+    finally:
+        # Remove the output file in all cases
+        try:
+            os.remove(path_out)
+        except FileNotFoundError:
+            pass

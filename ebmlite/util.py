@@ -487,6 +487,10 @@ if __name__ == "__main__":
         else:
             out.write(s)
     else:
+        if 'b' in out.mode and out != sys.stdout:   # view wants to write strings, not binary
+            out_name = out.name
+            out.close()
+            out = open(out_name, 'w')
         doc = schema.load(args.input, headers=True)
         pprint(doc, out=out)
 
