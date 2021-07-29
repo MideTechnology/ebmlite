@@ -17,10 +17,11 @@ def test_ebml2xml(script_runner):
     path_expt = path_base.format(ext=".xml")
 
     result = script_runner.run(
-        "python", "-m", "ebmlite.util", "ebml2xml",
+        "ebml2xml",
         path_in,
         SCHEMA_PATH,
-        "--output=" + path_out,
+        "--output",
+        path_out,
         "--clobber",
     )
     assert result.success
@@ -57,10 +58,11 @@ def test_xml2ebml(script_runner):
     path_expt = path_base.format(ext=".ebml")
 
     result = script_runner.run(
-        "python", "-m", "ebmlite.util", "xml2ebml",
+        "xml2ebml",
         path_in,
         SCHEMA_PATH,
-        "--output=" + path_out,
+        "--output",
+        path_out,
         "--clobber",
     )
     assert result.success
@@ -84,10 +86,11 @@ def test_view(script_runner):
     path_expt = path_base.format(ext=".txt")
 
     result = script_runner.run(
-        "python", "-m", "ebmlite.util", "view",
+        "view-ebml",
         path_in,
         SCHEMA_PATH,
-        "--output=" + path_out,
+        "--output",
+        path_out,
         "--clobber",
     )
     assert result.success
