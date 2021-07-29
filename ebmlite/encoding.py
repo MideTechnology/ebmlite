@@ -12,7 +12,7 @@ __all__ = ['encodeBinary', 'encodeDate', 'encodeFloat', 'encodeId', 'encodeInt',
            'encodeSize', 'encodeString', 'encodeUInt', 'encodeUnicode']
 
 import datetime
-from typing import ByteString, Optional, Union
+from typing import ByteString, List, Optional
 import sys
 
 from .decoding import _struct_uint64, _struct_int64
@@ -23,21 +23,21 @@ from .decoding import _struct_float32, _struct_float64
 # ==============================================================================
 
 # If no length is given, use the platform's size of a float.
-DEFAULT_FLOAT_SIZE = 4 if sys.maxsize <= 2147483647 else 8
+DEFAULT_FLOAT_SIZE: int = 4 if sys.maxsize <= 2147483647 else 8
 
-LENGTH_PREFIXES = [0,
-                   0x80,
-                   0x4000,
-                   0x200000,
-                   0x10000000,
-                   0x0800000000,
-                   0x040000000000,
-                   0x02000000000000,
-                   0x0100000000000000
-                   ]
+LENGTH_PREFIXES: List[int] = [0,
+                              0x80,
+                              0x4000,
+                              0x200000,
+                              0x10000000,
+                              0x0800000000,
+                              0x040000000000,
+                              0x02000000000000,
+                              0x0100000000000000
+                              ]
 
 # Translation table for removing invalid EBML string characters (32 < x < 127)
-STRING_CHARACTERS = (b"?"*32 + bytearray(range(32, 127))).ljust(256, b'?')
+STRING_CHARACTERS: bytes = (b"?"*32 + bytearray(range(32, 127))).ljust(256, b'?')
 
 # ==============================================================================
 #

@@ -50,7 +50,7 @@ from datetime import datetime
 import errno
 import os.path
 from io import BytesIO
-from typing import Any, Dict, List, Optional, Tuple, Union, BinaryIO
+from typing import Any, Dict, List, Optional, Union, BinaryIO
 from xml.etree import ElementTree as ET
 
 from .decoding import readElementID, readElementSize
@@ -66,7 +66,7 @@ from . import schemata
 # SCHEMA_PATH: A list of paths for schema XML files, similar to `sys.path`.
 # When `loadSchema()` is used, it will search these paths, in order, to find
 # the schema file.
-SCHEMA_PATH = ['',
+SCHEMA_PATH: List[str] = ['',
                os.path.realpath(os.path.dirname(schemata.__file__))]
 
 # SCHEMATA: A dictionary of loaded schemata, keyed by filename. Used by

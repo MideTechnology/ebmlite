@@ -13,7 +13,7 @@ __credits__ = "David Randall Stokes, Connor Flanigan, Becker Awqatty, Derek Witt
 __all__ = ['readElementID', 'readElementSize', 'readFloat', 'readInt',
            'readUInt', 'readDate', 'readString', 'readUnicode']
 
-from typing import Any, BinaryIO, Optional, Tuple, Union
+from typing import BinaryIO, Optional, Tuple
 
 from datetime import datetime, timedelta
 import struct
