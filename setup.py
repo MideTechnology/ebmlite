@@ -12,6 +12,7 @@ TEST_REQUIRES = [
     'codecov',
     'pytest-cov',
     'pytest-flake8',
+    'pytest-console-scripts',
     ]
 
 setuptools.setup(

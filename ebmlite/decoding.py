@@ -17,6 +17,7 @@ from typing import BinaryIO, Optional, Tuple
 
 from datetime import datetime, timedelta
 import struct
+import warnings
 
 # ==============================================================================
 #
@@ -189,11 +190,16 @@ def readString(stream: BinaryIO, size: int) -> bytes:
         @return: The decoded value.
     """
     if size == 0:
-        return b''
+        return u''
 
     value = stream.read(size)
     value = value.partition(b'\x00')[0]
-    return value
+
+    try:
+        return str(value, 'ascii')
+    except UnicodeDecodeError as ex:
+        warnings.warn(str(ex), UnicodeWarning)
+        return str(value, 'ascii', 'replace')
 
 
 def readUnicode(stream: BinaryIO, size: int) -> str:
