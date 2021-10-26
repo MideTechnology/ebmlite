@@ -234,7 +234,7 @@ class TestThreadedFile(unittest.TestCase):
             the results.
         """
         schemaFile = './ebmlite/schemata/matroska.xml'
-        ebmlFile1 = threaded_file.ThreadAwareFile('./tests/video-1.mkv')
+        ebmlFile1 = './tests/video-1.mkv'
         ebmlFile2 = './tests/video-1-copy.mkv'
         xmlFile1 = './tests/video-1.xml'
         xmlFile2 = './tests/video-1-copy.xml'
@@ -242,7 +242,7 @@ class TestThreadedFile(unittest.TestCase):
         schema = core.loadSchema(schemaFile)
 
         # Start with toXml
-        ebmlDoc1 = schema.load(ebmlFile1, headers=True)
+        ebmlDoc1 = schema.load(threaded_file.ThreadAwareFile(ebmlFile1), headers=True)
         ebmlRoot = util.toXml(ebmlDoc1)
         xmlString1 = ET.tostring(ebmlRoot, encoding='UTF-8')
 

@@ -58,7 +58,7 @@ class ThreadAwareFile(io.FileIO):
         self.initArgs = args
         self.initKwargs = kwargs
         
-        self._ready = Event() # NOT a lock; some things block, others wait
+        self._ready = Event()  # NOT a lock; some things block, others wait
         self._ready.set()
 
         self.threads = {}
