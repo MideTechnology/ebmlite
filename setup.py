@@ -14,6 +14,7 @@ TEST_REQUIRES = [
     'pytest-cov',
     'pytest-flake8',
     'pytest-console-scripts',
+    'pytest-xdist[psutil]',
     ]
 
 setuptools.setup(
