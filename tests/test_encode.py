@@ -30,10 +30,10 @@ class testUtilFunctions(unittest.TestCase):
         val3 = encodeSize(1000)
         val4 = encodeSize(2**60)
 
-        expected1 = bytes([0b1000_0001])
-        expected2 = bytes([0b1110_0100])
-        expected3 = bytes([0b0100_0011, 0b1110_1000])
-        expected4 = bytes([0b0001_0001, 0b0000_0000, 0b0000_0000, 0b0000_0000, 0b0000_0000, 0b0000_0000, 0b0000_0000, 0b0000_0000])
+        expected1 = bytes([0b10000001])
+        expected2 = bytes([0b11100100])
+        expected3 = bytes([0b01000011, 0b11101000])
+        expected4 = bytes([0b00010001, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000])
 
         self.assertEqual(expected1, val1, 'failed to encode 1')
         self.assertEqual(expected2, val2, 'failed to encode 100')
@@ -46,10 +46,10 @@ class testUtilFunctions(unittest.TestCase):
         val3 = encodeSize(1000, 4)
         val4 = encodeSize(None, length=4)
 
-        expected1 = bytes([0b0001_0000, 0b0000_0000, 0b0000_0000, 0b0000_0001])
-        expected2 = bytes([0b0001_0000, 0b0000_0000, 0b0000_0000, 0b0110_0100])
-        expected3 = bytes([0b0001_0000, 0b0000_0000, 0b0000_0011, 0b1110_1000])
-        expected4 = bytes([0b1111_1111]*4)
+        expected1 = bytes([0b00010000, 0b00000000, 0b00000000, 0b00000001])
+        expected2 = bytes([0b00010000, 0b00000000, 0b00000000, 0b01100100])
+        expected3 = bytes([0b00010000, 0b00000000, 0b00000011, 0b11101000])
+        expected4 = bytes([0b11111111]*4)
 
         self.assertEqual(expected1, val1, 'failed to encode 1')
         self.assertEqual(expected2, val2, 'failed to encode 100')
@@ -69,10 +69,10 @@ class testUtilFunctions(unittest.TestCase):
         val3 = encodeId(1000 + 16384)
         val4 = encodeId(10000 + 16384)
 
-        expected1 = bytes([0b1000_0001])
-        expected2 = bytes([0b1110_0100])
-        expected3 = bytes([0b0100_0011, 0b1110_1000])
-        expected4 = bytes([0b0110_0111, 0b0001_0000])
+        expected1 = bytes([0b10000001])
+        expected2 = bytes([0b11100100])
+        expected3 = bytes([0b01000011, 0b11101000])
+        expected4 = bytes([0b01100111, 0b00010000])
 
         self.assertEqual(expected1, val1, 'failed to encode 1')
         self.assertEqual(expected2, val2, 'failed to encode 100')
@@ -85,10 +85,10 @@ class testUtilFunctions(unittest.TestCase):
         val3 = encodeId(1000 + 16384, length=3)
         val4 = encodeId(10000 + 16384, length=3)
 
-        expected1 = bytes([0b0000_0000, 0b0000_0000, 0b1000_0001])
-        expected2 = bytes([0b0000_0000, 0b0000_0000, 0b1110_0100])
-        expected3 = bytes([0b0000_0000, 0b0100_0011, 0b1110_1000])
-        expected4 = bytes([0b0000_0000, 0b0110_0111, 0b0001_0000])
+        expected1 = bytes([0b00000000, 0b00000000, 0b10000001])
+        expected2 = bytes([0b00000000, 0b00000000, 0b11100100])
+        expected3 = bytes([0b00000000, 0b01000011, 0b11101000])
+        expected4 = bytes([0b00000000, 0b01100111, 0b00010000])
 
         self.assertEqual(expected1, val1, 'failed to encode 1')
         self.assertEqual(expected2, val2, 'failed to encode 100')
