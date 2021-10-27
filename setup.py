@@ -15,6 +15,7 @@ TEST_REQUIRES = [
     'pytest-flake8',
     'pytest-console-scripts',
     'pytest-xdist[psutil]',
+    'filelock',
     ]
 
 setuptools.setup(
@@ -30,6 +31,7 @@ setuptools.setup(
         classifiers=['Development Status :: 5 - Production/Stable',
                      'License :: OSI Approved :: MIT License',
                      'Natural Language :: English',
+                     'Programming Language :: Python :: 3.5',
                      'Programming Language :: Python :: 3.6',
                      'Programming Language :: Python :: 3.7',
                      'Programming Language :: Python :: 3.8',
