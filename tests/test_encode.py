@@ -129,7 +129,8 @@ class testEncoding(unittest.TestCase):
                              "Character %X not encoded properly" % i)
             
         #   uint64
-        for i in range(0, 256):            self.assertEqual(encodeUInt((i<<56) + 0x41414141414141, length=8), chr(i).encode('latin-1') + b'AAAAAAA',
+        for i in range(0, 256):       
+            self.assertEqual(encodeUInt((i<<56) + 0x41414141414141, length=8), chr(i).encode('latin-1') + b'AAAAAAA',
                              'Character %X not encoded properly' % i)
 
         # Length paramater behavior
