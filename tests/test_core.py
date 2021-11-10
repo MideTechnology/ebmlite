@@ -4,10 +4,9 @@ import types
 import unittest
 from io import BytesIO
 
-from ebmlite.core import loadSchema, BinaryElement, DateElement, Element, FloatElement, \
-        IntegerElement, MasterElement, StringElement, UIntegerElement, \
-        UnicodeElement, VoidElement, UnknownElement
-
+from ebmlite.core import loadSchema, parseSchema, BinaryElement, DateElement, \
+    Element, FloatElement, IntegerElement, MasterElement, StringElement, \
+    UIntegerElement, UnicodeElement, VoidElement, UnknownElement
 
 
 class testCoreElement(unittest.TestCase):
@@ -78,7 +77,7 @@ class testCoreElement(unittest.TestCase):
         self.assertEqual(self.element._value, None)
         self.assertEqual(self.element.gc(), 0)
 
-        self.element.value
+        _ = self.element.value  # `value` is a property that affects `_value`
         self.assertEqual(self.element._value, b'\x71\xea')
 
         self.assertEqual(self.element.gc(), 1)
@@ -789,6 +788,33 @@ class testSchema(unittest.TestCase):
         with self.assertRaises(IOError):
             self.schema.verify(b'\x00\x42\x86\x81\x01')
 
+
+    def testParseSchema(self):
+        """ Test parsing a schema from a string. """
+
+        filename = self.schema.filename
+        ids = list(sorted(self.schema.elements))
+
+        with open(filename, 'r') as f:
+            xml = f.read()
+
+        schema = parseSchema(xml, name=filename)
+        self.assertTrue(schema is self.schema,
+                        "parseSchema() did not use cached loaded schema")
+
+        schema = parseSchema(xml, name="testParseSchema")
+        self.assertTrue(schema is not self.schema,
+                        "parseSchema() did not produce a new schema")
+        self.assertEqual(schema, self.schema,
+                         "Parsed schema string did not match loaded schema")
+
+        # Just in case `Schema.__eq__()` has an error:
+        self.assertEqual(list(sorted(schema.elements)), ids,
+                         "Parsed schema string did not match loaded schema")
+
+        schema2 = parseSchema(xml, name="testParseSchema")
+        self.assertTrue(schema2 is schema,
+                        "parseSchema() did not use cached parsed schema")
 
 
 if __name__ == "__main__":

@@ -204,7 +204,6 @@ def encodeBinary(val, length=None):
         @raise ValueError: raised if val is longer than length.
     """
     if isinstance(val, str):
-        print(val)
         val = val.encode('utf_8')
     elif val is None:
         val = b''
