@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/MideTechnology/ebmlite.svg?branch=master)](https://travis-ci.org/MideTechnology/ebmlite)   [![codecov](https://codecov.io/gh/MideTechnology/ebmlite/branch/master/graph/badge.svg)](https://codecov.io/gh/MideTechnology/ebmlite)
+![example workflow](https://github.com/MideTechnology/ebmlite/actions/workflows/unit-tests.yml/badge.svg) [![codecov](https://codecov.io/gh/MideTechnology/ebmlite/branch/master/graph/badge.svg)](https://codecov.io/gh/MideTechnology/ebmlite) 
 
 
 
