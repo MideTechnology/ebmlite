@@ -13,6 +13,7 @@ __all__ = ['encodeBinary', 'encodeDate', 'encodeFloat', 'encodeId', 'encodeInt',
 
 import datetime
 import sys
+import warnings
 
 from .decoding import _struct_uint64, _struct_int64
 from .decoding import _struct_float32, _struct_float64
@@ -124,6 +125,11 @@ def encodeUInt(val, length=None):
             left-padded with ``0x00`` if `length` is not `None`.
         @raise ValueError: raised if val is longer than length.
     """
+    if isinstance(val, float):
+        fval, val = val, int(val)
+        if fval != val:
+            warnings.warn('encodeUInt: float value {} encoded as {}'.format(fval, val))
+
     pad = b'\x00'
     packed = _struct_uint64.pack(val).lstrip(pad) or pad
 
@@ -146,6 +152,11 @@ def encodeInt(val, length=None):
             (for negative) if `length` is not `None`.
         @raise ValueError: raised if val is longer than length.
     """
+    if isinstance(val, float):
+        fval, val = val, int(val)
+        if fval != val:
+            warnings.warn('encodeInt: float value {} encoded as {}'.format(fval, val))
+
     if val >= 0:
         pad = b'\x00'
         packed = _struct_int64.pack(val).lstrip(pad) or pad
