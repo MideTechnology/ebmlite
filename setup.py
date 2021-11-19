@@ -20,7 +20,7 @@ TEST_REQUIRES = [
 
 setuptools.setup(
         name='ebmlite',
-        version='3.2.0',
+        version='3.2.1',
         author='Mide Technology',
         author_email='help@mide.com',
         description='A lightweight, "pure Python" library for parsing EBML (Extensible Binary Markup Language) data.',
