@@ -15,7 +15,6 @@ TEST_REQUIRES = [
     'pytest-flake8',
     'pytest-console-scripts',
     'pytest-xdist[psutil]',
-    'filelock',
     ]
 
 setuptools.setup(

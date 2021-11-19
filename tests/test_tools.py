@@ -1,6 +1,7 @@
 import filecmp
 import os
 from pathlib import Path, PurePosixPath
+import tempfile
 import xml.etree.ElementTree as ET
 
 import pytest
@@ -13,20 +14,21 @@ SCHEMA_PATH = os.path.join(".", "ebmlite", "schemata", "matroska.xml")
 def test_ebml2xml(script_runner):
     path_base = os.path.join(".", "tests", "video-4{ext}")
     path_in = path_base.format(ext=".ebml")
-    path_out = path_base.format(ext=".ebml.xml")
     path_expt = path_base.format(ext=".xml")
 
-    result = script_runner.run(
-        "ebml2xml",
-        path_in,
-        SCHEMA_PATH,
-        "--output",
-        path_out,
-        "--clobber",
-    )
-    assert result.success
+    with tempfile.TemporaryDirectory() as temp_dir:
+        path_out = os.path.join(temp_dir, "video-4.ebml.xml")
 
-    try:
+        result = script_runner.run(
+            "ebml2xml",
+            path_in,
+            SCHEMA_PATH,
+            "--output",
+            path_out,
+            "--clobber",
+        )
+        assert result.success
+
         root_out = ET.parse(path_out).getroot()
         root_expt = ET.parse(path_expt).getroot()
         # Replace schema location, which varies based on project location on disk
@@ -42,40 +44,26 @@ def test_ebml2xml(script_runner):
         for e_out, e_expt in zip(root_out.iter(), root_expt.iter()):
             assert_elements_are_equiv(e_out, e_expt)
 
-    finally:
-        # Remove the output file in all cases
-        try:
-            os.remove(path_out)
-        except FileNotFoundError:
-            pass
-
 
 @pytest.mark.script_launch_mode('subprocess')
 def test_xml2ebml(script_runner):
     path_base = os.path.join(".", "tests", "video-4{ext}")
     path_in = path_base.format(ext=".xml")
-    path_out = path_base.format(ext=".xml.ebml")
     path_expt = path_base.format(ext=".ebml")
 
-    result = script_runner.run(
-        "xml2ebml",
-        path_in,
-        SCHEMA_PATH,
-        "--output",
-        path_out,
-        "--clobber",
-    )
-    assert result.success
+    with tempfile.TemporaryDirectory() as temp_dir:
+        path_out = os.path.join(temp_dir, "video-4.xml.ebml")
 
-    try:
+        result = script_runner.run(
+            "xml2ebml",
+            path_in,
+            SCHEMA_PATH,
+            "--output",
+            path_out,
+            "--clobber",
+        )
+        assert result.success
         assert filecmp.cmp(path_out, path_expt, shallow=False)
-
-    finally:
-        # Remove the output file in all cases
-        try:
-            os.remove(path_out)
-        except FileNotFoundError:
-            pass
 
 
 @pytest.mark.script_launch_mode('subprocess')
@@ -85,22 +73,16 @@ def test_view(script_runner):
     path_out = path_base.format(ext=".xml.txt")
     path_expt = path_base.format(ext=".txt")
 
-    result = script_runner.run(
-        "view-ebml",
-        path_in,
-        SCHEMA_PATH,
-        "--output",
-        path_out,
-        "--clobber",
-    )
-    assert result.success
+    with tempfile.TemporaryDirectory() as temp_dir:
+        path_out = os.path.join(temp_dir, "video-4.xml.txt")
 
-    try:
+        result = script_runner.run(
+            "view-ebml",
+            path_in,
+            SCHEMA_PATH,
+            "--output",
+            path_out,
+            "--clobber",
+        )
+        assert result.success
         assert filecmp.cmp(path_out, path_expt, shallow=False)
-
-    finally:
-        # Remove the output file in all cases
-        try:
-            os.remove(path_out)
-        except FileNotFoundError:
-            pass

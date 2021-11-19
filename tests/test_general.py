@@ -7,16 +7,11 @@ Created on Aug 14, 2017
 import unittest
 from xml.dom.minidom import parseString
 from xml.etree import ElementTree as ET
-
-import filelock
+import tempfile
 
 from ebmlite import core
 from ebmlite import util
 from ebmlite import threaded_file
-
-
-MKV_LOCK_FILE = './tests/testMkv.lock'
-IDE_LOCK_FILE = './tests/testIde.lock'
 
 
 class Test(unittest.TestCase):
@@ -28,13 +23,13 @@ class Test(unittest.TestCase):
             the results.
         """
 
-        with filelock.FileLock(MKV_LOCK_FILE, timeout=-1):
+        with tempfile.TemporaryDirectory() as tempDir:
 
             schemaFile = './ebmlite/schemata/matroska.xml'
             ebmlFile1 = './tests/video-1.mkv'
-            ebmlFile2 = './tests/video-1-copy.mkv'
-            xmlFile1 = './tests/video-1.xml'
-            xmlFile2 = './tests/video-1-copy.xml'
+            ebmlFile2 = tempDir + '/video-1-copy.mkv'
+            xmlFile1 = tempDir + '/video-1.xml'
+            xmlFile2 = tempDir + '/video-1-copy.xml'
 
             schema = core.loadSchema(schemaFile)
 
@@ -84,13 +79,13 @@ class Test(unittest.TestCase):
             the results.
         """
 
-        with filelock.FileLock(IDE_LOCK_FILE, timeout=-1):
+        with tempfile.TemporaryDirectory() as tempDir:
 
             schemaFile = './ebmlite/schemata/mide_ide.xml'
             ebmlFile1 = './tests/SSX46714-doesnot.IDE'
-            ebmlFile2 = './tests/SSX46714-new.IDE'
-            xmlFile1 = './tests/ssx-1.xml'
-            xmlFile2 = './tests/ssx-2.xml'
+            ebmlFile2 = tempDir + '/SSX46714-new.IDE'
+            xmlFile1 = tempDir + '/ssx-1.xml'
+            xmlFile2 = tempDir + '/ssx-2.xml'
 
             schema = core.loadSchema(schemaFile)
 
@@ -240,12 +235,13 @@ class TestThreadedFile(unittest.TestCase):
             good MKV file (a derivative of EBML) back and forth, then compare
             the results.
         """
-        with filelock.FileLock(MKV_LOCK_FILE, timeout=-1):
+        with tempfile.TemporaryDirectory() as tempDir:
+
             schemaFile = './ebmlite/schemata/matroska.xml'
             ebmlFile1 = './tests/video-1.mkv'
-            ebmlFile2 = './tests/video-1-copy.mkv'
-            xmlFile1 = './tests/video-1.xml'
-            xmlFile2 = './tests/video-1-copy.xml'
+            ebmlFile2 = tempDir + '/video-1-copy.mkv'
+            xmlFile1 = tempDir + '/video-1.xml'
+            xmlFile2 = tempDir + '/video-1-copy.xml'
 
             schema = core.loadSchema(schemaFile)
 
