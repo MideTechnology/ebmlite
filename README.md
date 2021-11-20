@@ -202,17 +202,29 @@ Optional Argument *out*: A file-like stream to which to write.
 Optional argument *indent*: The string containing the character(s) used for each
         indentation.
 
-Utils can also be called from the command line with the following syntax:
+### Command Line Utilities
+When EBMLite is installed as a Python library, the Utils can be called from the command line. The commands available are:
 ```commandline
-python util.py {xml2ebml|ebml2xml|view} {FILE1.ebml|FILE1.xml} SCHEMA.xml [-o {FILE2.xml|FILE2.ebml}] [-c|--clobber] [-p|--pretty]
+python -m ebmlite.tools.ebml2xml
 ```
-The program requires you to specify a mode: xml2ebml, ebml2xml, or view.  The first two modes convert xml files to ebml files and ebml files to xml files, respectively; the last mode formats an IDE file to be human-readable.  
-FILE1: The location of the ebml or xml file to convert/view.  
-SCHEMA: The location of the schema to use when interpreting these files.  
-FILE2: The location to output to; otherwise, the output is directed into the console.  
--c|--clobber: If FILE2 exists, then overwrite it, otherwise the program will fail.  
--p|--pretty: Prints the output in a human-readable format.
-
+`ebml2xml` will translate an EBML file into XML. For example:
+```commandline
+python -m ebmlite.tools.ebml2xml DAQ11093_000001.ide mide_ide.xml -o DAQ11093_000001.xml
+```
+will translate `DAQ11093_000001.ide` into XML, and write the result into `DAQ11093_000001.xml`. The schema `mide_ide.xml` 
+is built in to the EBMLite library. 
+```commandline
+python -m ebmlite.tools.xml2ebml 
+```
+`xml2ebml` will translate EBML back in to XML. For example
+```commandline
+python -m ebmlite.tools.xml2ebml DAQ11093_000001.xml mide_ide.xml -o DAQ11093_000001b.ide
+```
+Will turn `DAQ11093_000001.xml` back into an IDE file.
+```commandline
+python -m ebmlite.tools.view_ebml
+```
+`view_ebml` will show summary element data about an EBML file, including element ID and type
 
 To Do
 =====
