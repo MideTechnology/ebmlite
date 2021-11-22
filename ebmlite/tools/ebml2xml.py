@@ -29,27 +29,27 @@ def main():
         help="Clobber (overwrite) existing files.",
     )
     argparser.add_argument(
-        '-p', '--pretty', action="store_true", help="Generate 'pretty' XML.",
+        '-s', '--single', action="store_true", help="Generate XML as a single line with no newlines or indents",
     )
     argparser.add_argument(
-        '--min',
+        '-m', '--max',
         action="store_true",
-        help="Generate minimal XML with ebml2xml. Just element name and value",
+        help="Generate XML with maximum description, including offset, size, type, and id info",
     )
 
     args = argparser.parse_args()
 
-    with utils.load_files(args, binary_output=not args.pretty) as (schema, out):
+    with utils.load_files(args, binary_output=args.single) as (schema, out):
         doc = schema.load(args.input, headers=True)
-        if args.min:
+        if args.max:
+            root = ebmlite.util.toXml(doc, offsets=True, sizes=True, types=True, ids=True)
+        else:
             root = ebmlite.util.toXml(doc, offsets=False, sizes=False, types=False, ids=False)
-        else:
-            root = ebmlite.util.toXml(doc)  # , offsets, sizes, types, ids)
         s = ET.tostring(root, encoding="utf-8")
-        if args.pretty:
-            parseString(s).writexml(out, addindent='\t', newl='\n', encoding='utf-8')
-        else:
+        if args.single:
             out.write(s)
+        else:
+            parseString(s).writexml(out, addindent='\t', newl='\n', encoding='utf-8')
 
 
 if __name__ == "__main__":

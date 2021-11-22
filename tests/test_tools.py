@@ -23,6 +23,8 @@ def test_ebml2xml(script_runner):
         "--output",
         path_out,
         "--clobber",
+        "--max",
+        "--single"
     )
     assert result.success
 
