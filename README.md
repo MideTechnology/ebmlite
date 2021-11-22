@@ -208,7 +208,7 @@ documentation can be viewed using one of the following:
 ```commandline
 python -m ebmlite.tools.ebml2xml -h
 python -m ebmlite.tools.xml2ebml -h
-python -m ebmlite.tools.ebml2xml -h
+python -m ebmlite.tools.view_ebml -h
 ```
 The commands available are:
 ```
