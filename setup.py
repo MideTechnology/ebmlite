@@ -20,13 +20,13 @@ TEST_REQUIRES = [
 
 setuptools.setup(
         name='ebmlite',
-        version='3.2.1',
+        version='3.2.2a1',
         author='Mide Technology',
         author_email='help@mide.com',
         description='A lightweight, "pure Python" library for parsing EBML (Extensible Binary Markup Language) data.',
         long_description=long_description,
         long_description_content_type='text/markdown',
-        url='https://github.com/MideTechnology/ebmlite',
+        url='https://github.com/MideTechnology/ebmlite/tree/master',
         license='MIT',
         classifiers=['Development Status :: 5 - Production/Stable',
                      'License :: OSI Approved :: MIT License',
