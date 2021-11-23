@@ -203,30 +203,37 @@ Optional argument *indent*: The string containing the character(s) used for each
         indentation.
 
 ### Command Line Utilities
-When EBMLite is installed as a Python library, the Utils can be called from the command line. The commands available are:
+When EBMLite is installed as a Python library, the Utils can be called from the command line. From the command line,
+documentation can be viewed using one of the following:
 ```commandline
-python -m ebmlite.tools.ebml2xml
+python -m ebmlite.tools.ebml2xml -h
+python -m ebmlite.tools.xml2ebml -h
+python -m ebmlite.tools.view_ebml -h
+```
+The commands available are:
+```
+python -m ebmlite.tools.ebml2xml <EBML file> <schema> -o <file.XML>
 ```
 `ebml2xml` will translate an EBML file into XML. For example:
 ```commandline
 python -m ebmlite.tools.ebml2xml DAQ11093_000001.ide mide_ide.xml -o DAQ11093_000001.xml
 ```
-will translate `DAQ11093_000001.ide` into XML, and write the result into `DAQ11093_000001.xml`. The schema `mide_ide.xml` 
-is built in to the EBMLite library. 
-```commandline
-python -m ebmlite.tools.xml2ebml 
+will translate `DAQ11093_000001.ide` (an enDAQ data recorder file) into XML, and write the result into
+`DAQ11093_000001.xml`. The schema `mide_ide.xml` is built in to the EBMLite library. 
+```
+python -m ebmlite.tools.xml2ebml <file.XML> <schema> -o <EBML file>
 ```
 `xml2ebml` will translate EBML back in to XML. For example
 ```commandline
 python -m ebmlite.tools.xml2ebml DAQ11093_000001.xml mide_ide.xml -o DAQ11093_000001b.ide
 ```
 Will turn `DAQ11093_000001.xml` back into an IDE file.
-```commandline
-python -m ebmlite.tools.view_ebml
+```
+python -m ebmlite.tools.view_ebml <EBML file> <schema>
 ```
 `view_ebml` will show summary element data about an EBML file, including element ID and type
 
 To Do
 =====
 * Complete documentation and example code.
-* See `@todo` items in the Python files (i.e. `core.py`).
+* See `todo` items in the Python files (i.e. `core.py`).
