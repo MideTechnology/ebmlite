@@ -45,11 +45,11 @@ __all__ = ['BinaryElement', 'DateElement', 'Document', 'Element',
            'UnknownElement', 'VoidElement', 'loadSchema']
 
 from ast import literal_eval
-from collections import OrderedDict
 from datetime import datetime
 import errno
 import os.path
 from io import BytesIO, StringIO, IOBase
+import sys
 from xml.etree import ElementTree as ET
 
 from .decoding import readElementID, readElementSize
@@ -57,6 +57,13 @@ from .decoding import readFloat, readInt, readUInt, readDate
 from .decoding import readString, readUnicode
 from . import encoding
 from . import schemata
+
+# Dictionaries in Python 3.7+ are explicitly insert-ordered in all
+# implementations. If older, continue to use `collections.OrderedDict`.
+if sys.hexversion < 0x03070000:
+    from collections import OrderedDict
+else:
+    OrderedDict = dict
 
 # ==============================================================================
 #
