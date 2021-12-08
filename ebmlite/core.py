@@ -61,9 +61,9 @@ from . import schemata
 # Dictionaries in Python 3.7+ are explicitly insert-ordered in all
 # implementations. If older, continue to use `collections.OrderedDict`.
 if sys.hexversion < 0x03070000:
-    from collections import OrderedDict
+    from collections import OrderedDict as Dict
 else:
-    OrderedDict = dict
+    Dict = dict
 
 # ==============================================================================
 #
@@ -731,7 +731,7 @@ class MasterElement(Element):
                 very specific, and it isn't totally necessary for the core
                 library.
         """
-        result = OrderedDict()
+        result = Dict()
         for el in self:
             if el.multiple:
                 result.setdefault(el.name, []).append(el.dump())
@@ -934,7 +934,7 @@ class Document(MasterElement):
         if 'EBML' not in cls.schema:
             return {}
 
-        headers = OrderedDict()
+        headers = Dict()
         for elName, elType in (('EBMLVersion', int),
                                ('EBMLReadVersion', int),
                                ('DocType', str),
@@ -945,7 +945,7 @@ class Document(MasterElement):
                 if v is not None:
                     headers[elName] = v
 
-        return OrderedDict(EBML=headers)
+        return Dict(EBML=headers)
 
     @classmethod
     def encode(cls, stream, data, headers=False, **kwargs):
