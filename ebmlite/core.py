@@ -42,7 +42,7 @@ __credits__ = "David Randall Stokes, Connor Flanigan, Becker Awqatty, Derek Witt
 __all__ = ['BinaryElement', 'DateElement', 'Document', 'Element',
            'FloatElement', 'IntegerElement', 'MasterElement', 'Schema',
            'StringElement', 'UIntegerElement', 'UnicodeElement',
-           'UnknownElement', 'VoidElement', 'loadSchema']
+           'UnknownElement', 'VoidElement', 'loadSchema', 'parseSchema']
 
 from ast import literal_eval
 from datetime import datetime
