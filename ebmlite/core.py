@@ -42,14 +42,14 @@ __credits__ = "David Randall Stokes, Connor Flanigan, Becker Awqatty, Derek Witt
 __all__ = ['BinaryElement', 'DateElement', 'Document', 'Element',
            'FloatElement', 'IntegerElement', 'MasterElement', 'Schema',
            'StringElement', 'UIntegerElement', 'UnicodeElement',
-           'UnknownElement', 'VoidElement', 'loadSchema']
+           'UnknownElement', 'VoidElement', 'loadSchema', 'parseSchema']
 
 from ast import literal_eval
-from collections import OrderedDict
 from datetime import datetime
 import errno
 import os.path
 from io import BytesIO, StringIO, IOBase
+import sys
 from xml.etree import ElementTree as ET
 
 from .decoding import readElementID, readElementSize
@@ -57,6 +57,13 @@ from .decoding import readFloat, readInt, readUInt, readDate
 from .decoding import readString, readUnicode
 from . import encoding
 from . import schemata
+
+# Dictionaries in Python 3.7+ are explicitly insert-ordered in all
+# implementations. If older, continue to use `collections.OrderedDict`.
+if sys.hexversion < 0x03070000:
+    from collections import OrderedDict as Dict
+else:
+    Dict = dict
 
 # ==============================================================================
 #
@@ -724,7 +731,7 @@ class MasterElement(Element):
                 very specific, and it isn't totally necessary for the core
                 library.
         """
-        result = OrderedDict()
+        result = Dict()
         for el in self:
             if el.multiple:
                 result.setdefault(el.name, []).append(el.dump())
@@ -927,7 +934,7 @@ class Document(MasterElement):
         if 'EBML' not in cls.schema:
             return {}
 
-        headers = OrderedDict()
+        headers = Dict()
         for elName, elType in (('EBMLVersion', int),
                                ('EBMLReadVersion', int),
                                ('DocType', str),
@@ -938,7 +945,7 @@ class Document(MasterElement):
                 if v is not None:
                     headers[elName] = v
 
-        return OrderedDict(EBML=headers)
+        return Dict(EBML=headers)
 
     @classmethod
     def encode(cls, stream, data, headers=False, **kwargs):
