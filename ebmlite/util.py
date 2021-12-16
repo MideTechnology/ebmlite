@@ -25,6 +25,7 @@ import tempfile
 from xml.etree import ElementTree as ET
 
 from . import core, encoding, decoding
+from . import xml_codecs
 
 # ==============================================================================
 #
@@ -120,7 +121,8 @@ def validateID(elementId):
 # ==============================================================================
 
 
-def toXml(el, parent=None, offsets=True, sizes=True, types=True, ids=True):
+def toXml(el, parent=None, offsets=True, sizes=True, types=False, ids=True,
+          binary_codec=None):
     """ Convert an EBML Document to XML. Binary elements will contain
         base64-encoded data in their body. Other non-master elements will
         contain their value in a ``value`` attribute.
@@ -138,6 +140,10 @@ def toXml(el, parent=None, offsets=True, sizes=True, types=True, ids=True):
             corresponding EBML element's EBML ID.
         @return The root XML element of the file.
     """
+    if binary_codec is None:
+        binary_codec = xml_codecs.Base64Codec()
+        # binary_codec = xml_codecs.HexCodec()
+
     if isinstance(el, core.Document):
         elname = el.__class__.__name__
     else:
@@ -166,7 +172,8 @@ def toXml(el, parent=None, offsets=True, sizes=True, types=True, ids=True):
         for chEl in el:
             toXml(chEl, xmlEl, offsets, sizes, types, ids)
     elif isinstance(el, core.BinaryElement):
-        xmlEl.text = b64encode(el.value).decode()
+        xmlEl.set('encoding', binary_codec.NAME)
+        xmlEl.text = binary_codec.encode(el.value, offset=el.offset)
     elif not isinstance(el, core.VoidElement):
         xmlEl.set('value', str(el.value).encode('ascii', 'xmlcharrefreplace').decode())
 
@@ -216,6 +223,8 @@ def xmlElement2ebml(xmlEl, ebmlFile, schema, sizeLength=None, unknown=True):
         encId = encoding.encodeId(int(eid, 16))
         cls.id = int(eid, 16)
 
+    codec = xmlEl.get('encoding', 'base64')
+
     if sizeLength is None:
         sl = xmlEl.get('sizeLength', None)
         if sl is None:
@@ -243,10 +252,7 @@ def xmlElement2ebml(xmlEl, ebmlFile, schema, sizeLength=None, unknown=True):
         return len(encId) + (endPos - sizePos)
 
     elif issubclass(cls, core.BinaryElement):
-        if xmlEl.text is None:
-            val = b""
-        else:
-            val = b64decode(xmlEl.text)
+        val = xml_codecs.BINARY_CODECS[codec].decode(xmlEl.text)
     elif issubclass(cls, (core.IntegerElement, core.FloatElement)):
         val = ast.literal_eval(xmlEl.get('value'))
     else:
