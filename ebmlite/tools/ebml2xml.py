@@ -8,6 +8,15 @@ import ebmlite.xml_codecs
 
 
 def main():
+    # Build help text listing the binary codecs, and get the default one.
+    codecs = list(ebmlite.xml_codecs.BINARY_CODECS)
+    codec_desc = ""
+    for i, (name, codec) in enumerate(ebmlite.xml_codecs.BINARY_CODECS.items()):
+        name = '"{}"'.format(name)
+        if i == 0:
+            name += ' (default)'.format(name)
+        codec_desc += '{}: {}\n'.format(name, " ".join(codec.__doc__.split()))
+
     argparser = argparse.ArgumentParser(
         description="A tool for converting ebml to xml."
     )
@@ -39,15 +48,15 @@ def main():
     )
     argparser.add_argument(
         '-e', '--encoding',
-        choices=list(ebmlite.xml_codecs.BINARY_CODECS),
-        default='base64',
-        help="The method of encoding binary data as text"
+        choices=codecs,
+        default=codecs[0],
+        help="The method of encoding binary data as text.\n" + codec_desc
     )
 
     args = argparser.parse_args()
 
     codecargs = {'cols': None} if args.single else {}
-    codec = ebmlite.xml_codecs.BINARY_CODECS[args.encoding](**codecargs)
+    codec = ebmlite.xml_codecs.BINARY_CODECS[args.encoding.strip().lower()](**codecargs)
 
     with utils.load_files(args, binary_output=args.single) as (schema, out):
         doc = schema.load(args.input, headers=True)

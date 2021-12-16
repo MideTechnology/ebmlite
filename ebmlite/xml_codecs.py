@@ -6,6 +6,10 @@ import base64
 from io import BytesIO, StringIO
 
 
+# ==============================================================================
+#
+# ==============================================================================
+
 class Base64Codec:
     """ Encoder/decoder for binary data as base64 formatted text to/from XML.
     """
@@ -93,6 +97,10 @@ class Base64Codec:
         else:
             return result
 
+
+# ==============================================================================
+#
+# ==============================================================================
 
 class HexCodec:
     """ Encoder/decoder for binary data as hexadecimal format to/from XML.
@@ -199,8 +207,12 @@ class HexCodec:
         return numbytes
 
 
+# ==============================================================================
+#
+# ==============================================================================
+
 class IgnoreCodec:
-    """ Suppress binary data.
+    """ Suppresses writing binary data to XML.
     """
     NAME = "ignore"
 
@@ -217,8 +229,12 @@ class IgnoreCodec:
         return b''
 
 
+# ==============================================================================
+#
+# ==============================================================================
 
+# Collection of codecs. The first one will be the default in the CLI (or at least
+# it will be in Python 3.7 and later)
 BINARY_CODECS = {'base64': Base64Codec,
                  'hex': HexCodec,
-                 'ignore': IgnoreCodec,
-                 }
+                 'ignore': IgnoreCodec}
