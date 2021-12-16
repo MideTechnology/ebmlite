@@ -121,8 +121,8 @@ def validateID(elementId):
 # ==============================================================================
 
 
-def toXml(el, parent=None, offsets=True, sizes=True, types=False, ids=True,
-          binary_codec=None):
+def toXml(el, parent=None, offsets=True, sizes=True, types=True, ids=True,
+          binary_codec='base64', void_codec='ignore'):
     """ Convert an EBML Document to XML. Binary elements will contain
         base64-encoded data in their body. Other non-master elements will
         contain their value in a ``value`` attribute.
@@ -140,9 +140,10 @@ def toXml(el, parent=None, offsets=True, sizes=True, types=False, ids=True,
             corresponding EBML element's EBML ID.
         @return The root XML element of the file.
     """
-    if binary_codec is None:
-        binary_codec = xml_codecs.Base64Codec()
-        # binary_codec = xml_codecs.HexCodec()
+    if isinstance(binary_codec, str):
+        binary_codec = xml_codecs.BINARY_CODECS[binary_codec]()
+    if isinstance(void_codec, str):
+        void_codec = xml_codecs.BINARY_CODECS[void_codec]()
 
     if isinstance(el, core.Document):
         elname = el.__class__.__name__
@@ -170,7 +171,12 @@ def toXml(el, parent=None, offsets=True, sizes=True, types=False, ids=True,
 
     if isinstance(el, core.MasterElement):
         for chEl in el:
-            toXml(chEl, xmlEl, offsets, sizes, types, ids)
+            toXml(chEl, xmlEl, offsets, sizes, types, ids, binary_codec, void_codec)
+    elif isinstance(el, core.VoidElement):
+        xmlEl.set('size', str(el.size))
+        if void_codec.NAME != 'ignore':
+            xmlEl.set('encoding', void_codec.NAME)
+        xmlEl.text = void_codec.encode(el.value)
     elif isinstance(el, core.BinaryElement):
         xmlEl.set('encoding', binary_codec.NAME)
         xmlEl.text = binary_codec.encode(el.value, offset=el.offset)

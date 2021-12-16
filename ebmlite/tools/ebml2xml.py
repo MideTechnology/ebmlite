@@ -4,6 +4,7 @@ from xml.etree import ElementTree as ET
 
 from ebmlite.tools import utils
 import ebmlite.util
+import ebmlite.xml_codecs
 
 
 def main():
@@ -36,15 +37,24 @@ def main():
         action="store_true",
         help="Generate XML with maximum description, including offset, size, type, and id info",
     )
+    argparser.add_argument(
+        '-e', '--encoding',
+        choices=list(ebmlite.xml_codecs.BINARY_CODECS),
+        default='base64',
+        help="The method of encoding binary data as text"
+    )
 
     args = argparser.parse_args()
+
+    codecargs = {'cols': None} if args.single else {}
+    codec = ebmlite.xml_codecs.BINARY_CODECS[args.encoding](**codecargs)
 
     with utils.load_files(args, binary_output=args.single) as (schema, out):
         doc = schema.load(args.input, headers=True)
         if args.max:
-            root = ebmlite.util.toXml(doc, offsets=True, sizes=True, types=True, ids=True)
+            root = ebmlite.util.toXml(doc, offsets=True, sizes=True, types=True, ids=True, binary_codec=codec)
         else:
-            root = ebmlite.util.toXml(doc, offsets=False, sizes=False, types=False, ids=False)
+            root = ebmlite.util.toXml(doc, offsets=False, sizes=False, types=False, ids=False, binary_codec=codec)
         s = ET.tostring(root, encoding="utf-8")
         if args.single:
             out.write(s)

@@ -15,7 +15,9 @@ class Base64Codec:
         """ Constructor.
 
             :param cols: The length of each line of base64 data, excluding
-                any indentation specified when encoding.
+                any indentation specified when encoding. If 0 or `None`,
+                data will be written as a single continuous block with no
+                newlines.
 
             Additional keyword arguments will be accepted (to maintain
             compatibility with other codecs) but ignored.
@@ -106,16 +108,18 @@ class HexCodec:
 
             :param width: The number of bytes displayed per column when
                 encoding.
-            :param cols: The number of columns to display when encoding.
+            :param cols: The number of columns to display when encoding. If 0
+                or `None`, data will be written as a single continuous block
+                with no newlines.
             :param offsets: If `True`, each line will start with its offset
-                (in decimal).
+                (in decimal). Applicable if `cols` is a non-zero number.
         """
         self.width = width
         self.cols = cols
-        self.offsets = offsets
+        self.offsets = bool(offsets and cols)
 
 
-    def encode(self, data, stream=None, offset=0, indent=''):
+    def encode(self, data, stream=None, offset=0, indent='', **kwargs):
         """ Convert binary data to hexadecimal text.
 
             :param data: The binary data from an EBML `BinaryElement`.
@@ -135,11 +139,14 @@ class HexCodec:
         else:
             out = stream
 
+        newline = bool(self.cols)
+        offsets = self.offsets and newline
+
         numbytes = 0
         for i, b in enumerate(data):
-            if not i % self.cols:
+            if newline and not i % self.cols:
                 numbytes += out.write(indent)
-                if self.offsets:
+                if offsets:
                     numbytes += out.write('\n[{:06d}] '.format(i + offset))
                 else:
                     numbytes += out.write('\n')
@@ -192,6 +199,26 @@ class HexCodec:
         return numbytes
 
 
+class IgnoreCodec:
+    """ Suppress binary data.
+    """
+    NAME = "ignore"
+
+    @staticmethod
+    def encode(data, stream=None, **kwargs):
+        if stream:
+            return 0
+        return ''
+
+    @staticmethod
+    def decode(data, stream=None, **kwargs):
+        if stream:
+            return 0
+        return b''
+
+
+
 BINARY_CODECS = {'base64': Base64Codec,
                  'hex': HexCodec,
+                 'ignore': IgnoreCodec,
                  }
