@@ -1,11 +1,8 @@
-import collections
-import datetime
-import types
 import random
 import unittest
 from io import BytesIO
 
-from ebmlite import xml_codecs
+from ebmlite import core, util, xml_codecs
 
 class testCodecs(unittest.TestCase):
     """ Tests for the binary codecs for converting to/from test (e.g. XML).
@@ -34,3 +31,27 @@ class testCodecs(unittest.TestCase):
              "IgnoreCodec.encode() returned content, should have returned ''")
         self.assertEqual(len(ignore.decode("ignore me")), 0,
              "IgnoreCodec.decode() returned content, should have returned b''")
+
+
+    def test_xml(self):
+        """ Test converting to/from XML with different codecs. Note: this
+            only tests whether the product using different codecs is valid.
+            Content testing is done elsewhere.
+        """
+        schemaFile = './ebmlite/schemata/mide_ide.xml'
+        schema = core.loadSchema(schemaFile)
+
+        ebmlDoc = schema.load('./tests/SSX46714-doesnot.IDE', headers=True)
+
+        # Test all codecs
+        for Codec in xml_codecs.BINARY_CODECS.values():
+            out = BytesIO()
+            codec = Codec()
+            xmlDoc = util.toXml(ebmlDoc, binary_codec=codec)
+            _ebmlDoc2 = util.xml2ebml(xmlDoc, out, schema)
+
+        # Test all codecs, calling by name
+        for codec in xml_codecs.BINARY_CODECS.keys():
+            out = BytesIO()
+            xmlDoc = util.toXml(ebmlDoc, binary_codec=codec)
+            _ebmlDoc2 = util.xml2ebml(xmlDoc, out, schema)
