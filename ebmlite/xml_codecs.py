@@ -12,7 +12,59 @@ from io import BytesIO, StringIO
 #
 # ==============================================================================
 
-class Base64Codec:
+class BinaryCodec:
+    """ Base class for binary encoders/decoders, rendering and reading
+        `BinaryElement` contents as text.
+
+        :cvar NAME: The codec's name, written to the rendered XML as
+            the `encoding` attribute. Also used as the `--encoding`
+            argument in the command-line tools. Must be unique, and
+            should be lowercase.
+        :type NAME: str
+    """
+    NAME = ""
+
+    def __init__(self, **kwargs):
+        """ Constructor. All arguments should be optional keyword
+            arguments. Can be considered optional in subclasses.
+        """
+        pass
+
+    def encode(self, data, stream=None, indent='', offset=0, **kwargs):
+        """ Convert binary data to text. Typical arguments:
+
+            :param data: The binary data from an EBML `BinaryElement`.
+            :param stream: An optional stream to which to write the encoded
+                data. Should be included and used in all implementations.
+            :param indent: Indentation before each row of text. Used if
+                the codec was instantiated with `cols` specified.
+            :param offset: The originating EBML element's offset in the file.
+                For use with codecs that write line numbers/position info.
+            :returns: If no `stream`, the encoded data as text. If `stream`,
+                the number of bytes written.
+        """
+        raise NotImplemented
+
+    @classmethod
+    def decode(cls, data, stream=None):
+        """ Decode binary data in text form (e.g., from an XML file). Note:
+            this is a `classmethod`, and should work regardless of the
+            arguments used when the data was encoded (e.g., with or without
+            indentations and/or line breaks, metadata like offsets, etc.).
+
+            :param data: The text data from an XML file.
+            :param stream: A stream to which to write the encoded data.
+            :returns: If no `stream`, the decoded binary data. If `stream`,
+                the number of bytes written.
+        """
+        raise NotImplemented
+
+
+# ==============================================================================
+#
+# ==============================================================================
+
+class Base64Codec(BinaryCodec):
     """ Encoder/decoder for binary data as base64 formatted text to/from text.
     """
     NAME = "base64"
@@ -115,7 +167,7 @@ class Base64Codec:
 #
 # ==============================================================================
 
-class HexCodec:
+class HexCodec(BinaryCodec):
     """ Encoder/decoder for binary data as hexadecimal format to/from text.
         Encoded text is multiple columns of bytes/words (default is 16 columns,
         2 bytes per column), with an optional file offset at the start of each
@@ -246,7 +298,8 @@ class IgnoreCodec:
 # ==============================================================================
 
 # Collection of codecs. The first one will be the default in the CLI (or at least
-# it will be in Python 3.7 and later)
+# it will be in Python 3.7 and later). User-implemented codecs should be added to
+# the dictionary.
 BINARY_CODECS = {'base64': Base64Codec,
                  'hex': HexCodec,
                  'ignore': IgnoreCodec}
