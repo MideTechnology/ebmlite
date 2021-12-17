@@ -10,10 +10,11 @@ import ebmlite.xml_codecs
 def main():
     # Build help text listing the binary codecs, and get the default one.
     codecs = list(ebmlite.xml_codecs.BINARY_CODECS)
+    default_codec = codecs[0]
     codec_desc = ""
-    for i, (name, codec) in enumerate(ebmlite.xml_codecs.BINARY_CODECS.items()):
+    for name, codec in ebmlite.xml_codecs.BINARY_CODECS.items():
         name = '"{}"'.format(name)
-        if i == 0:
+        if codec.NAME == default_codec:
             name += ' (default)'.format(name)
         codec_desc += '{}: {}\n'.format(name, " ".join(codec.__doc__.split()))
 
@@ -49,7 +50,7 @@ def main():
     argparser.add_argument(
         '-e', '--encoding',
         choices=codecs,
-        default=codecs[0],
+        default=default_codec,
         help="The method of encoding binary data as text.\n" + codec_desc
     )
 

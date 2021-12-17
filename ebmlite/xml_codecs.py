@@ -1,5 +1,7 @@
 """
 Classes for various means of encoding/decoding binary data to/from XML.
+
+Note: the class docstrings will be shown in the `ebml2xml` help text.
 """
 
 import base64
@@ -11,11 +13,11 @@ from io import BytesIO, StringIO
 # ==============================================================================
 
 class Base64Codec:
-    """ Encoder/decoder for binary data as base64 formatted text to/from XML.
+    """ Encoder/decoder for binary data as base64 formatted text to/from text.
     """
     NAME = "base64"
 
-    def __init__(self, cols=78, **kwargs):
+    def __init__(self, cols=76, **kwargs):
         """ Constructor.
 
             :param cols: The length of each line of base64 data, excluding
@@ -54,14 +56,25 @@ class Base64Codec:
         else:
             out = stream
 
+        if self.cols == 76:
+            # Default width of a base64 line; use existing newlines
+            result = "\n" + result
+            if indent:
+                result = result.replace('\n', '\n' + indent)
+            if stream is not None:
+                return out.write(result)
+            return result
+
+        result = result.replace('\n', '')
+
         if self.cols is None:
             if stream is not None:
                 return out.write(result)
             return result
 
         numbytes = 0
-
         for chunk in range(0, len(result), self.cols):
+            numbytes += out.write('\n')
             numbytes += out.write(indent) + out.write(result[chunk:chunk+self.cols])
 
         if stream is None:
@@ -103,7 +116,7 @@ class Base64Codec:
 # ==============================================================================
 
 class HexCodec:
-    """ Encoder/decoder for binary data as hexadecimal format to/from XML.
+    """ Encoder/decoder for binary data as hexadecimal format to/from text.
         Encoded text is multiple columns of bytes/words (default is 16 columns,
         2 bytes per column), with an optional file offset at the start of each
         row.
@@ -153,11 +166,10 @@ class HexCodec:
         numbytes = 0
         for i, b in enumerate(data):
             if newline and not i % self.cols:
+                numbytes += out.write('\n')
                 numbytes += out.write(indent)
                 if offsets:
-                    numbytes += out.write('\n[{:06d}] '.format(i + offset))
-                else:
-                    numbytes += out.write('\n')
+                    numbytes += out.write('[{:06d}] '.format(i + offset))
             elif not i % self.width:
                 numbytes += out.write(' ')
             numbytes += out.write('{:02x}'.format(b))
@@ -212,7 +224,7 @@ class HexCodec:
 # ==============================================================================
 
 class IgnoreCodec:
-    """ Suppresses writing binary data to XML.
+    """ Suppresses writing binary data as text.
     """
     NAME = "ignore"
 
