@@ -275,7 +275,7 @@ class HexCodec(BinaryCodec):
 #
 # ==============================================================================
 
-class IgnoreCodec:
+class IgnoreCodec(BinaryCodec):
     """ Suppresses writing binary data as text.
     """
     NAME = "ignore"
