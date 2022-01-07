@@ -36,7 +36,7 @@ EBML files quickly and efficiently, and that's about it.
     currently handles legacy ``python-ebml`` schemata.
 """
 __author__ = "David Randall Stokes, Connor Flanigan"
-__copyright__ = "Copyright 2021, Mide Technology Corporation"
+__copyright__ = "Copyright 2022, Mide Technology Corporation"
 __credits__ = "David Randall Stokes, Connor Flanigan, Becker Awqatty, Derek Witt"
 
 __all__ = ['BinaryElement', 'DateElement', 'Document', 'Element',
@@ -47,9 +47,13 @@ __all__ = ['BinaryElement', 'DateElement', 'Document', 'Element',
 from ast import literal_eval
 from datetime import datetime
 import errno
-import os.path
+import importlib
 from io import BytesIO, StringIO, IOBase
+import os.path
+from pathlib import Path
+import re
 import sys
+import types
 from xml.etree import ElementTree as ET
 
 from .decoding import readElementID, readElementSize
@@ -74,6 +78,9 @@ else:
 # the schema file.
 SCHEMA_PATH = ['',
                os.path.realpath(os.path.dirname(schemata.__file__))]
+
+SCHEMA_PATH.extend(p for p in os.environ.get('EBMLITE_SCHEMA_PATH', '').split(os.path.pathsep)
+                   if p not in SCHEMA_PATH)
 
 # SCHEMATA: A dictionary of loaded schemata, keyed by filename. Used by
 # `loadSchema()`. In most cases, SCHEMATA should not be otherwise modified.
@@ -1412,8 +1419,43 @@ class Schema(object):
 #
 # ==============================================================================
 
+def listSchemata(*paths):
+    """ Gather all EBML schemata. `ebmlite.SCHEMA_PATH` is used by default;
+        alternatively, one or more paths or modules can be supplied as
+        arguments.
 
-def loadSchema(filename, reload=False, **kwargs):
+        @returns: A dictionary of schema files. Keys are the base name of the
+            schema XML, values are lists of full paths to the XML. The first
+            filename in the list is what will load if the base name is used
+            with `loadSchema()`.
+    """
+    schemata = {}
+    paths = paths or SCHEMA_PATH
+    for path in paths:
+        if not str(path):
+            path = os.getcwd()
+        else:
+            try:
+                if '{' in str(path):
+                    path = importlib.resources.files(str(path).strip('{}'))
+                elif isinstance(path, types.ModuleType):
+                    path = importlib.resources.files(path.__name__)
+            except ModuleNotFoundError:
+                continue
+
+        for p in Path(path).glob('*.xml'):
+            # TODO: Verify XML is in fact a schema?
+            try:
+                xml = ET.parse(p)
+                if xml.getroot().tag == 'Schema':
+                    schemata.setdefault(os.path.basename(p), []).append(p)
+            except (ET.ParseError, IOError, TypeError):
+                continue
+
+    return schemata
+
+
+def loadSchema(filename, reload=False, paths=None, **kwargs):
     """ Import a Schema XML file. Loading the same file more than once will
         return the initial instantiation, unless `reload` is `True`.
 
@@ -1424,34 +1466,59 @@ def loadSchema(filename, reload=False, **kwargs):
         @keyword reload: If `True`, the resulting Schema is guaranteed to be
             new. Note: existing references to previous instances of the
             Schema and/or its elements will not update.
+        @keyword paths: A list of paths to search for schemata, an alternative
+            to `ebmlite.SCHEMA_PATH`
 
         Additional keyword arguments are sent verbatim to the `Schema`
         constructor.
+
+        @raises: IOError, ModuleNotFoundError
     """
     global SCHEMATA
 
     if filename in SCHEMATA and not reload:
         return SCHEMATA[filename]
 
-    origName = filename
-    if not filename.startswith(('.', '/', '\\', '~')):
-        # Not a specific path and file not found: search paths in SCHEMA_PATH
-        for p in SCHEMA_PATH:
-            f = os.path.join(p, origName)
-            if os.path.exists(f):
-                filename = f
-                break
+    paths = paths or SCHEMA_PATH
+    origName = str(filename)
+    filename = Path(filename)
 
-    filename = os.path.realpath(os.path.expanduser(filename))
-    if filename in SCHEMATA and not reload:
-        return SCHEMATA[filename]
+    moduleRegex = re.compile(r'\{(.+)\}[/\\](.+)')
 
-    if not os.path.exists(filename):
+    if '{' in origName:
+        m = moduleRegex.match(origName)
+        if not m:
+            raise IOError(errno.ENOENT, 'Malformed module path', origName)
+        module, name = m.groups()
+        filename = Path(importlib.resources.files(module)) / name  # raises ModuleNotFoundError
+
+    if not filename.is_file():
+        if not os.path.dirname(filename):
+            # Not a specific path and file not found: search paths in SCHEMA_PATH
+            for p in paths:
+                if '{' in str(p):
+                    try:
+                        p = importlib.resources.files(str(p).strip('{}'))
+                    except ModuleNotFoundError:
+                        continue
+                f = (p / filename).expanduser().absolute()
+                if f.is_file():
+                    filename = f
+                    break
+
+    filename = filename.expanduser().absolute()
+    if str(filename) in SCHEMATA and not reload:
+        return SCHEMATA[str(filename)]
+
+    if not filename.is_file():
         raise IOError(errno.ENOENT, 'Could not find schema XML', origName)
 
-    schema = Schema(filename, **kwargs)
-    SCHEMATA[filename] = schema
+    with filename.open() as fs:
+        schema = Schema(fs, **kwargs)
+
+    SCHEMATA[str(filename)] = SCHEMATA[str(origName)] = schema
     return schema
+
 
 
 def parseSchema(src, name=None, reload=False, **kwargs):
