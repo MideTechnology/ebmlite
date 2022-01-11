@@ -16,7 +16,7 @@ EBML files quickly and efficiently, and that's about it.
     over chunks of the raw binary data. Current implementation doesn't check
     element contents, just ID and payload size (for speed).
 @todo: Document-wide caching, for future handling of streamed data. Affects
-    the longer-term streaming TODO (listed below) and optimization of
+    the longer-term streaming to-do (listed below) and optimization of
     'infinite' elements (listed above).
 @todo: Clean up and standardize usage of the term 'size' versus 'length.'
 @todo: General documentation (more detailed than the README) and examples.
@@ -27,7 +27,7 @@ EBML files quickly and efficiently, and that's about it.
     of how schemata are loaded.
 @todo: (longer term) Refactor to support streaming data. This will require
     modifying the indexing and iterating methods of `Document`. Also affects
-    the document-wide caching TODO item, listed above.
+    the document-wide caching to-do item, listed above.
 @todo: (longer term) Support the official Schema definition format. Start by
     adopting some of the attributes, specifically ``minOccurs`` and
     ``maxOccurs`` (they serve the function provided by the current
@@ -64,6 +64,8 @@ from . import schemata
 
 # Dictionaries in Python 3.7+ are explicitly insert-ordered in all
 # implementations. If older, continue to use `collections.OrderedDict`.
+# Additionally, `importlib.resources` is new to 3.7 as well; work
+# around it.
 if sys.hexversion < 0x03070000:
     from collections import OrderedDict as Dict
     importlib_resources = None
