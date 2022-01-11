@@ -64,13 +64,18 @@ from . import schemata
 
 # Dictionaries in Python 3.7+ are explicitly insert-ordered in all
 # implementations. If older, continue to use `collections.OrderedDict`.
-# Additionally, `importlib.resources` is new to 3.7 as well; work
-# around it.
 if sys.hexversion < 0x03070000:
     from collections import OrderedDict as Dict
     importlib_resources = None
 else:
     Dict = dict
+    import importlib.resources as importlib_resources
+
+# Additionally, `importlib.resources.files` is new to 3.9 as well; this is
+# part of a work-around.
+if sys.hexversion < 0x03090000:
+    importlib_resources = None
+else:
     import importlib.resources as importlib_resources
 
 # ==============================================================================
@@ -1436,6 +1441,7 @@ def _expandSchemaPath(path, name=''):
         @return: A `Path`/`Traversable` object.
     """
     strpath = str(path)
+    subdir = ''
 
     if not strpath:
         path = strpath = os.getcwd()
@@ -1445,16 +1451,16 @@ def _expandSchemaPath(path, name=''):
 
         m = re.match(r'(\{.+\})[/\\](.+)', strpath)
         if m:
-            path, name = m.groups()
+            path, subdir = m.groups()
             strpath = path
 
     if importlib_resources:
         if isinstance(path, types.ModuleType):
-            return importlib_resources.files(path) / name
+            return importlib_resources.files(path) / subdir / name
         elif '{' in strpath:
-            return importlib_resources.files(strpath.strip('{} ')) / name
+            return importlib_resources.files(strpath.strip('{} ')) / subdir / name
     else:
-        # Pre-3.7: Use naive means of finding the module path. Won't work in
+        # Pre-3.9: Use naive means of finding the module path. Won't work in
         # some cases (module is a zip, etc.); it's just a fallback. To be
         # deprecated.
         if isinstance(path, types.ModuleType):
@@ -1462,7 +1468,7 @@ def _expandSchemaPath(path, name=''):
         elif '{' in strpath:
             path = os.path.dirname(importlib.import_module(strpath.strip('{}')).__file__)
 
-    return Path(path) / name
+    return Path(path) / subdir / name
 
 
 def listSchemata(*paths, absolute=True):
