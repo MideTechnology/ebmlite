@@ -1486,7 +1486,7 @@ def listSchemata(*paths, absolute=True):
             continue
 
         for p in fullpath.iterdir():
-            key = os.path.basename(p)
+            key = p.name
             if key.lower().endswith('.xml'):
                 try:
                     xml = ET.parse(p)
@@ -1530,7 +1530,7 @@ def loadSchema(filename, reload=False, paths=None, **kwargs):
     filename = _expandSchemaPath(filename)  # raises ModuleNotFoundError
 
     if not filename.is_file():
-        if not os.path.dirname(filename):
+        if len(filename.parts) == 1:
             # Not a specific path and file not found: search paths in SCHEMA_PATH
             for p in paths:
                 try:
