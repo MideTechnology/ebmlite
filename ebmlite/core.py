@@ -66,10 +66,8 @@ from . import schemata
 # implementations. If older, continue to use `collections.OrderedDict`.
 if sys.hexversion < 0x03070000:
     from collections import OrderedDict as Dict
-    importlib_resources = None
 else:
     Dict = dict
-    import importlib.resources as importlib_resources
 
 # Additionally, `importlib.resources.files` is new to 3.9 as well; this is
 # part of a work-around.
@@ -1447,7 +1445,7 @@ def _expandSchemaPath(path, name=''):
         path = strpath = os.getcwd()
     elif '{' in strpath:
         if '}' not in strpath:
-            raise IOError(errno.ENOENT, 'Malformed module path', path)
+            raise IOError(errno.ENOENT, 'Malformed module path', strpath)
 
         m = re.match(r'(\{.+\})[/\\](.+)', strpath)
         if m:
