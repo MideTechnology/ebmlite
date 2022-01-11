@@ -6,7 +6,8 @@ from io import BytesIO
 
 from ebmlite.core import loadSchema, parseSchema, BinaryElement, DateElement, \
     Element, FloatElement, IntegerElement, MasterElement, StringElement, \
-    UIntegerElement, UnicodeElement, VoidElement, UnknownElement
+    UIntegerElement, UnicodeElement, VoidElement, UnknownElement, \
+    SCHEMATA
 
 
 class testCoreElement(unittest.TestCase):
@@ -701,7 +702,6 @@ class testSchema(unittest.TestCase):
         self.stream = BytesIO(b'test')
 
 
-
     def testAddElement(self):
         """ Test adding elements to a schema. """
 
@@ -787,6 +787,31 @@ class testSchema(unittest.TestCase):
         self.assertTrue(self.schema.verify(b'\x42\x86\x81\x01'))
         with self.assertRaises(IOError):
             self.schema.verify(b'\x00\x42\x86\x81\x01')
+
+
+    def testLoadSchema(self):
+        """ Test schema loading. If things have gotten this far, basic
+            loading works; this tests some additional features.
+       """
+
+        # Back up schemata so this test starts fresh
+        schemata = SCHEMATA.copy()
+        SCHEMATA.clear()
+
+        schema1 = loadSchema('mide_ide.xml')
+        schema2 = loadSchema('./ebmlite/schemata/mide_ide.xml')
+
+        self.assertTrue(schema1 is schema2,
+                        "loadSchema() did not use cached parsed schema")
+
+        schema3 = loadSchema('mide_ide.xml', reload=True)
+
+        self.assertTrue(schema1 is not schema3,
+                        "loadSchema() did not reload schema")
+
+        # Restore schemata
+        SCHEMATA.clear()
+        SCHEMATA.update(schemata)
 
 
     def testParseSchema(self):

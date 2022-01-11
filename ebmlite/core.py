@@ -66,8 +66,10 @@ from . import schemata
 # implementations. If older, continue to use `collections.OrderedDict`.
 if sys.hexversion < 0x03070000:
     from collections import OrderedDict as Dict
+    importlib_resources = None
 else:
     Dict = dict
+    import importlib.resources as importlib_resources
 
 # ==============================================================================
 #
@@ -1419,7 +1421,49 @@ class Schema(object):
 #
 # ==============================================================================
 
-def listSchemata(*paths):
+def _expandSchemaPath(path, name=''):
+    """ Helper function to process a schema path or name, converting module
+        references to Paths.
+
+        @param path: The schema path. May be a directory name, a module
+            name in braces (e.g., `{idelib.schemata}`), or a module
+            instance. Directory and module names may contain schema
+            filenames.
+        @param name: An optional schema base filename. Will get appended
+            to the resulting `Path`/`Traversable`.
+        @return: A `Path`/`Traversable` object.
+    """
+    strpath = str(path)
+
+    if not strpath:
+        path = strpath = os.getcwd()
+    elif '{' in strpath:
+        if '}' not in strpath:
+            raise IOError(errno.ENOENT, 'Malformed module path', path)
+
+        m = re.match(r'(\{.+\})[/\\](.+)', strpath)
+        if m:
+            path, name = m.groups()
+            strpath = path
+
+    if importlib_resources:
+        if isinstance(path, types.ModuleType):
+            return importlib_resources.files(path) / name
+        elif '{' in strpath:
+            return importlib_resources.files(strpath.strip('{} ')) / name
+    else:
+        # Pre-3.7: Use naive means of finding the module path. Won't work in
+        # some cases (module is a zip, etc.); it's just a fallback. To be
+        # deprecated.
+        if isinstance(path, types.ModuleType):
+            path = os.path.dirname(path.__file__)
+        elif '{' in strpath:
+            path = os.path.dirname(importlib.import_module(strpath.strip('{}')).__file__)
+
+    return Path(path) / name
+
+
+def listSchemata(*paths, absolute=True):
     """ Gather all EBML schemata. `ebmlite.SCHEMA_PATH` is used by default;
         alternatively, one or more paths or modules can be supplied as
         arguments.
@@ -1431,26 +1475,26 @@ def listSchemata(*paths):
     """
     schemata = {}
     paths = paths or SCHEMA_PATH
-    for path in paths:
-        if not str(path):
-            path = os.getcwd()
-        else:
-            try:
-                if '{' in str(path):
-                    path = importlib.resources.files(str(path).strip('{}'))
-                elif isinstance(path, types.ModuleType):
-                    path = importlib.resources.files(path.__name__)
-            except ModuleNotFoundError:
-                continue
 
-        for p in Path(path).glob('*.xml'):
-            # TODO: Verify XML is in fact a schema?
-            try:
-                xml = ET.parse(p)
-                if xml.getroot().tag == 'Schema':
-                    schemata.setdefault(os.path.basename(p), []).append(p)
-            except (ET.ParseError, IOError, TypeError):
-                continue
+    for path in paths:
+        try:
+            fullpath = _expandSchemaPath(path)
+        except ModuleNotFoundError:
+            continue
+
+        if not fullpath.is_dir():
+            continue
+
+        for p in fullpath.iterdir():
+            key = os.path.basename(p)
+            if key.lower().endswith('.xml'):
+                try:
+                    xml = ET.parse(p)
+                    if xml.getroot().tag == 'Schema':
+                        value = p if absolute else Path(path) / p.name
+                        schemata.setdefault(key, []).append(value)
+                except (ET.ParseError, IOError, TypeError):
+                    continue
 
     return schemata
 
@@ -1463,10 +1507,10 @@ def loadSchema(filename, reload=False, paths=None, **kwargs):
             be found and file's path is not absolute, the paths listed in
             `SCHEMA_PATH` will be searched (similar to `sys.path` when
             importing modules).
-        @keyword reload: If `True`, the resulting Schema is guaranteed to be
+        @param reload: If `True`, the resulting Schema is guaranteed to be
             new. Note: existing references to previous instances of the
             Schema and/or its elements will not update.
-        @keyword paths: A list of paths to search for schemata, an alternative
+        @param paths: A list of paths to search for schemata, an alternative
             to `ebmlite.SCHEMA_PATH`
 
         Additional keyword arguments are sent verbatim to the `Schema`
@@ -1476,37 +1520,30 @@ def loadSchema(filename, reload=False, paths=None, **kwargs):
     """
     global SCHEMATA
 
-    if filename in SCHEMATA and not reload:
-        return SCHEMATA[filename]
-
     paths = paths or SCHEMA_PATH
     origName = str(filename)
     filename = Path(filename)
 
-    moduleRegex = re.compile(r'\{(.+)\}[/\\](.+)')
+    if origName in SCHEMATA and not reload:
+        return SCHEMATA[origName]
 
-    if '{' in origName:
-        m = moduleRegex.match(origName)
-        if not m:
-            raise IOError(errno.ENOENT, 'Malformed module path', origName)
-        module, name = m.groups()
-        filename = Path(importlib.resources.files(module)) / name  # raises ModuleNotFoundError
+    filename = _expandSchemaPath(filename)  # raises ModuleNotFoundError
 
     if not filename.is_file():
         if not os.path.dirname(filename):
             # Not a specific path and file not found: search paths in SCHEMA_PATH
             for p in paths:
-                if '{' in str(p):
-                    try:
-                        p = importlib.resources.files(str(p).strip('{}'))
-                    except ModuleNotFoundError:
-                        continue
-                f = (p / filename).expanduser().absolute()
-                if f.is_file():
-                    filename = f
-                    break
+                try:
+                    f = _expandSchemaPath(p, filename)
+                    if f.is_file():
+                        filename = f
+                        break
+                except ModuleNotFoundError:
+                    continue
 
-    filename = filename.expanduser().absolute()
+    if hasattr(filename, 'expanduser'):
+        filename = filename.expanduser().absolute()
+
     if str(filename) in SCHEMATA and not reload:
         return SCHEMATA[str(filename)]
 
@@ -1516,9 +1553,8 @@ def loadSchema(filename, reload=False, paths=None, **kwargs):
     with filename.open() as fs:
         schema = Schema(fs, **kwargs)
 
-    SCHEMATA[str(filename)] = SCHEMATA[str(origName)] = schema
+    SCHEMATA[str(filename)] = SCHEMATA[origName] = schema
     return schema
-
 
 
 def parseSchema(src, name=None, reload=False, **kwargs):

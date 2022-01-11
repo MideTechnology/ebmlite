@@ -26,7 +26,20 @@ def main():
         '-c', '--clobber', action="store_true",
         help="Clobber (overwrite) existing files.",
     )
+    argparser.add_argument(
+        '-l', '--list', action="store_true",
+        help="Display a list of EBML schemata found in SCHEMA_PATH",
+    )
+    argparser.add_argument(
+        '-L', '--list_relative', action="store_true",
+        help="Display a list of EBML schemata found in SCHEMA_PATH, using package-relative filenames",
+    )
+
     args = argparser.parse_args()
+
+    if args.list:
+        ebmlite.util.printSchemata(args.output, absolute=not args.list_relative)
+        exit(0)
 
     with utils.load_files(args, binary_output=False) as (schema, out):
         doc = schema.load(args.input, headers=True)
