@@ -1,13 +1,13 @@
 """
 A tool for listing all EBML schemata in SCHEMA_PATH, including paths in the
-EBMLITE_SCHEMA_PATH (if present).
+EBMLITE_SCHEMA_PATH (if present), and (optionally) any additional paths
+specified by the user. Additional paths may include module names enclosed in
+braces (e.g., "{idelib}").
 """
 
 import argparse
-import os
 import sys
 
-from ebmlite.tools import utils
 import ebmlite.util
 import ebmlite.core
 
@@ -16,7 +16,7 @@ def main():
     argparser = argparse.ArgumentParser(description=__doc__.strip())
 
     argparser.add_argument(
-        '-o', '--output', metavar="FILE.xml", help="The output file.",
+        '-o', '--output', metavar="FILE.txt", help="An optional output file",
         default=sys.stdout
     )
     argparser.add_argument(
@@ -24,18 +24,12 @@ def main():
         help="Show schema filenames with package-relative path references",
     )
     argparser.add_argument(
-        '-p', '--path', nargs='?', action="append",
-        help=""
+        'paths', nargs='*',
+        help="Additional paths to search for schemata; will be searched before paths in SCHEMA_PATH"
     )
 
     args = argparser.parse_args()
-
-    paths = []
-    for p in args.path:
-        paths.extend(p for p in p.split(os.path.pathsep)
-                     if p not in ebmlite.core.SCHEMA_PATH)
-
-    ebmlite.util.printSchemata(paths=paths, out=args.output, absolute=not args.relative)
+    ebmlite.util.printSchemata(paths=args.paths, out=args.output, absolute=not args.relative)
 
 
 if __name__ == "__main__":
