@@ -117,6 +117,33 @@ The structure of the schema's XML defines the structure of the EBML document; ch
 
 **Note:** As seen in the example above, _ebmlite_ allows an EBML document to have multiple elements at its root level. Several other EBML libraries do this as well, but this is apparently counter to the official spec. Officially, an EBML document should have only a single root element, similar to an XML file.
 
+Using Schema Files
+------------------
+### Schema File Location (`ebmlite.SCHEMA_PATH`)
+`ebmlite.SCHEMA_PATH` is a list that stores a set of paths which will be searched for schema files, similar to
+`sys.path` works for modules. If a schema filename with no path is used (e.g. `ebmlite.loadSchema("matroska.xml")`),
+it is searched for in `SCHEMA_PATH`'s paths. Users may modify `SCHEMA_PATH` as needed.
+
+The default schemata XML files are in the package's `schemata` subdirectory.
+
+### Module-relative Paths
+Since multiple packages are currently using `ebmlite`, schemata may be imported using module names. Modules
+can be specified in paths by using braces (curly brackets) around their names (e.g., `"{idelib}/schemata/mide_ide.xml"`).
+Module-relative names may be used when loading schemata, can be included in `ebmlite.SCHEMA_PATH`, and can be
+used with the command-line utilities (in quotes).
+
+_New to version 3.3._
+
+### The `EBMLITE_SCHEMA_PATH` Environment Variable
+An operating system environment variable may be defined as a global means of specifying schema paths, in and out
+of Python. `EBMLITE_SCHEMA_PATH` functions like the `PATH` environment variable in Windows. `EBMLITE_SCHEMA_PATH`
+contains one or more paths, which will be added to `ebmlite.SCHEMA_PATH`; multiple paths are delimited by `;` in
+Windows, `:` in *NIX operating systems (Linux, macOS, etc.). `EBMLITE_SCHEMA_PATH` is largely intended for use
+with the `ebmlite` command-line utilities.
+
+_New to version 3.3._
+
+
 _ebmlite_
 ----------------
 ### Schema
@@ -202,7 +229,8 @@ Optional Argument *out*: A file-like stream to which to write.
 Optional argument *indent*: The string containing the character(s) used for each
         indentation.
 
-### Command Line Utilities
+Command Line Utilities
+----------------------
 When EBMLite is installed as a Python library, the Utils can be called from the command line. From the command line,
 documentation can be viewed using one of the following:
 ```commandline
@@ -211,6 +239,7 @@ python -m ebmlite.tools.xml2ebml -h
 python -m ebmlite.tools.view_ebml -h
 ```
 The commands available are:
+### ebml2xml
 ```
 python -m ebmlite.tools.ebml2xml <EBML file> <schema> -o <file.XML>
 ```
@@ -219,7 +248,9 @@ python -m ebmlite.tools.ebml2xml <EBML file> <schema> -o <file.XML>
 python -m ebmlite.tools.ebml2xml DAQ11093_000001.ide mide_ide.xml -o DAQ11093_000001.xml
 ```
 will translate `DAQ11093_000001.ide` (an enDAQ data recorder file) into XML, and write the result into
-`DAQ11093_000001.xml`. The schema `mide_ide.xml` is built in to the EBMLite library. 
+`DAQ11093_000001.xml`. The schema `mide_ide.xml` is built in to the EBMLite library.
+
+### xml2ebml
 ```
 python -m ebmlite.tools.xml2ebml <file.XML> <schema> -o <EBML file>
 ```
@@ -228,10 +259,25 @@ python -m ebmlite.tools.xml2ebml <file.XML> <schema> -o <EBML file>
 python -m ebmlite.tools.xml2ebml DAQ11093_000001.xml mide_ide.xml -o DAQ11093_000001b.ide
 ```
 Will turn `DAQ11093_000001.xml` back into an IDE file.
+
+### view_ebml
 ```
 python -m ebmlite.tools.view_ebml <EBML file> <schema>
 ```
 `view_ebml` will show summary element data about an EBML file, including element ID and type
+
+
+### list_schemata
+```
+python -m ebmlite.tools.list_schemata
+```
+`list_schemata` will list all `ebmlite` schemata XML files in the directories specified in `ebmlite.SCHEMA_PATH`
+(and the `EBMLITE_SCHEMA_PATH` OS environment variable, if defined). The resulting list displays the base filename
+of the schema, followed by the file's full path, as well as the full paths of any schemata in other
+directories/modules that share the base name. If the schema's base name is used without a path, the first file
+will be loaded.
+
+_New to version 3.3._
 
 To Do
 =====
