@@ -873,6 +873,8 @@ class testSchema(unittest.TestCase):
 
         # NOTE: This will need to be changed if/when enDAQ schemata removed
         #  from package.
+        self.assertIn('mide_manifest.xml', schemata,
+                      'mide_manifest.xml not found in {}'.format(schemata))
         self.assertGreaterEqual(len(schemata['mide_manifest.xml']), 2,
                          "listSchemata() did not find all mide_manifest.xml schemata")
 
