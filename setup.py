@@ -47,6 +47,7 @@ setuptools.setup(
             'view-ebml=ebmlite.tools.view_ebml:main',
             'ebml2xml=ebmlite.tools.ebml2xml:main',
             'xml2ebml=ebmlite.tools.xml2ebml:main',
+            'list-schemata=ebmlite.tools.list_schemata:main',
         ]},
         test_suite='tests',
         install_requires=INSTALL_REQUIRES,

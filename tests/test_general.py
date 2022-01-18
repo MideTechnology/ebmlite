@@ -4,6 +4,7 @@ Created on Aug 14, 2017
 @author: dstokes
 """
 
+import os.path
 import unittest
 from xml.dom.minidom import parseString
 from xml.etree import ElementTree as ET
@@ -11,6 +12,7 @@ from xml.etree import ElementTree as ET
 import filelock
 
 from ebmlite import core
+from ebmlite import schemata
 from ebmlite import util
 from ebmlite import threaded_file
 
@@ -231,6 +233,27 @@ class Test(unittest.TestCase):
 
             self.assertRaises(TypeError, util.validateID, '0x80')
             self.assertRaises(Exception, util.validateID, 128.1)
+
+
+    def testListSchemata(self):
+        path_out = './tests/schemata.txt'
+        util.printSchemata(out=open(path_out, 'wt'))
+
+        try:
+            with open(path_out, 'r') as f:
+                output = f.read()
+
+            # Baseline: output contained default schemata
+            for filename in os.listdir(os.path.dirname(schemata.__file__)):
+                if filename.endswith('xml'):
+                    assert filename in output
+
+        finally:
+            # Remove the output file in all cases
+            try:
+                os.remove(path_out)
+            except FileNotFoundError:
+                pass
 
 
 class TestThreadedFile(unittest.TestCase):

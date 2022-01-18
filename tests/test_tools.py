@@ -5,6 +5,7 @@ import xml.etree.ElementTree as ET
 
 import pytest
 
+from ebmlite import core, schemata
 
 SCHEMA_PATH = os.path.join(".", "ebmlite", "schemata", "matroska.xml")
 
@@ -100,6 +101,35 @@ def test_view(script_runner):
 
     try:
         assert filecmp.cmp(path_out, path_expt, shallow=False)
+
+    finally:
+        # Remove the output file in all cases
+        try:
+            os.remove(path_out)
+        except FileNotFoundError:
+            pass
+
+
+@pytest.mark.script_launch_mode('subprocess')
+def test_list_schemata(script_runner):
+    core.SCHEMA_PATH = [os.path.dirname(schemata.__file__)]
+    path_out = os.path.join(".", "tests", "list-schemata.txt")
+
+    result = script_runner.run(
+        "list-schemata",
+        SCHEMA_PATH,
+        "--output",
+        path_out,
+    )
+    assert result.success
+
+    try:
+        with open(path_out, 'r') as f:
+            output = f.read()
+
+        for filename in os.listdir(core.SCHEMA_PATH[0]):
+            if filename.endswith('xml'):
+                assert filename in output
 
     finally:
         # Remove the output file in all cases
