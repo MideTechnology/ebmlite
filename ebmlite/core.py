@@ -1495,7 +1495,8 @@ def listSchemata(*paths, absolute=True):
             key = p.name
             if key.lower().endswith('.xml'):
                 try:
-                    xml = ET.parse(p)
+                    # Casting to string is py35 fix. Remove in future.
+                    xml = ET.parse(str(p))
                     if xml.getroot().tag == 'Schema':
                         value = p if absolute else Path(path) / p.name
                         schemata.setdefault(key, []).append(value)
