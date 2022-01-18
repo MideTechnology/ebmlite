@@ -1,12 +1,15 @@
 import collections
 import datetime
+import os.path
+import sys
 import types
 import unittest
 from io import BytesIO
 
-from ebmlite.core import loadSchema, parseSchema, BinaryElement, DateElement, \
-    Element, FloatElement, IntegerElement, MasterElement, StringElement, \
-    UIntegerElement, UnicodeElement, VoidElement, UnknownElement
+from ebmlite.core import listSchemata, loadSchema, parseSchema, \
+    BinaryElement, DateElement, Element, FloatElement, IntegerElement, \
+    MasterElement, StringElement, UIntegerElement, UnicodeElement, \
+    VoidElement, UnknownElement, SCHEMATA, SCHEMA_PATH
 
 
 class testCoreElement(unittest.TestCase):
@@ -701,7 +704,6 @@ class testSchema(unittest.TestCase):
         self.stream = BytesIO(b'test')
 
 
-
     def testAddElement(self):
         """ Test adding elements to a schema. """
 
@@ -789,6 +791,31 @@ class testSchema(unittest.TestCase):
             self.schema.verify(b'\x00\x42\x86\x81\x01')
 
 
+    def testLoadSchema(self):
+        """ Test schema loading. If things have gotten this far, basic
+            loading works; this tests some additional features.
+       """
+
+        # Back up schemata so this test starts fresh
+        schemata = SCHEMATA.copy()
+        SCHEMATA.clear()
+
+        schema1 = loadSchema('mide_ide.xml')
+        schema2 = loadSchema('./ebmlite/schemata/mide_ide.xml')
+
+        self.assertTrue(schema1 is schema2,
+                        "loadSchema() did not use cached parsed schema")
+
+        schema3 = loadSchema('mide_ide.xml', reload=True)
+
+        self.assertTrue(schema1 is not schema3,
+                        "loadSchema() did not reload schema")
+
+        # Restore schemata
+        SCHEMATA.clear()
+        SCHEMATA.update(schemata)
+
+
     def testParseSchema(self):
         """ Test parsing a schema from a string. """
 
@@ -815,6 +842,43 @@ class testSchema(unittest.TestCase):
         schema2 = parseSchema(xml, name="testParseSchema")
         self.assertTrue(schema2 is schema,
                         "parseSchema() did not use cached parsed schema")
+
+
+    def testSchemaModulePath(self):
+        """ Test schema loading using module-relative paths. """
+        sys.path.insert(0, os.path.dirname(__file__))
+
+        SCHEMATA.clear()
+        schema1 = loadSchema("{module_path_testing}/test_schema.xml")
+
+        SCHEMA_PATH.insert(0, '{module_path_testing}')
+        schema2 = loadSchema("test_schema2.xml")
+
+        SCHEMA_PATH.pop(0)
+
+
+    def testListSchemata(self):
+        """ Test schema gathering. """
+        sys.path.insert(0, os.path.dirname(__file__))
+        SCHEMA_PATH.insert(0, '{module_path_testing}')
+
+        schemata = listSchemata()
+
+        for name, paths in schemata.items():
+            byName = loadSchema(name)
+            byPath = [loadSchema(p) for p in paths]
+
+            self.assertEqual(byName, byPath[0],
+                             "Base schema name did not load expected default")
+
+        # NOTE: This will need to be changed if/when enDAQ schemata removed
+        #  from package.
+        self.assertIn('mide_manifest.xml', schemata,
+                      'mide_manifest.xml not found in {}'.format(schemata))
+        self.assertGreaterEqual(len(schemata['mide_manifest.xml']), 2,
+                         "listSchemata() did not find all mide_manifest.xml schemata")
+
+        SCHEMA_PATH.pop(0)
 
 
 if __name__ == "__main__":

@@ -14,11 +14,13 @@ __author__ = "David Randall Stokes, Connor Flanigan"
 __copyright__ = "Copyright 2021, Mide Technology Corporation"
 __credits__ = "David Randall Stokes, Connor Flanigan, Becker Awqatty, Derek Witt"
 
-__all__ = ['createID', 'validateID', 'toXml', 'xml2ebml', 'loadXml', 'pprint']
+__all__ = ['createID', 'validateID', 'toXml', 'xml2ebml', 'loadXml', 'pprint',
+           'printSchemata']
 
 import ast
 from base64 import b64encode, b64decode
 from io import StringIO
+import pathlib
 import struct
 import sys
 import tempfile
@@ -338,6 +340,7 @@ def xml2ebml(xmlFile, ebmlFile, schema, sizeLength=None, headers=True,
 #
 #===============================================================================
 
+
 def loadXml(xmlFile, schema, ebmlFile=None):
     """ Helpful utility to load an EBML document from an XML file.
 
@@ -402,3 +405,34 @@ def pprint(el, values=True, out=sys.stdout, indent="  ", _depth=0):
                 out.write("\n")
 
     out.flush()
+
+
+#===============================================================================
+#
+#===============================================================================
+
+def printSchemata(paths=None, out=sys.stdout, absolute=True):
+    """ Display a list of schemata in `SCHEMA_PATH`. A thin wrapper for the
+        core `listSchemata()` function.
+
+        @param out: A file-like stream to which to write.
+    """
+    out = out or sys.stdout
+    newfile = isinstance(out, (str, pathlib.Path))
+    if newfile:
+        out = open(out, 'w')
+
+    try:
+        if paths:
+            paths.extend(core.SCHEMA_PATH)
+        else:
+            paths = core.SCHEMA_PATH
+        schemata = core.listSchemata(*paths, absolute=absolute)
+        for k, v in schemata.items():
+            out.write("{}\n".format(k))
+            for s in v:
+                out.write("    {}\n".format(s))
+        out.flush()
+    finally:
+        if newfile:
+            out.close()
