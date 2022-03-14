@@ -43,7 +43,7 @@ class BinaryCodec:
             :returns: If no `stream`, the encoded data as text. If `stream`,
                 the number of bytes written.
         """
-        raise NotImplemented
+        raise NotImplementedError
 
     @classmethod
     def decode(cls, data, stream=None):
@@ -57,7 +57,7 @@ class BinaryCodec:
             :returns: If no `stream`, the decoded binary data. If `stream`,
                 the number of bytes written.
         """
-        raise NotImplemented
+        raise NotImplementedError
 
 
 # ==============================================================================

@@ -120,6 +120,7 @@ def test_list_schemata(script_runner):
         SCHEMA_PATH,
         "--output",
         path_out,
+        # env={'EBMLITE_SCHEMA_PATH': '"{module_path_testing}"'}
     )
     assert result.success
 
@@ -130,6 +131,8 @@ def test_list_schemata(script_runner):
         for filename in os.listdir(core.SCHEMA_PATH[0]):
             if filename.endswith('xml'):
                 assert filename in output
+
+        assert 'test_schema.xml' in output
 
     finally:
         # Remove the output file in all cases
