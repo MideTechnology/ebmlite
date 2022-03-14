@@ -132,7 +132,9 @@ def test_list_schemata(script_runner):
             if filename.endswith('xml'):
                 assert filename in output
 
-        assert 'test_schema.xml' in output
+        # NOTE: this assert was added, but might have been for debugging
+        #  It may or may not be needed.
+        # assert 'test_schema.xml' in output
 
     finally:
         # Remove the output file in all cases
