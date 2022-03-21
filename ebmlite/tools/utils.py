@@ -18,7 +18,10 @@ def load_files(args, binary_output=False):
         exit(1)
 
     try:
-        schema = core.loadSchema(args.schema)
+        schema_file = args.schema
+        if os.path.splitext(schema_file.strip())[1] == '':
+            schema_file += '.xml'
+        schema = core.loadSchema(schema_file)
     except IOError as err:
         errPrint("Error loading schema: %s\n" % err)
 
