@@ -18,7 +18,10 @@ def load_files(args, binary_output=False):
         exit(1)
 
     try:
-        schema = core.loadSchema(args.schema)
+        schema_file = args.schema
+        if os.path.splitext(schema_file.strip())[1] == '':
+            schema_file += '.xml'
+        schema = core.loadSchema(schema_file)
     except IOError as err:
         errPrint("Error loading schema: %s\n" % err)
 
@@ -28,6 +31,6 @@ def load_files(args, binary_output=False):
 
     output = os.path.realpath(os.path.expanduser(args.output))
     if os.path.exists(output) and not args.clobber:
-        errPrint("Output file exists: %s" % args.output)
+        errPrint("Error: Output file already exists: %s" % args.output)
     with open(output, ('wb' if binary_output else 'w')) as out:
         yield (schema, out)

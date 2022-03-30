@@ -16,7 +16,7 @@ EBML files quickly and efficiently, and that's about it.
     over chunks of the raw binary data. Current implementation doesn't check
     element contents, just ID and payload size (for speed).
 @todo: Document-wide caching, for future handling of streamed data. Affects
-    the longer-term streaming TODO (listed below) and optimization of
+    the longer-term streaming to-do (listed below) and optimization of
     'infinite' elements (listed above).
 @todo: Clean up and standardize usage of the term 'size' versus 'length.'
 @todo: General documentation (more detailed than the README) and examples.
@@ -27,7 +27,7 @@ EBML files quickly and efficiently, and that's about it.
     of how schemata are loaded.
 @todo: (longer term) Refactor to support streaming data. This will require
     modifying the indexing and iterating methods of `Document`. Also affects
-    the document-wide caching TODO item, listed above.
+    the document-wide caching to-do item, listed above.
 @todo: (longer term) Support the official Schema definition format. Start by
     adopting some of the attributes, specifically ``minOccurs`` and
     ``maxOccurs`` (they serve the function provided by the current
@@ -36,20 +36,24 @@ EBML files quickly and efficiently, and that's about it.
     currently handles legacy ``python-ebml`` schemata.
 """
 __author__ = "David Randall Stokes, Connor Flanigan"
-__copyright__ = "Copyright 2021, Mide Technology Corporation"
+__copyright__ = "Copyright 2022, Mide Technology Corporation"
 __credits__ = "David Randall Stokes, Connor Flanigan, Becker Awqatty, Derek Witt"
 
 __all__ = ['BinaryElement', 'DateElement', 'Document', 'Element',
            'FloatElement', 'IntegerElement', 'MasterElement', 'Schema',
            'StringElement', 'UIntegerElement', 'UnicodeElement',
-           'UnknownElement', 'VoidElement', 'loadSchema']
+           'UnknownElement', 'VoidElement', 'loadSchema', 'parseSchema']
 
 from ast import literal_eval
-from collections import OrderedDict
 from datetime import datetime
 import errno
-import os.path
+import importlib
 from io import BytesIO, StringIO, IOBase
+import os.path
+from pathlib import Path
+import re
+import sys
+import types
 from xml.etree import ElementTree as ET
 
 from .decoding import readElementID, readElementSize
@@ -57,6 +61,20 @@ from .decoding import readFloat, readInt, readUInt, readDate
 from .decoding import readString, readUnicode
 from . import encoding
 from . import schemata
+
+# Dictionaries in Python 3.7+ are explicitly insert-ordered in all
+# implementations. If older, continue to use `collections.OrderedDict`.
+if sys.hexversion < 0x03070000:
+    from collections import OrderedDict as Dict
+else:
+    Dict = dict
+
+# Additionally, `importlib.resources.files` is new to 3.9 as well; this is
+# part of a work-around.
+if sys.hexversion < 0x03090000:
+    importlib_resources = None
+else:
+    import importlib.resources as importlib_resources
 
 # ==============================================================================
 #
@@ -67,6 +85,9 @@ from . import schemata
 # the schema file.
 SCHEMA_PATH = ['',
                os.path.realpath(os.path.dirname(schemata.__file__))]
+
+SCHEMA_PATH.extend(p for p in os.environ.get('EBMLITE_SCHEMA_PATH', '').split(os.path.pathsep)
+                   if p not in SCHEMA_PATH)
 
 # SCHEMATA: A dictionary of loaded schemata, keyed by filename. Used by
 # `loadSchema()`. In most cases, SCHEMATA should not be otherwise modified.
@@ -724,7 +745,7 @@ class MasterElement(Element):
                 very specific, and it isn't totally necessary for the core
                 library.
         """
-        result = OrderedDict()
+        result = Dict()
         for el in self:
             if el.multiple:
                 result.setdefault(el.name, []).append(el.dump())
@@ -927,7 +948,7 @@ class Document(MasterElement):
         if 'EBML' not in cls.schema:
             return {}
 
-        headers = OrderedDict()
+        headers = Dict()
         for elName, elType in (('EBMLVersion', int),
                                ('EBMLReadVersion', int),
                                ('DocType', str),
@@ -938,7 +959,7 @@ class Document(MasterElement):
                 if v is not None:
                     headers[elName] = v
 
-        return OrderedDict(EBML=headers)
+        return Dict(EBML=headers)
 
     @classmethod
     def encode(cls, stream, data, headers=False, **kwargs):
@@ -1405,8 +1426,87 @@ class Schema(object):
 #
 # ==============================================================================
 
+def _expandSchemaPath(path, name=''):
+    """ Helper function to process a schema path or name, converting module
+        references to Paths.
 
-def loadSchema(filename, reload=False, **kwargs):
+        @param path: The schema path. May be a directory name, a module
+            name in braces (e.g., `{idelib.schemata}`), or a module
+            instance. Directory and module names may contain schema
+            filenames.
+        @param name: An optional schema base filename. Will get appended
+            to the resulting `Path`/`Traversable`.
+        @return: A `Path`/`Traversable` object.
+    """
+    strpath = str(path)
+    subdir = ''
+
+    if not strpath:
+        path = strpath = os.getcwd()
+    elif '{' in strpath:
+        if '}' not in strpath:
+            raise IOError(errno.ENOENT, 'Malformed module path', strpath)
+
+        m = re.match(r'(\{.+\})[/\\](.+)', strpath)
+        if m:
+            path, subdir = m.groups()
+            strpath = path
+
+    if importlib_resources:
+        if isinstance(path, types.ModuleType):
+            return importlib_resources.files(path) / subdir / name
+        elif '{' in strpath:
+            return importlib_resources.files(strpath.strip('{} ')) / subdir / name
+    else:
+        # Pre-3.9: Use naive means of finding the module path. Won't work in
+        # some cases (module is a zip, etc.); it's just a fallback. To be
+        # deprecated.
+        if isinstance(path, types.ModuleType):
+            path = os.path.dirname(path.__file__)
+        elif '{' in strpath:
+            path = os.path.dirname(importlib.import_module(strpath.strip('{}')).__file__)
+
+    return Path(path) / subdir / name
+
+
+def listSchemata(*paths, absolute=True):
+    """ Gather all EBML schemata. `ebmlite.SCHEMA_PATH` is used by default;
+        alternatively, one or more paths or modules can be supplied as
+        arguments.
+
+        @returns: A dictionary of schema files. Keys are the base name of the
+            schema XML, values are lists of full paths to the XML. The first
+            filename in the list is what will load if the base name is used
+            with `loadSchema()`.
+    """
+    schemata = {}
+    paths = paths or SCHEMA_PATH
+
+    for path in paths:
+        try:
+            fullpath = _expandSchemaPath(path)
+        except ModuleNotFoundError:
+            continue
+
+        if not fullpath.is_dir():
+            continue
+
+        for p in fullpath.iterdir():
+            key = p.name
+            if key.lower().endswith('.xml'):
+                try:
+                    # Casting to string is py35 fix. Remove in future.
+                    xml = ET.parse(str(p))
+                    if xml.getroot().tag == 'Schema':
+                        value = p if absolute else Path(path) / p.name
+                        schemata.setdefault(key, []).append(value)
+                except (ET.ParseError, IOError, TypeError):
+                    continue
+
+    return schemata
+
+
+def loadSchema(filename, reload=False, paths=None, **kwargs):
     """ Import a Schema XML file. Loading the same file more than once will
         return the initial instantiation, unless `reload` is `True`.
 
@@ -1414,36 +1514,53 @@ def loadSchema(filename, reload=False, **kwargs):
             be found and file's path is not absolute, the paths listed in
             `SCHEMA_PATH` will be searched (similar to `sys.path` when
             importing modules).
-        @keyword reload: If `True`, the resulting Schema is guaranteed to be
+        @param reload: If `True`, the resulting Schema is guaranteed to be
             new. Note: existing references to previous instances of the
             Schema and/or its elements will not update.
+        @param paths: A list of paths to search for schemata, an alternative
+            to `ebmlite.SCHEMA_PATH`
 
         Additional keyword arguments are sent verbatim to the `Schema`
         constructor.
+
+        @raises: IOError, ModuleNotFoundError
     """
     global SCHEMATA
 
-    if filename in SCHEMATA and not reload:
-        return SCHEMATA[filename]
+    paths = paths or SCHEMA_PATH
+    origName = str(filename)
+    filename = Path(filename)
 
-    origName = filename
-    if not filename.startswith(('.', '/', '\\', '~')):
-        # Not a specific path and file not found: search paths in SCHEMA_PATH
-        for p in SCHEMA_PATH:
-            f = os.path.join(p, origName)
-            if os.path.exists(f):
-                filename = f
-                break
+    if origName in SCHEMATA and not reload:
+        return SCHEMATA[origName]
 
-    filename = os.path.realpath(os.path.expanduser(filename))
-    if filename in SCHEMATA and not reload:
-        return SCHEMATA[filename]
+    filename = _expandSchemaPath(filename)  # raises ModuleNotFoundError
 
-    if not os.path.exists(filename):
+    if not filename.is_file():
+        if len(filename.parts) == 1:
+            # Not a specific path and file not found: search paths in SCHEMA_PATH
+            for p in paths:
+                try:
+                    f = _expandSchemaPath(p, filename)
+                    if f.is_file():
+                        filename = f
+                        break
+                except ModuleNotFoundError:
+                    continue
+
+    if hasattr(filename, 'expanduser'):
+        filename = filename.expanduser().absolute()
+
+    if str(filename) in SCHEMATA and not reload:
+        return SCHEMATA[str(filename)]
+
+    if not filename.is_file():
         raise IOError(errno.ENOENT, 'Could not find schema XML', origName)
 
-    schema = Schema(filename, **kwargs)
-    SCHEMATA[filename] = schema
+    with filename.open() as fs:
+        schema = Schema(fs, **kwargs)
+
+    SCHEMATA[str(filename)] = SCHEMATA[origName] = schema
     return schema
 
 

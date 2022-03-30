@@ -5,6 +5,7 @@ import xml.etree.ElementTree as ET
 
 import pytest
 
+from ebmlite import core, schemata
 
 SCHEMA_PATH = os.path.join(".", "ebmlite", "schemata", "matroska.xml")
 
@@ -23,6 +24,8 @@ def test_ebml2xml(script_runner):
         "--output",
         path_out,
         "--clobber",
+        "--max",
+        "--single"
     )
     assert result.success
 
@@ -36,6 +39,7 @@ def test_ebml2xml(script_runner):
         # Output file is not in canonical form (see Py3.8+: ET.canonicalize)
         # -> compare key properties of each element
         def assert_elements_are_equiv(e1, e2):
+            e1.attrib.pop('encoding', None)  # TODO: Regenerate the test XML to include encoding
             assert e1.tag == e2.tag and e1.attrib == e2.attrib
 
         assert_elements_are_equiv(root_out, root_expt)
@@ -97,6 +101,40 @@ def test_view(script_runner):
 
     try:
         assert filecmp.cmp(path_out, path_expt, shallow=False)
+
+    finally:
+        # Remove the output file in all cases
+        try:
+            os.remove(path_out)
+        except FileNotFoundError:
+            pass
+
+
+@pytest.mark.script_launch_mode('subprocess')
+def test_list_schemata(script_runner):
+    core.SCHEMA_PATH = [os.path.dirname(schemata.__file__)]
+    path_out = os.path.join(".", "tests", "list-schemata.txt")
+
+    result = script_runner.run(
+        "list-schemata",
+        SCHEMA_PATH,
+        "--output",
+        path_out,
+        # env={'EBMLITE_SCHEMA_PATH': '"{module_path_testing}"'}
+    )
+    assert result.success
+
+    try:
+        with open(path_out, 'r') as f:
+            output = f.read()
+
+        for filename in os.listdir(core.SCHEMA_PATH[0]):
+            if filename.endswith('xml'):
+                assert filename in output
+
+        # NOTE: this assert was added, but might have been for debugging
+        #  It may or may not be needed.
+        # assert 'test_schema.xml' in output
 
     finally:
         # Remove the output file in all cases
