@@ -1,7 +1,5 @@
 import unittest
 from datetime import timedelta, datetime
-import math
-import struct
 
 from ebmlite.encoding import getLength, encodeBinary, encodeDate, encodeFloat, \
     encodeInt, encodeString, encodeUInt, encodeSize, encodeId, encodeUnicode
@@ -33,7 +31,8 @@ class testUtilFunctions(unittest.TestCase):
         expected1 = bytes([0b10000001])
         expected2 = bytes([0b11100100])
         expected3 = bytes([0b01000011, 0b11101000])
-        expected4 = bytes([0b00010001, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000])
+        expected4 = bytes([0b00010001, 0b00000000, 0b00000000, 0b00000000,
+                           0b00000000, 0b00000000, 0b00000000, 0b00000000])
 
         self.assertEqual(expected1, val1, 'failed to encode 1')
         self.assertEqual(expected2, val2, 'failed to encode 100')
@@ -115,25 +114,30 @@ class testEncoding(unittest.TestCase):
         # General cases
         #   chars
         for i in range(0, 256):
-            self.assertEqual(encodeUInt(i, length=1), chr(i).encode('latin-1'),
+            self.assertEqual(encodeUInt(i, length=1),
+                             chr(i).encode('latin-1'),
                              'Character %X not encoded properly' % i)
             
         #   uint16
         for i in range(0, 256):
-            self.assertEqual(encodeUInt((i<<8) + 0x41, length=2), chr(i).encode('latin-1') + b'A',
+            self.assertEqual(encodeUInt((i << 8) + 0x41, length=2),
+                             chr(i).encode('latin-1') + b'A',
                              'Character %X not encoded properly' % i)
             
         #   uint32
         for i in range(0, 256):
-            self.assertEqual(encodeUInt((i<<24) + 0x414141, length=4), chr(i).encode('latin-1') + b'AAA',
+            self.assertEqual(encodeUInt((i << 24) + 0x414141, length=4),
+                             chr(i).encode('latin-1') + b'AAA',
                              "Character %X not encoded properly" % i)
             
         #   uint64
-        for i in range(0, 256):            self.assertEqual(encodeUInt((i<<56) + 0x41414141414141, length=8), chr(i).encode('latin-1') + b'AAAAAAA',
+        for i in range(0, 256):
+            self.assertEqual(encodeUInt((i << 56) + 0x41414141414141, length=8),
+                             chr(i).encode('latin-1') + b'AAAAAAA',
                              'Character %X not encoded properly' % i)
 
-        # Length paramater behavior
-        #   unspecified length calls should truncate to smallest length possible
+        # Length parameter behavior
+        #   unspecified length calls should truncate to the smallest possible length
         self.assertEqual(encodeUInt(0x123), b'\x01\x23')
         #   but zero should still be a nonempty string
         self.assertEqual(encodeUInt(0), b'\x00')
@@ -145,6 +149,8 @@ class testEncoding(unittest.TestCase):
             encodeUInt(0x123, length=1)
         with self.assertRaises(ValueError):
             encodeUInt(0, length=0)
+        with self.assertRaises(TypeError):
+            encodeUInt('bogus')
 
     def testInt(self):
         """ Test converting signed integers into bytes. """
@@ -152,28 +158,32 @@ class testEncoding(unittest.TestCase):
         # General cases
         #   chars
         for i in range(-128, 128):
-            self.assertEqual(encodeInt(i, length=1), chr(i % 256).encode('latin-1'),
+            self.assertEqual(encodeInt(i, length=1),
+                             chr(i % 256).encode('latin-1'),
                              'Character %X  not encoded properly' % (i % 256))
             
         #   int16
         for i in range(-128, 128):
-            self.assertEqual(encodeInt((i<<8) + 0x41, length=2), chr(i % 256).encode('latin-1') + b'A',
+            self.assertEqual(encodeInt((i << 8) + 0x41, length=2),
+                             chr(i % 256).encode('latin-1') + b'A',
                              'Character %X  not encoded properly' % (i % 256))
             
         #   int32
         for i in range(-128, 128):
-            self.assertEqual(encodeInt((i<<24) + 0x414141, length=4), chr(i % 256).encode('latin-1') + b'AAA',
+            self.assertEqual(encodeInt((i << 24) + 0x414141, length=4),
+                             chr(i % 256).encode('latin-1') + b'AAA',
                              'Character %X  not encoded properly' % (i % 256))
             
         #   int64
         for i in range(-128, 128):
-            self.assertEqual(encodeInt((i<<56) + 0x41414141414141, length=8), chr(i % 256).encode('latin-1') + b'AAAAAAA',
+            self.assertEqual(encodeInt((i << 56) + 0x41414141414141, length=8),
+                             chr(i % 256).encode('latin-1') + b'AAAAAAA',
                              'Character %X  not encoded properly' % (i % 256))
 
         self.assertEqual(encodeInt(0b10000000), b'\x00\x80')
 
-        # Length paramater behavior
-        #   unspecified length calls should truncate to smallest length possible
+        # Length parameter behavior
+        #   unspecified length calls should truncate to the smallest possible length
         self.assertEqual(encodeInt(0x123), b'\x01\x23')
         self.assertEqual(encodeInt(-0x123), b'\xfe\xdd')
         #   but 0/(-1) should still be nonempty strings
@@ -192,12 +202,17 @@ class testEncoding(unittest.TestCase):
             encodeInt(0, length=0)
         with self.assertRaises(ValueError):
             encodeInt(-1, length=0)
+        # type check
+        with self.assertRaises(TypeError):
+            encodeInt('bogus')
 
     def testFloat(self):
         """ Test converting floats into bytes. """
         
         # empty float
-        self.assertEqual(encodeFloat(10, length=0), b'', 'Empty float did not return an empty string')
+        self.assertEqual(encodeFloat(10, length=0),
+                         b'',
+                         'Empty float did not return an empty string')
         
         # four byte float
         fl1 = encodeFloat(0,            length=4)
@@ -237,7 +252,7 @@ class testEncoding(unittest.TestCase):
         self.assertEqual(fl9,  target9,  '8-byte 1/3 float not correct')
         self.assertEqual(fl10, target10, '8-byte inf float not correct')
 
-        # lengthless floats
+        # floats without specified length
         fl11 = encodeFloat(0)
         fl12 = encodeFloat(1)
         fl13 = encodeFloat(-2)
@@ -258,7 +273,10 @@ class testEncoding(unittest.TestCase):
         
         with self.assertRaises(ValueError):
             encodeFloat(1.0, length=5)
-    
+
+        with self.assertRaises(TypeError):
+            encodeFloat('bogus')
+
     def testBinary(self):
         """ Test converting bytes (strings) to bytes. """
         
@@ -270,6 +288,9 @@ class testEncoding(unittest.TestCase):
 
         self.assertEqual(encodeBinary(None), b'')
 
+        with self.assertRaises(TypeError):
+            encodeBinary(42)
+
     def testBinaryLength(self):
         """ Test converting bytes (strings) to bytes. """
 
@@ -277,15 +298,13 @@ class testEncoding(unittest.TestCase):
             self.assertEqual(
                     encodeBinary(s, length=20),
                     s.ljust(20, b'\x00'),
-                    'failed to encode {} as bytes'.format(s),
-                    )
+                    'failed to encode {} as bytes'.format(s))
 
         for s in ['', 'test', 'a', 'Midé', '🐍', '🧃']:
             self.assertEqual(
                     encodeBinary(s, length=20),
                     s.encode('utf-8').ljust(20, b'\x00'),
-                    'failed to encode {} as unicode'.format(s),
-                    )
+                    'failed to encode {} as unicode'.format(s))
 
         with self.assertRaises(ValueError):
             encodeBinary('🐍', length=1)
@@ -303,6 +322,10 @@ class testEncoding(unittest.TestCase):
                 self.assertEqual(encodeString(bytes(s), length=2), bytes(s + b'\x00'))
             else:
                 self.assertEqual(encodeString(bytes(s), length=2), bytes(s[:2]))
+
+        with self.assertRaises(TypeError):
+            encodeString(42)
+
 
     def testStringWithUnicode(self):
 

@@ -235,10 +235,12 @@ def encodeBinary(val, length=None):
             with ``0x00`` if `length` is not `None`.
         @raise ValueError: raised if val is longer than length.
     """
-    if isinstance(val, str):
-        val = val.encode('utf_8')
-    elif val is None:
+    if val is None:
         val = b''
+    elif isinstance(val, str):
+        val = val.encode('utf_8')
+    elif not isinstance(val, (bytearray, bytes)):
+        raise TypeError('Cannot encode {} {!r} as binary'.format(type(val).__name__, val))
 
     if length is None:
         return val
