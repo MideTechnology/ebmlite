@@ -60,7 +60,7 @@ class testUtilFunctions(unittest.TestCase):
         with self.assertRaises(ValueError):
             encodeSize(1.3)
 
-        with self.assertRaises(struct.error):
+        with self.assertRaises(ValueError):
             encodeSize(2**70)
 
     def testEncodeId(self):
