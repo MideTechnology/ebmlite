@@ -12,6 +12,7 @@ TEST_REQUIRES = [
     'pytest>=4.6',
     'codecov',
     'pytest-cov',
+    'flake8<5.0',
     'pytest-flake8',
     'pytest-console-scripts',
     'pytest-xdist[psutil]',
