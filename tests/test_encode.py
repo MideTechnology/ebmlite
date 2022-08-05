@@ -149,8 +149,12 @@ class testEncoding(unittest.TestCase):
             encodeUInt(0x123, length=1)
         with self.assertRaises(ValueError):
             encodeUInt(0, length=0)
+
+        with self.assertRaises(ValueError):
+            encodeUInt(-42)
         with self.assertRaises(TypeError):
             encodeUInt('bogus')
+
 
     def testInt(self):
         """ Test converting signed integers into bytes. """
@@ -348,8 +352,10 @@ class testEncoding(unittest.TestCase):
             self.assertEqual(
                     encodeUnicode(s),
                     s.encode('utf-8'),
-                    'Unicode of {} not encoded as string correctly'.format(s),
-                    )
+                    'Unicode of {} not encoded as string correctly'.format(s))
+        with self.assertRaises(TypeError):
+            encodeUnicode(42)
+
 
     def testUnicodeLength(self):
         """ Test converting unicode strings to bytes. """
@@ -358,8 +364,7 @@ class testEncoding(unittest.TestCase):
 
             self.assertEqual(
                     encodeUnicode(s, length=2),
-                    s.encode('utf-8').ljust(2, b'\x00')[:2],
-                    )
+                    s.encode('utf-8').ljust(2, b'\x00')[:2])
     
     def testDate(self):
         """ Test converting dates to bytes. """
@@ -368,6 +373,10 @@ class testEncoding(unittest.TestCase):
         delta = timedelta(microseconds=0x41425344//1000)
 
         self.assertEqual(encodeDate(zeroTime + delta), b'\x00\x00\x00\x00ABPh')
+
+        with self.assertRaises(TypeError):
+            encodeDate('bogus')
+
 
     def testNow(self):
         """ Test converting dates to bytes. """
