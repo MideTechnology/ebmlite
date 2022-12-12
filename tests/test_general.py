@@ -4,70 +4,80 @@ Created on Aug 14, 2017
 @author: dstokes
 """
 
+import os.path
 import unittest
 from xml.dom.minidom import parseString
 from xml.etree import ElementTree as ET
 
+import filelock
+
 from ebmlite import core
+from ebmlite import schemata
 from ebmlite import util
+from ebmlite import threaded_file
+
+
+MKV_LOCK_FILE = './tests/testMkv.lock'
+IDE_LOCK_FILE = './tests/testIde.lock'
 
 
 class Test(unittest.TestCase):
     """ Integration tests for util.py """
-
-
 
     def testMkv(self):
         """ Test the functionality of the ebmlite library by converting a known
             good MKV file (a derivative of EBML) back and forth, then compare
             the results.
         """
-        schemaFile = './ebmlite/schemata/matroska.xml'
-        ebmlFile1 = './tests/video-1.mkv'
-        ebmlFile2 = './tests/video-1-copy.mkv'
-        xmlFile1 = './tests/video-1.xml'
-        xmlFile2 = './tests/video-1-copy.xml'
 
-        schema = core.loadSchema(schemaFile)
+        with filelock.FileLock(MKV_LOCK_FILE, timeout=-1):
 
-        # Start with toXml
-        ebmlDoc1 = schema.load(ebmlFile1, headers=True)
-        ebmlRoot = util.toXml(ebmlDoc1)
-        xmlString1 = ET.tostring(ebmlRoot, encoding='UTF-8')
+            schemaFile = './ebmlite/schemata/matroska.xml'
+            ebmlFile1 = './tests/video-1.mkv'
+            ebmlFile2 = './tests/video-1-copy.mkv'
+            xmlFile1 = './tests/video-1.xml'
+            xmlFile2 = './tests/video-1-copy.xml'
 
-        # Save xml
-        with open(xmlFile1, 'wt') as f:
-            f.write(xmlString1.decode())
+            schema = core.loadSchema(schemaFile)
 
-        # Convert xml2ebml
-        with open(ebmlFile2, 'wb') as out:
-            util.xml2ebml(xmlFile1, out, schema)
+            # Start with toXml
+            ebmlDoc1 = schema.load(ebmlFile1, headers=True)
+            ebmlRoot = util.toXml(ebmlDoc1)
+            xmlString1 = ET.tostring(ebmlRoot, encoding='UTF-8')
 
-        # write the second xml file
-        ebmlDoc2 = schema.load(ebmlFile2, headers=True)
-        mkvRoot2 = util.toXml(ebmlDoc2)
-        xmlString2 = ET.tostring(mkvRoot2, encoding='UTF-8')
-        # self.assertEqual(xmlString1, xmlString2, "xml strings aren't matching up")
-        with open(xmlFile2, 'wt') as f:
-            f.write(xmlString2.decode())
+            # Save xml
+            with open(xmlFile1, 'wt') as f:
+                f.write(xmlString1.decode())
 
-        # Load back the XML files in order to compare the two
-        xmlDoc1 = util.loadXml(xmlFile1, schema)
-        xmlDoc2 = util.loadXml(xmlFile2, schema)
+            # Convert xml2ebml
+            with open(ebmlFile2, 'wb') as out:
+                util.xml2ebml(xmlFile1, out, schema)
 
-        # Compare each element from the XML
-        xmlEls1 = [xmlDoc1]
-        xmlEls2 = [xmlDoc2]
-        while len(xmlEls1) > 0:
-            self.assertEqual(xmlEls1[0], xmlEls2[0], 'Element '
-                             + repr(xmlEls1[0])
-                             + ' was not converted properly')
-            for x in list(xmlEls1.pop(0).children.values()):
-                if issubclass(x, core.Element):
-                    xmlEls1.append(x)
-            for x in list(xmlEls2.pop(0).children.values()):
-                if issubclass(x, core.Element):
-                    xmlEls2.append(x)
+            # write the second xml file
+            ebmlDoc2 = schema.load(ebmlFile2, headers=True)
+            mkvRoot2 = util.toXml(ebmlDoc2)
+            xmlString2 = ET.tostring(mkvRoot2, encoding='UTF-8')
+            # self.assertEqual(xmlString1, xmlString2, "xml strings aren't matching up")
+            with open(xmlFile2, 'wt') as f:
+                f.write(xmlString2.decode())
+
+            # Load back the XML files in order to compare the two
+            xmlDoc1 = util.loadXml(xmlFile1, schema)
+            xmlDoc2 = util.loadXml(xmlFile2, schema)
+
+            # Compare each element from the XML
+            xmlEls1 = [xmlDoc1]
+            xmlEls2 = [xmlDoc2]
+            while len(xmlEls1) > 0:
+                self.assertEqual(xmlEls1[0], xmlEls2[0], 'Element '
+                                 + repr(xmlEls1[0])
+                                 + ' was not converted properly')
+                for x in list(xmlEls1.pop(0).children.values()):
+                    if issubclass(x, core.Element):
+                        xmlEls1.append(x)
+                for x in list(xmlEls2.pop(0).children.values()):
+                    if issubclass(x, core.Element):
+                        xmlEls2.append(x)
 
 
     def testIde(self):
@@ -75,51 +85,54 @@ class Test(unittest.TestCase):
             good IDE file (a derivative of EBML) back and forth, then compare
             the results.
         """
-        schemaFile = './ebmlite/schemata/mide_ide.xml'
-        ebmlFile1 = './tests/SSX46714-doesnot.IDE'
-        ebmlFile2 = './tests/SSX46714-new.IDE'
-        xmlFile1 = './tests/ssx-1.xml'
-        xmlFile2 = './tests/ssx-2.xml'
 
-        schema = core.loadSchema(schemaFile)
+        with filelock.FileLock(IDE_LOCK_FILE, timeout=-1):
 
-        # Start with toXml
-        ebmlDoc1 = schema.load(ebmlFile1, headers=True)
-        ebmlRoot = util.toXml(ebmlDoc1)
-        xmlString1 = ET.tostring(ebmlRoot, encoding='UTF-8')
+            schemaFile = './ebmlite/schemata/mide_ide.xml'
+            ebmlFile1 = './tests/SSX46714-doesnot.IDE'
+            ebmlFile2 = './tests/SSX46714-new.IDE'
+            xmlFile1 = './tests/ssx-1.xml'
+            xmlFile2 = './tests/ssx-2.xml'
 
-        # Save xml
-        with open(xmlFile1, 'wt') as f:
-            f.write(xmlString1.replace(b'><', b'>\r\n<').decode())
+            schema = core.loadSchema(schemaFile)
 
-        # Convert xml2ebml
-        with open(ebmlFile2, 'wb') as out:
-            util.xml2ebml(xmlFile1, out, schema)
+            # Start with toXml
+            ebmlDoc1 = schema.load(ebmlFile1, headers=True)
+            ebmlRoot = util.toXml(ebmlDoc1)
+            xmlString1 = ET.tostring(ebmlRoot, encoding='UTF-8')
 
-        # write the second xml file
-        ebmlDoc2 = schema.load(ebmlFile2, headers=True)
-        mkvRoot2 = util.toXml(ebmlDoc2)
-        xmlString2 = ET.tostring(mkvRoot2, encoding='UTF-8')
-        with open(xmlFile2, 'wt') as f:
-            f.write(xmlString2.replace(b'><', b'>\r\n<').decode())
+            # Save xml
+            with open(xmlFile1, 'wt') as f:
+                f.write(xmlString1.replace(b'><', b'>\r\n<').decode())
 
-        # Load back the XML files in order to compare the two
-        xmlDoc1 = util.loadXml(xmlFile1, schema)
-        xmlDoc2 = util.loadXml(xmlFile2, schema)
+            # Convert xml2ebml
+            with open(ebmlFile2, 'wb') as out:
+                util.xml2ebml(xmlFile1, out, schema)
 
-        # Compare each element from the XML
-        xmlEls1 = [xmlDoc1]
-        xmlEls2 = [xmlDoc2]
-        while len(xmlEls1) > 0:
-            self.assertEqual(xmlEls1[0], xmlEls2[0], 'Element '
-                             + repr(xmlEls1[0])
-                             + ' was not converted properly')
-            for x in list(xmlEls1.pop(0).children.values()):
-                if issubclass(x, core.Element):
-                    xmlEls1.append(x)
-            for x in list(xmlEls2.pop(0).children.values()):
-                if issubclass(x, core.Element):
-                    xmlEls2.append(x)
+            # write the second xml file
+            ebmlDoc2 = schema.load(ebmlFile2, headers=True)
+            mkvRoot2 = util.toXml(ebmlDoc2)
+            xmlString2 = ET.tostring(mkvRoot2, encoding='UTF-8')
+            with open(xmlFile2, 'wt') as f:
+                f.write(xmlString2.replace(b'><', b'>\r\n<').decode())
+
+            # Load back the XML files in order to compare the two
+            xmlDoc1 = util.loadXml(xmlFile1, schema)
+            xmlDoc2 = util.loadXml(xmlFile2, schema)
+
+            # Compare each element from the XML
+            xmlEls1 = [xmlDoc1]
+            xmlEls2 = [xmlDoc2]
+            while len(xmlEls1) > 0:
+                self.assertEqual(xmlEls1[0], xmlEls2[0], 'Element '
+                                 + repr(xmlEls1[0])
+                                 + ' was not converted properly')
+                for x in list(xmlEls1.pop(0).children.values()):
+                    if issubclass(x, core.Element):
+                        xmlEls1.append(x)
+                for x in list(xmlEls2.pop(0).children.values()):
+                    if issubclass(x, core.Element):
+                        xmlEls2.append(x)
 
 
 
@@ -220,6 +233,83 @@ class Test(unittest.TestCase):
 
             self.assertRaises(TypeError, util.validateID, '0x80')
             self.assertRaises(Exception, util.validateID, 128.1)
+
+
+    def testListSchemata(self):
+        path_out = './tests/schemata.txt'
+        util.printSchemata(out=open(path_out, 'wt'))
+
+        try:
+            with open(path_out, 'r') as f:
+                output = f.read()
+
+            # Baseline: output contained default schemata
+            for filename in os.listdir(os.path.dirname(schemata.__file__)):
+                if filename.endswith('xml'):
+                    assert filename in output
+
+        finally:
+            # Remove the output file in all cases
+            try:
+                os.remove(path_out)
+            except FileNotFoundError:
+                pass
+
+
+class TestThreadedFile(unittest.TestCase):
+
+    def testMkv(self):
+        """ Test the functionality of the ebmlite library by converting a known
+            good MKV file (a derivative of EBML) back and forth, then compare
+            the results.
+        """
+        with filelock.FileLock(MKV_LOCK_FILE, timeout=-1):
+            schemaFile = './ebmlite/schemata/matroska.xml'
+            ebmlFile1 = './tests/video-1.mkv'
+            ebmlFile2 = './tests/video-1-copy.mkv'
+            xmlFile1 = './tests/video-1.xml'
+            xmlFile2 = './tests/video-1-copy.xml'
+
+            schema = core.loadSchema(schemaFile)
+
+            # Start with toXml
+            ebmlDoc1 = schema.load(threaded_file.ThreadAwareFile(ebmlFile1), headers=True)
+            ebmlRoot = util.toXml(ebmlDoc1)
+            xmlString1 = ET.tostring(ebmlRoot, encoding='UTF-8')
+
+            # Save xml
+            with open(xmlFile1, 'wt') as f:
+                f.write(xmlString1.decode())
+
+            # Convert xml2ebml
+            with open(ebmlFile2, 'wb') as out:
+                util.xml2ebml(xmlFile1, out, schema)
+
+            # write the second xml file
+            ebmlDoc2 = schema.load(ebmlFile2, headers=True)
+            mkvRoot2 = util.toXml(ebmlDoc2)
+            xmlString2 = ET.tostring(mkvRoot2, encoding='UTF-8')
+            # self.assertEqual(xmlString1, xmlString2, "xml strings aren't matching up")
+            with open(xmlFile2, 'wt') as f:
+                f.write(xmlString2.decode())
+
+            # Load back the XML files in order to compare the two
+            xmlDoc1 = util.loadXml(xmlFile1, schema)
+            xmlDoc2 = util.loadXml(xmlFile2, schema)
+
+            # Compare each element from the XML
+            xmlEls1 = [xmlDoc1]
+            xmlEls2 = [xmlDoc2]
+            while len(xmlEls1) > 0:
+                self.assertEqual(xmlEls1[0], xmlEls2[0], 'Element '
+                                 + repr(xmlEls1[0])
+                                 + ' was not converted properly')
+                for x in list(xmlEls1.pop(0).children.values()):
+                    if issubclass(x, core.Element):
+                        xmlEls1.append(x)
+                for x in list(xmlEls2.pop(0).children.values()):
+                    if issubclass(x, core.Element):
+                        xmlEls2.append(x)
 
 
 if __name__ == "__main__":

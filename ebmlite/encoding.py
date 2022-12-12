@@ -13,7 +13,9 @@ __all__ = ['encodeBinary', 'encodeDate', 'encodeFloat', 'encodeId', 'encodeInt',
 
 import datetime
 from typing import ByteString, List, Optional
+import struct
 import sys
+import warnings
 
 from .decoding import _struct_uint64, _struct_int64
 from .decoding import _struct_float32, _struct_float64
@@ -89,7 +91,7 @@ def encodeSize(val: Optional[int], length: Optional[int] = None) -> bytes:
     try:
         prefix = LENGTH_PREFIXES[length]
         return encodeUInt(val | prefix, length)
-    except (IndexError, TypeError):
+    except (IndexError, TypeError, ValueError):
         raise ValueError("Cannot encode element size %s" % length)
 
 
@@ -112,7 +114,10 @@ def encodeId(eid: int, length: Optional[int] = None) -> bytes:
         if length < 1 or length > 4:
             raise ValueError("Cannot encode an ID 0x%0x to length %d" %
                              (eid, length))
-    return encodeUInt(eid, length)
+    try:
+        return encodeUInt(eid, length)
+    except TypeError:
+        raise TypeError('Cannot encode {} {!r} as ID'.format(type(eid).__name__, eid))
 
 
 def encodeUInt(val: int, length: Optional[int] = None) -> bytes:
@@ -125,8 +130,23 @@ def encodeUInt(val: int, length: Optional[int] = None) -> bytes:
             left-padded with ``0x00`` if `length` is not `None`.
         @raise ValueError: raised if val is longer than length.
     """
+    if isinstance(val, float):
+        fval, val = val, int(val)
+        if fval != val:
+            warnings.warn('encodeUInt: float value {} encoded as {}'.format(fval, val))
+    elif not isinstance(val, int):
+        raise TypeError('Cannot encode {} {!r} as unsigned integer'.format(type(val).__name__, val))
+
+    if val < 0:
+        raise ValueError('Cannot encode negative value {} as unsigned integer'.format(val))
+
     pad = b'\x00'
-    packed = _struct_uint64.pack(val).lstrip(pad) or pad
+
+    try:
+        packed = _struct_uint64.pack(val).lstrip(pad) or pad
+    except struct.error as err:
+        # Catch other errors. Value is probably too large for struct.
+        raise ValueError(str(err))
 
     if length is None:
         return packed
@@ -147,23 +167,32 @@ def encodeInt(val: int, length: Optional[int] = None) -> bytes:
             (for negative) if `length` is not `None`.
         @raise ValueError: raised if val is longer than length.
     """
-    if val >= 0:
-        pad = b'\x00'
-        packed = _struct_int64.pack(val).lstrip(pad) or pad
-        if packed[0] & 0b10000000:
-            packed = pad + packed
-    else:
-        pad = b'\xff'
-        packed = _struct_int64.pack(val).lstrip(pad) or pad
-        if not packed[0] & 0b10000000:
-            packed = pad + packed
+    if isinstance(val, float):
+        fval, val = val, int(val)
+        if fval != val:
+            warnings.warn('encodeInt: float value {} encoded as {}'.format(fval, val))
 
-    if length is None:
-        return packed
-    if len(packed) > length:
-        raise ValueError("Encoded length (%d) greater than specified length "
-                         "(%d)" % (len(packed), length))
-    return packed.rjust(length, pad)
+    try:
+        if val >= 0:
+            pad = b'\x00'
+            packed = _struct_int64.pack(val).lstrip(pad) or pad
+            if packed[0] & 0b10000000:
+                packed = pad + packed
+        else:
+            pad = b'\xff'
+            packed = _struct_int64.pack(val).lstrip(pad) or pad
+            if not packed[0] & 0b10000000:
+                packed = pad + packed
+
+        if length is None:
+            return packed
+        if len(packed) > length:
+            raise ValueError("Encoded length (%d) greater than specified length "
+                             "(%d)" % (len(packed), length))
+        return packed.rjust(length, pad)
+
+    except (TypeError, struct.error):
+        raise TypeError('Cannot encode {} {!r} as integer'.format(type(val).__name__, val))
 
 
 def encodeFloat(val: float, length: Optional[int] = None) -> bytes:
@@ -182,21 +211,24 @@ def encodeFloat(val: float, length: Optional[int] = None) -> bytes:
         else:
             length = DEFAULT_FLOAT_SIZE
 
-    if length == 0:
-        return b''
-    if length == 4:
-        return _struct_float32.pack(val)
-    elif length == 8:
-        return _struct_float64.pack(val)
-    else:
-        raise ValueError("Cannot encode float of length %d; only 0, 4, or 8" %
-                         length)
+    try:
+        if length == 0:
+            return b''
+        if length == 4:
+            return _struct_float32.pack(val)
+        elif length == 8:
+            return _struct_float64.pack(val)
+        else:
+            raise ValueError("Cannot encode float of length %d; only 0, 4, or 8" %
+                             length)
+    except struct.error:
+        raise TypeError('Cannot encode {} {!r} as float'.format(type(val).__name__, val))
 
 
 def encodeBinary(val: ByteString, length: Optional[int] = None) -> bytes:
     """ Encode binary data.
 
-        @param val: A string or bytearray containing the data to encode.
+        @param val: A string, bytes, or bytearray containing the data to encode.
         @keyword length: An explicit length for the encoded data. A
             `ValueError` will be raised if `length` is shorter than the
             actual length of the binary data.
@@ -204,11 +236,12 @@ def encodeBinary(val: ByteString, length: Optional[int] = None) -> bytes:
             with ``0x00`` if `length` is not `None`.
         @raise ValueError: raised if val is longer than length.
     """
-    if isinstance(val, str):
-        print(val)
-        val = val.encode('utf_8')
-    elif val is None:
+    if val is None:
         val = b''
+    elif isinstance(val, str):
+        val = val.encode('utf_8')
+    elif not isinstance(val, (bytearray, bytes)):
+        raise TypeError('Cannot encode {} {!r} as binary'.format(type(val).__name__, val))
 
     if length is None:
         return val
@@ -223,15 +256,15 @@ def encodeString(val: ByteString, length: Optional[int] = None):
     """ Encode an ASCII string.
 
         @param val: The string (or bytearray) to encode.
-        @keyword length: An explicit length for the encoded data. Longer
-            strings will be truncated.
         @keyword length: An explicit length for the encoded data. The result
-            will be truncated if the length is less than that of the original.
+            will be truncated if the original string is longer.
         @return: The binary representation of val as a string, truncated or
             left-padded with ``0x00`` if `length` is not `None`.
     """
     if isinstance(val, str):
         val = val.encode('ascii', 'replace')
+    elif not isinstance(val, (bytearray, bytes)):
+        raise TypeError('Cannot encode {} {!r} as ASCII string'.format(type(val).__name__, val))
 
     if length is not None:
         val = val[:length]
@@ -244,10 +277,13 @@ def encodeUnicode(val: str, length: Optional[int] = None) -> bytes:
 
         @param val: The Unicode string to encode.
         @keyword length: An explicit length for the encoded data. The result
-            will be truncated if the length is less than that of the original.
+            will be truncated if the original string is longer.
         @return: The binary representation of val as a string, truncated or
             left-padded with ``0x00`` if `length` is not `None`.
     """
+    if not isinstance(val, (bytearray, bytes, str)):
+        raise TypeError('Cannot encode {} {!r} as string'.format(type(val).__name__, val))
+
     val = val.encode('utf_8')
 
     if length is not None:
@@ -273,6 +309,8 @@ def encodeDate(val: datetime.datetime, length: Optional[int] = None) -> bytes:
 
     if val is None:
         val = datetime.datetime.utcnow()
+    elif not isinstance(val, datetime.datetime):
+        raise TypeError('Cannot encode {} {!r} as datetime'.format(type(val).__name__, val))
 
     delta = val - datetime.datetime(2001, 1, 1, tzinfo=None)
     nanoseconds = (delta.microseconds +

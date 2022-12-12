@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/MideTechnology/ebmlite.svg?branch=master)](https://travis-ci.org/MideTechnology/ebmlite)   [![codecov](https://codecov.io/gh/MideTechnology/ebmlite/branch/master/graph/badge.svg)](https://codecov.io/gh/MideTechnology/ebmlite)
+![example workflow](https://github.com/MideTechnology/ebmlite/actions/workflows/unit-tests.yml/badge.svg) [![codecov](https://codecov.io/gh/MideTechnology/ebmlite/branch/master/graph/badge.svg)](https://codecov.io/gh/MideTechnology/ebmlite) 
 
 
 
@@ -117,6 +117,33 @@ The structure of the schema's XML defines the structure of the EBML document; ch
 
 **Note:** As seen in the example above, _ebmlite_ allows an EBML document to have multiple elements at its root level. Several other EBML libraries do this as well, but this is apparently counter to the official spec. Officially, an EBML document should have only a single root element, similar to an XML file.
 
+Using Schema Files
+------------------
+### Schema File Location (`ebmlite.SCHEMA_PATH`)
+`ebmlite.SCHEMA_PATH` is a list that stores a set of paths which will be searched for schema files, similar to
+`sys.path` works for modules. If a schema filename with no path is used (e.g. `ebmlite.loadSchema("matroska.xml")`),
+it is searched for in `SCHEMA_PATH`'s paths. Users may modify `SCHEMA_PATH` as needed.
+
+The default schemata XML files are in the package's `schemata` subdirectory.
+
+### Module-relative Paths
+Since multiple packages are currently using `ebmlite`, schemata may be imported using module names. Modules
+can be specified in paths by using braces (curly brackets) around their names (e.g., `"{idelib}/schemata/mide_ide.xml"`).
+Module-relative names may be used when loading schemata, can be included in `ebmlite.SCHEMA_PATH`, and can be
+used with the command-line utilities (in quotes).
+
+_New to version 3.3._
+
+### The `EBMLITE_SCHEMA_PATH` Environment Variable
+An operating system environment variable may be defined as a global means of specifying schema paths, in and out
+of Python. `EBMLITE_SCHEMA_PATH` functions like the `PATH` environment variable in Windows. `EBMLITE_SCHEMA_PATH`
+contains one or more paths, which will be added to `ebmlite.SCHEMA_PATH`; multiple paths are delimited by `;` in
+Windows, `:` in *NIX operating systems (Linux, macOS, etc.). `EBMLITE_SCHEMA_PATH` is largely intended for use
+with the `ebmlite` command-line utilities.
+
+_New to version 3.3._
+
+
 _ebmlite_
 ----------------
 ### Schema
@@ -125,7 +152,7 @@ The ``Schema`` class is a factory used to encode and decode EBML files.  When it
 ### Documents
 ``Documents`` are subclasses of MasterElements, which act as an interface to EBML files and act as the root node of the EBML tree.  Each ``Schema`` also creates a ``Document`` subclass to use, and the base ``Document`` class will not function without class variables defined by the ``Schema``.  
 
-### Utils
+### Utilities
 The functions provided by util.py will expose the majority of functionality needed to users, without the need to interface too deeply with this library.  The following functions are provided:
 * util.**toXml**(el, [parent=``None``,] [offsets=``True``,] [sizes=``True``,] [types=``True``,] [ids=``True``]):   
 Recursively converts EBML elements into xml elements.    
@@ -202,19 +229,58 @@ Optional Argument *out*: A file-like stream to which to write.
 Optional argument *indent*: The string containing the character(s) used for each
         indentation.
 
-Utils can also be called from the command line with the following syntax:
+Command Line Utilities
+----------------------
+When `ebmlite` is installed as a Python library, the utilities can be called from the command line.
+From the command line, documentation can be viewed using one of the following:
 ```commandline
-python util.py {xml2ebml|ebml2xml|view} {FILE1.ebml|FILE1.xml} SCHEMA.xml [-o {FILE2.xml|FILE2.ebml}] [-c|--clobber] [-p|--pretty]
+python -m ebmlite.tools.ebml2xml -h
+python -m ebmlite.tools.xml2ebml -h
+python -m ebmlite.tools.view_ebml -h
 ```
-The program requires you to specify a mode: xml2ebml, ebml2xml, or view.  The first two modes convert xml files to ebml files and ebml files to xml files, respectively; the last mode formats an IDE file to be human-readable.  
-FILE1: The location of the ebml or xml file to convert/view.  
-SCHEMA: The location of the schema to use when interpreting these files.  
-FILE2: The location to output to; otherwise, the output is directed into the console.  
--c|--clobber: If FILE2 exists, then overwrite it, otherwise the program will fail.  
--p|--pretty: Prints the output in a human-readable format.
+The commands available are:
+### ebml2xml
+```
+python -m ebmlite.tools.ebml2xml <EBML file> <schema> -o <file.XML>
+```
+`ebml2xml` will translate an EBML file into XML. For example:
+```commandline
+python -m ebmlite.tools.ebml2xml DAQ11093_000001.ide mide_ide.xml -o DAQ11093_000001.xml
+```
+will translate the EBML file `DAQ11093_000001.ide` (an enDAQ data recorder file) into XML,
+and write the result into `DAQ11093_000001.xml`. The schema `mide_ide.xml` is built in to
+the EBMLite library.
 
+### xml2ebml
+```
+python -m ebmlite.tools.xml2ebml <file.XML> <schema> -o <EBML file>
+```
+`xml2ebml` will translate XML back in to EBML. For example
+```commandline
+python -m ebmlite.tools.xml2ebml DAQ11093_000001.xml mide_ide.xml -o DAQ11093_000001b.ide
+```
+Will turn `DAQ11093_000001.xml` back into an IDE file.
+
+### view_ebml
+```
+python -m ebmlite.tools.view_ebml <EBML file> <schema>
+```
+`view_ebml` will show summary element data about an EBML file, including element ID and type
+
+
+### list_schemata
+```
+python -m ebmlite.tools.list_schemata
+```
+`list_schemata` will list all `ebmlite` schemata XML files in the directories specified in `ebmlite.SCHEMA_PATH`
+(and the `EBMLITE_SCHEMA_PATH` OS environment variable, if defined). The resulting list displays the base filename
+of the schema, followed by the file's full path, as well as the full paths of any schemata in other
+directories/modules that share the base name. If the schema's base name is used without a path, the first file
+will be loaded.
+
+_New to version 3.3._
 
 To Do
 =====
 * Complete documentation and example code.
-* See `@todo` items in the Python files (i.e. `core.py`).
+* See `todo` items in the Python files (i.e. `core.py`).

@@ -14,17 +14,20 @@ __author__ = "David Randall Stokes, Connor Flanigan"
 __copyright__ = "Copyright 2021, Mide Technology Corporation"
 __credits__ = "David Randall Stokes, Connor Flanigan, Becker Awqatty, Derek Witt"
 
-__all__ = ['createID', 'validateID', 'toXml', 'xml2ebml', 'loadXml', 'pprint']
+__all__ = ['createID', 'validateID', 'toXml', 'xml2ebml', 'loadXml', 'pprint',
+           'printSchemata']
 
 import ast
 from base64 import b64encode, b64decode
 from io import StringIO
+import pathlib
 import struct
 import sys
 import tempfile
 from xml.etree import ElementTree as ET
 
 from . import core, encoding, decoding
+from . import xml_codecs
 
 # ==============================================================================
 #
@@ -120,7 +123,8 @@ def validateID(elementId):
 # ==============================================================================
 
 
-def toXml(el, parent=None, offsets=True, sizes=True, types=True, ids=True):
+def toXml(el, parent=None, offsets=True, sizes=True, types=True, ids=True,
+          binary_codec='base64', void_codec='ignore'):
     """ Convert an EBML Document to XML. Binary elements will contain
         base64-encoded data in their body. Other non-master elements will
         contain their value in a ``value`` attribute.
@@ -136,8 +140,19 @@ def toXml(el, parent=None, offsets=True, sizes=True, types=True, ids=True):
             name of the corresponding EBML element type.
         @keyword ids: If `True`, create ``id`` attributes containing the
             corresponding EBML element's EBML ID.
+        @keyword binary_codec: The name of an XML codec class from
+            `ebmlite.xml_codecs`, or an instance of a codec, for rendering
+            binary elements as text.
+        @keyword void_codec:  The name of an XML codec class from
+            `ebmlite.xml_codecs`, or an instance of a codec, for rendering
+            the contents of Void elements as text.
         @return The root XML element of the file.
     """
+    if isinstance(binary_codec, str):
+        binary_codec = xml_codecs.BINARY_CODECS[binary_codec]()
+    if isinstance(void_codec, str):
+        void_codec = xml_codecs.BINARY_CODECS[void_codec]()
+
     if isinstance(el, core.Document):
         elname = el.__class__.__name__
     else:
@@ -164,9 +179,15 @@ def toXml(el, parent=None, offsets=True, sizes=True, types=True, ids=True):
 
     if isinstance(el, core.MasterElement):
         for chEl in el:
-            toXml(chEl, xmlEl, offsets, sizes, types, ids)
+            toXml(chEl, xmlEl, offsets, sizes, types, ids, binary_codec, void_codec)
+    elif isinstance(el, core.VoidElement):
+        xmlEl.set('size', str(el.size))
+        if void_codec.NAME != 'ignore':
+            xmlEl.set('encoding', void_codec.NAME)
+        xmlEl.text = void_codec.encode(el.value)
     elif isinstance(el, core.BinaryElement):
-        xmlEl.text = b64encode(el.value).decode()
+        xmlEl.set('encoding', binary_codec.NAME)
+        xmlEl.text = binary_codec.encode(el.value, offset=el.offset)
     elif not isinstance(el, core.VoidElement):
         xmlEl.set('value', str(el.value).encode('ascii', 'xmlcharrefreplace').decode())
 
@@ -216,6 +237,8 @@ def xmlElement2ebml(xmlEl, ebmlFile, schema, sizeLength=None, unknown=True):
         encId = encoding.encodeId(int(eid, 16))
         cls.id = int(eid, 16)
 
+    codec = xmlEl.get('encoding', 'base64')
+
     if sizeLength is None:
         sl = xmlEl.get('sizeLength', None)
         if sl is None:
@@ -243,10 +266,7 @@ def xmlElement2ebml(xmlEl, ebmlFile, schema, sizeLength=None, unknown=True):
         return len(encId) + (endPos - sizePos)
 
     elif issubclass(cls, core.BinaryElement):
-        if xmlEl.text is None:
-            val = b""
-        else:
-            val = b64decode(xmlEl.text)
+        val = xml_codecs.BINARY_CODECS[codec].decode(xmlEl.text)
     elif issubclass(cls, (core.IntegerElement, core.FloatElement)):
         val = ast.literal_eval(xmlEl.get('value'))
     else:
@@ -338,6 +358,7 @@ def xml2ebml(xmlFile, ebmlFile, schema, sizeLength=None, headers=True,
 #
 #===============================================================================
 
+
 def loadXml(xmlFile, schema, ebmlFile=None):
     """ Helpful utility to load an EBML document from an XML file.
 
@@ -365,7 +386,8 @@ def loadXml(xmlFile, schema, ebmlFile=None):
 #
 #===============================================================================
 
-def pprint(el, values=True, out=sys.stdout, indent="  ", _depth=0):
+def pprint(el, values=True, out=sys.stdout, indent="  ", binary_codec="ignore",
+           void_codec="ignore", _depth=0):
     """ Test function to recursively crawl an EBML document or element and
         print its structure, with child elements shown indented.
 
@@ -374,8 +396,18 @@ def pprint(el, values=True, out=sys.stdout, indent="  ", _depth=0):
         @keyword out: A file-like stream to which to write.
         @keyword indent: The string containing the character(s) used for each
             indentation.
+        @keyword binary_codec: The name of a class from `ebmlite.xml_codecs`,
+            or an instance of a codec, for rendering binary elements as text.
+        @keyword void_codec: The name of a class from `ebmlite.xml_codecs`,
+            or an instance of a codec, for rendering the contents of Void
+            elements as text.
     """
     tab = indent * _depth
+
+    if isinstance(binary_codec, str):
+        binary_codec = xml_codecs.BINARY_CODECS[binary_codec]()
+    if isinstance(void_codec, str):
+        void_codec = xml_codecs.BINARY_CODECS[void_codec]()
 
     if _depth == 0:
         if values:
@@ -387,18 +419,57 @@ def pprint(el, values=True, out=sys.stdout, indent="  ", _depth=0):
     if isinstance(el, core.Document):
         out.write("%06s %06s %s %s (Document, type %s)\n" % (el.offset, el.size, tab, el.name, el.type))
         for i in el:
-            pprint(i, values, out, indent, _depth+1)
+            pprint(i, values, out, indent, binary_codec, void_codec, _depth+1)
     else:
         out.write("%06s %06s %s %s (ID 0x%0X)" % (el.offset, el.size, tab, el.name, el.id))
         if isinstance(el, core.MasterElement):
             out.write(": (master) %d subelements\n" % len(el.value))
             for i in el:
-                pprint(i, values, out, indent, _depth+1)
+                pprint(i, values, out, indent, binary_codec, void_codec, _depth+1)
         else:
             out.write(": (%s)" % el.dtype.__name__)
-            if values and not isinstance(el, core.BinaryElement):
-                out.write(" %r\n" % (el.value))
-            else:
-                out.write("\n")
+            if values:
+                if isinstance(el, core.BinaryElement):
+                    indent = tab + " " * 17
+                    if isinstance(el, core.VoidElement) and void_codec.NAME != 'ignore':
+                        out.write(" <{}>".format(void_codec.NAME))
+                        void_codec.encode(el.value, offset=el.offset, indent=indent, stream=out)
+                    elif binary_codec.NAME != 'ignore':
+                        out.write(" <{}>".format(binary_codec.NAME))
+                        binary_codec.encode(el.value, offset=el.offset, indent=indent, stream=out)
+                else:
+                    out.write(" %r" % (el.value))
+            out.write("\n")
 
     out.flush()
+
+
+#===============================================================================
+#
+#===============================================================================
+
+def printSchemata(paths=None, out=sys.stdout, absolute=True):
+    """ Display a list of schemata in `SCHEMA_PATH`. A thin wrapper for the
+        core `listSchemata()` function.
+
+        @param out: A file-like stream to which to write.
+    """
+    out = out or sys.stdout
+    newfile = isinstance(out, (str, pathlib.Path))
+    if newfile:
+        out = open(out, 'w')
+
+    try:
+        if paths:
+            paths.extend(core.SCHEMA_PATH)
+        else:
+            paths = core.SCHEMA_PATH
+        schemata = core.listSchemata(*paths, absolute=absolute)
+        for k, v in schemata.items():
+            out.write("{}\n".format(k))
+            for s in v:
+                out.write("    {}\n".format(s))
+        out.flush()
+    finally:
+        if newfile:
+            out.close()

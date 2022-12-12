@@ -17,7 +17,7 @@ import io
 import platform
 from threading import currentThread, Event
 
-class ThreadAwareFile(io.IOBase):
+class ThreadAwareFile(io.FileIO):
     """ A 'replacement' for a standard read-only file stream that supports
         simultaneous access by multiple threads without (explicit) blocking.
         Each thread actually gets its own stream, so it can perform its own
@@ -58,7 +58,7 @@ class ThreadAwareFile(io.IOBase):
         self.initArgs = args
         self.initKwargs = kwargs
         
-        self._ready = Event() # NOT a lock; some things block, others wait
+        self._ready = Event()  # NOT a lock; some things block, others wait
         self._ready.set()
 
         self.threads = {}
@@ -108,7 +108,7 @@ class ThreadAwareFile(io.IOBase):
         ident = currentThread().ident
         if ident not in self.threads:
             # First access from this thread. Open the file.
-            fp = io.IOBase(*self.initArgs, **self.initKwargs)
+            fp = io.FileIO(*self.initArgs, **self.initKwargs)
             self.threads[ident] = fp
             return fp
         return self.threads[ident]
