@@ -152,7 +152,7 @@ The ``Schema`` class is a factory used to encode and decode EBML files.  When it
 ### Documents
 ``Documents`` are subclasses of MasterElements, which act as an interface to EBML files and act as the root node of the EBML tree.  Each ``Schema`` also creates a ``Document`` subclass to use, and the base ``Document`` class will not function without class variables defined by the ``Schema``.  
 
-### Utils
+### Utilities
 The functions provided by util.py will expose the majority of functionality needed to users, without the need to interface too deeply with this library.  The following functions are provided:
 * util.**toXml**(el, [parent=``None``,] [offsets=``True``,] [sizes=``True``,] [types=``True``,] [ids=``True``]):   
 Recursively converts EBML elements into xml elements.    
@@ -231,8 +231,8 @@ Optional argument *indent*: The string containing the character(s) used for each
 
 Command Line Utilities
 ----------------------
-When EBMLite is installed as a Python library, the Utils can be called from the command line. From the command line,
-documentation can be viewed using one of the following:
+When `ebmlite` is installed as a Python library, the utilities can be called from the command line.
+From the command line, documentation can be viewed using one of the following:
 ```commandline
 python -m ebmlite.tools.ebml2xml -h
 python -m ebmlite.tools.xml2ebml -h
@@ -247,14 +247,15 @@ python -m ebmlite.tools.ebml2xml <EBML file> <schema> -o <file.XML>
 ```commandline
 python -m ebmlite.tools.ebml2xml DAQ11093_000001.ide mide_ide.xml -o DAQ11093_000001.xml
 ```
-will translate `DAQ11093_000001.ide` (an enDAQ data recorder file) into XML, and write the result into
-`DAQ11093_000001.xml`. The schema `mide_ide.xml` is built in to the EBMLite library.
+will translate the EBML file `DAQ11093_000001.ide` (an enDAQ data recorder file) into XML,
+and write the result into `DAQ11093_000001.xml`. The schema `mide_ide.xml` is built in to
+the EBMLite library.
 
 ### xml2ebml
 ```
 python -m ebmlite.tools.xml2ebml <file.XML> <schema> -o <EBML file>
 ```
-`xml2ebml` will translate EBML back in to XML. For example
+`xml2ebml` will translate XML back in to EBML. For example
 ```commandline
 python -m ebmlite.tools.xml2ebml DAQ11093_000001.xml mide_ide.xml -o DAQ11093_000001b.ide
 ```

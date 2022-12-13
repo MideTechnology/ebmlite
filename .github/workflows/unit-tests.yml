@@ -12,7 +12,10 @@ jobs:
       fail-fast: false
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
-        python-version: ['3.6', '3.7', '3.8', '3.9', '3.10']
+        python-version: ['3.6', '3.7', '3.8', '3.9', '3.10', '3.11']
+        exclude:
+          - os: ubuntu-latest
+            python-version: '3.6'
 
     env:
       OS: ${{ matrix.os }}
@@ -22,18 +25,18 @@ jobs:
 
     steps:
 
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python-version }}
       - run: python -m pip install --upgrade pip
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - run: python -m pip install .[test]
 
       - run: python -m pytest ./tests/ --cov=ebmlite --cov-report=xml --flake8 -n auto
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: multi-file-stuff
           path: |
@@ -42,7 +45,7 @@ jobs:
             ./tests/ssx-1.xml
             ./tests/ssx-2.xml
 
-      - uses: codecov/codecov-action@v2
+      - uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           env_vars: OS,PYTHON-VERSION

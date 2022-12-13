@@ -12,6 +12,7 @@ TEST_REQUIRES = [
     'pytest>=4.6',
     'codecov',
     'pytest-cov',
+    'flake8<5.0',
     'pytest-flake8',
     'pytest-console-scripts',
     'pytest-xdist[psutil]',
@@ -20,7 +21,7 @@ TEST_REQUIRES = [
 
 setuptools.setup(
         name='ebmlite',
-        version='3.3.0',
+        version='3.3.1',
         author='Mide Technology',
         author_email='help@mide.com',
         description='A lightweight, "pure Python" library for parsing EBML (Extensible Binary Markup Language) data.',
@@ -35,7 +36,9 @@ setuptools.setup(
                      'Programming Language :: Python :: 3.7',
                      'Programming Language :: Python :: 3.8',
                      'Programming Language :: Python :: 3.9',
-                     'Programming Language :: Python :: 3.10'],
+                     'Programming Language :: Python :: 3.10',
+                     'Programming Language :: Python :: 3.11',
+                     ],
         keywords='ebml binary matroska webm',
         packages=setuptools.find_packages(exclude="tests"),
         package_dir={'': '.'},
