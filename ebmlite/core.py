@@ -154,10 +154,10 @@ class Element(object):
             elements should be created when a `Document` is loaded, rather
             than instantiated explicitly.
 
-            @keyword stream: A file-like object containing EBML data.
-            @keyword offset: The element's starting location in the file.
-            @keyword size: The size of the whole element.
-            @keyword payloadOffset: The starting location of the element's
+            :param stream: A file-like object containing EBML data.
+            :param offset: The element's starting location in the file.
+            :param size: The size of the whole element.
+            :param payloadOffset: The starting location of the element's
                 payload (i.e. immediately after the element's header).
         """
         self.stream = stream
@@ -235,13 +235,13 @@ class Element(object):
     def encode(cls, value, length=None, lengthSize=None, infinite=False):
         """ Encode an EBML element.
 
-            @param value: The value to encode, or a list of values to encode.
+            :param value: The value to encode, or a list of values to encode.
                 If a list is provided, each item will be encoded as its own
                 element.
-            @keyword length: An explicit length for the encoded data,
+            :param length: An explicit length for the encoded data,
                 overriding the variable length encoding. For producing
                 byte-aligned structures.
-            @keyword lengthSize: An explicit length for the encoded element
+            :param lengthSize: An explicit length for the encoded element
                 size, overriding the variable length encoding.
             @return: A bytearray containing the encoded EBML data.
         """
@@ -479,15 +479,15 @@ class UnknownElement(BinaryElement):
             most cases, elements should be created when a `Document` is loaded,
             rather than instantiated explicitly.
 
-            @keyword stream: A file-like object containing EBML data.
-            @keyword offset: The element's starting location in the file.
-            @keyword size: The size of the whole element.
-            @keyword payloadOffset: The starting location of the element's
+            :param stream: A file-like object containing EBML data.
+            :param offset: The element's starting location in the file.
+            :param size: The size of the whole element.
+            :param payloadOffset: The starting location of the element's
                 payload (i.e. immediately after the element's header).
-            @keyword id: The unknown element's ID. Unlike 'normal' elements,
+            :param id: The unknown element's ID. Unlike 'normal' elements,
                 in which ID is a class attribute, each UnknownElement instance
                 explicitly defines this.
-            @keyword schema: The schema used to load the element. Specified
+            :param schema: The schema used to load the element. Specified
                 explicitly because `UnknownElement`s are not part of any
                 schema.
         """
@@ -534,12 +534,12 @@ class MasterElement(Element):
             object, and then return it and the offset of the next element
             (this element's position + size).
 
-            @param stream: The source file-like stream.
-            @keyword nocache: If `True`, the parsed element's `precache`
+            :param stream: The source file-like stream.
+            :param nocache: If `True`, the parsed element's `precache`
                 attribute is ignored, and the element's value will not be
                 cached. For faster iteration when the element value doesn't
                 matter (e.g. counting child elements).
-            @return: The parsed element and the offset of the next element
+            :return: The parsed element and the offset of the next element
                 (i.e. the end of the parsed element).
         """
         offset = stream.tell()
@@ -569,14 +569,8 @@ class MasterElement(Element):
         if not cls.children:
             return False
 
-        try:
-            return elId in cls._childIds
-        except AttributeError:
-            # The set of valid child IDs hasn't been created yet.
-            cls._childIds = set(cls.children)
-            if cls.schema is not None:
-                cls._childIds.update(cls.schema.globals)
-            return elId in cls._childIds
+        return elId in cls.children or elId in cls.schema.globals
+
 
     @property
     def size(self):
@@ -708,14 +702,14 @@ class MasterElement(Element):
     def encode(cls, data, length=None, lengthSize=None, infinite=False):
         """ Encode an EBML master element.
 
-            @param data: The data to encode, provided as a dictionary keyed by
+            :param data: The data to encode, provided as a dictionary keyed by
                 element name, a list of two-item name/value tuples, or a list
                 of either. Note: individual items in a list of name/value
                 pairs *must* be tuples!
-            @keyword infinite: If `True`, the element will be written with an
+            :param infinite: If `True`, the element will be written with an
                 undefined size. When parsed, its end will be determined by the
                 occurrence of an invalid child element (or end-of-file).
-            @return: A bytearray containing the encoded EBML binary.
+            :return: A bytearray containing the encoded EBML binary.
         """
         # TODO: Use 'length' to automatically generate `Void` element?
         if isinstance(data, list) and len(data) > 0 and isinstance(data[0], list):
@@ -769,13 +763,13 @@ class Document(MasterElement):
             In most cases, `Schema.load()` should be used instead of
             explicitly instantiating a `Document`.
 
-            @param stream: A stream object (e.g. a file) from which to read
+            :param stream: A stream object (e.g. a file) from which to read
                 the EBML content.
-            @keyword name: The name of the document. Defaults to the filename
+            :param name: The name of the document. Defaults to the filename
                 (if applicable).
-            @keyword size: The size of the document, in bytes. Use if the
+            :param size: The size of the document, in bytes. Use if the
                 stream is neither a file or a `BytesIO` object.
-            @keyword headers: If `False`, the file's ``EBML`` header element
+            :param headers: If `False`, the file's ``EBML`` header element
                 (if present) will not appear as a root element in the document.
                 The contents of the ``EBML`` element will always be read,
                 regardless, and stored in the Document's `info` attribute.
@@ -941,7 +935,7 @@ class Document(MasterElement):
         """ Create the default EBML 'header' elements for a Document, using
             the default values in the schema.
 
-            @return: A dictionary containing a single key (``EBML``) with a
+            :return: A dictionary containing a single key (``EBML``) with a
                 dictionary as its value. The child dictionary contains
                 element names and values.
         """
@@ -965,11 +959,11 @@ class Document(MasterElement):
     def encode(cls, stream, data, headers=False, **kwargs):
         """ Encode an EBML document.
 
-            @param value: The data to encode, provided as a dictionary keyed
+            :param data: The data to encode, provided as a dictionary keyed
                 by element name, or a list of two-item name/value tuples.
                 Note: individual items in a list of name/value pairs *must*
                 be tuples!
-            @return: A bytearray containing the encoded EBML binary.
+            :return: A bytearray containing the encoded EBML binary.
         """
         if headers is True:
             stream.write(cls.encodePayload(cls._createHeaders()))
@@ -1049,9 +1043,9 @@ class Schema(object):
     def __init__(self, source, name=None):
         """ Constructor. Creates a new Schema from a schema description XML.
 
-            @param source: The Schema's source, either a string with the full
+            :param source: The Schema's source, either a string with the full
                 path and name of the schema XML file, or a file-like stream.
-            @keyword name: The schema's name. Defaults to the document type
+            :param name: The schema's name. Defaults to the document type
                 element's default value (if defined) or the base file name.
         """
         self.source = source
@@ -1067,7 +1061,7 @@ class Schema(object):
         self.elementInfo = {}  # Raw element schema attributes, keyed by ID
 
         self.globals = {}   # Elements valid for any parent, by ID
-        self.children = {}  # Valid root elements, by ID
+        self.children = set()  # Valid root elements, by ID
 
         # Parse, using the correct method for the schema format.
         schema = ET.parse(source)
@@ -1158,7 +1152,7 @@ class Schema(object):
             for chEl in el:
                 self._parseSchema(chEl, cls)
 
-    def addElement(self, eid, ename, baseClass, attribs={}, parent=None,
+    def addElement(self, eid, ename, baseClass, attribs=None, parent=None,
                    docs=None):
         """ Create a new `Element` subclass and add it to the schema.
 
@@ -1168,23 +1162,16 @@ class Schema(object):
             schema must contain the required ID, name, and type; successive
             appearances only need the ID and/or name.
 
-            @param eid: The element's EBML ID.
-            @param ename: The element's name.
-            @keyword multiple: If `True`, an EBML document can contain more
-                than one of this element. Not currently enforced.
-            @keyword mandatory: If `True`, a valid EBML document requires one
-                (or more) of this element. Not currently enforced.
-            @keyword length: A fixed length to use when writing the element.
-                `None` will use the minimum length required.
-            @keyword precache: If `True`, the element's value will be read
-                when the element is parsed, rather than when the value is
-                explicitly accessed. Can save time for small elements.
-            @keyword attribs: A dictionary of raw element attributes, as read
+            :param eid: The element's EBML ID.
+            :param ename: The element's name.
+            :param baseClass:
+            :param attribs: A dictionary of raw element attributes, as read
                 from the schema file.
-            @keyword parent: The new element's parent element class.
-            @keyword docs: The new element's docstring (e.g. the defining XML
+            :param parent: The new element's parent element class.
+            :param docs: The new element's docstring (e.g. the defining XML
                 element's text content).
         """
+        attribs = {} if attribs is None else attribs
 
         def _getBool(d, k, default):
             """ Helper function to get a dictionary value cast to bool. """
@@ -1265,7 +1252,7 @@ class Schema(object):
                           {'id': eid, 'name': ename, 'schema': self,
                            'mandatory': mandatory, 'multiple': multiple,
                            'precache': precache, 'length': length,
-                           'children': dict(), '__doc__': docs,
+                           'children': set(), '__doc__': docs,
                            '__slots__': baseClass.__slots__})
 
             self.elements[eid] = eclass
@@ -1277,8 +1264,8 @@ class Schema(object):
 
         parent = parent or self
         if parent.children is None:
-            parent.children = {}
-        parent.children[eid] = eclass
+            parent.children = set()
+        parent.children.add(eid)
 
         return eclass
 
@@ -1321,10 +1308,10 @@ class Schema(object):
     def load(self, fp, name=None, headers=False, **kwargs):
         """ Load an EBML file using this Schema.
 
-            @param fp: A file-like object containing the EBML to load, or the
+            :param fp: A file-like object containing the EBML to load, or the
                 name of an EBML file.
-            @keyword name: The name of the document. Defaults to filename.
-            @keyword headers: If `False`, the file's ``EBML`` header element
+            :param name: The name of the document. Defaults to filename.
+            :param headers: If `False`, the file's ``EBML`` header element
                 (if present) will not appear as a root element in the
                 document. The contents of the ``EBML`` element will always be
                 read.
@@ -1334,8 +1321,8 @@ class Schema(object):
     def loads(self, data, name=None):
         """ Load EBML from a string using this Schema.
 
-            @param data: A string or bytearray containing raw EBML data.
-            @keyword name: The name of the document. Defaults to the Schema's
+            :param data: A string or bytearray containing raw EBML data.
+            :param name: The name of the document. Defaults to the Schema's
                 document class name.
         """
         return self.load(BytesIO(data), name=name)
@@ -1346,9 +1333,9 @@ class Schema(object):
             @todo: Decide if this is worth keeping. It exists for historical
                 reasons that may have been refactored out.
 
-            @param fp: A file-like object containing the EBML to load, or the
+            :param fp: A file-like object containing the EBML to load, or the
                 name of an EBML file.
-            @keyword name: The name of the document. Defaults to filename.
+            :param name: The name of the document. Defaults to filename.
         """
         return self.load(fp, name=name)
 
@@ -1381,9 +1368,9 @@ class Schema(object):
         """ Write an EBML document using this Schema to a file or file-like
             stream.
 
-            @param stream: The file (or ``.write()``-supporting file-like
+            :param stream: The file (or ``.write()``-supporting file-like
                 object) to which to write the encoded EBML.
-            @param data: The data to encode, provided as a dictionary keyed by
+            :param data: The data to encode, provided as a dictionary keyed by
                 element name, or a list of two-item name/value tuples. Note:
                 individual items in a list of name/value pairs *must* be tuples!
         """
@@ -1393,10 +1380,10 @@ class Schema(object):
     def encodes(self, data, headers=False):
         """ Create an EBML document using this Schema, returned as a string.
 
-            @param data: The data to encode, provided as a dictionary keyed by
+            :param data: The data to encode, provided as a dictionary keyed by
                 element name, or a list of two-item name/value tuples. Note:
                 individual items in a list of name/value pairs *must* be tuples!
-            @return: A string containing the encoded EBML binary.
+            :return: A string containing the encoded EBML binary.
         """
         stream = BytesIO()
         self.encode(stream, data, headers=headers)
@@ -1430,13 +1417,13 @@ def _expandSchemaPath(path, name=''):
     """ Helper function to process a schema path or name, converting module
         references to Paths.
 
-        @param path: The schema path. May be a directory name, a module
+        :param path: The schema path. May be a directory name, a module
             name in braces (e.g., `{idelib.schemata}`), or a module
             instance. Directory and module names may contain schema
             filenames.
-        @param name: An optional schema base filename. Will get appended
+        :param name: An optional schema base filename. Will get appended
             to the resulting `Path`/`Traversable`.
-        @return: A `Path`/`Traversable` object.
+        :return: A `Path`/`Traversable` object.
     """
     strpath = str(path)
     subdir = ''
@@ -1474,7 +1461,7 @@ def listSchemata(*paths, absolute=True):
         alternatively, one or more paths or modules can be supplied as
         arguments.
 
-        @returns: A dictionary of schema files. Keys are the base name of the
+        :returns: A dictionary of schema files. Keys are the base name of the
             schema XML, values are lists of full paths to the XML. The first
             filename in the list is what will load if the base name is used
             with `loadSchema()`.
@@ -1510,14 +1497,14 @@ def loadSchema(filename, reload=False, paths=None, **kwargs):
     """ Import a Schema XML file. Loading the same file more than once will
         return the initial instantiation, unless `reload` is `True`.
 
-        @param filename: The name of the Schema XML file. If the file cannot
+        :param filename: The name of the Schema XML file. If the file cannot
             be found and file's path is not absolute, the paths listed in
             `SCHEMA_PATH` will be searched (similar to `sys.path` when
             importing modules).
-        @param reload: If `True`, the resulting Schema is guaranteed to be
+        :param reload: If `True`, the resulting Schema is guaranteed to be
             new. Note: existing references to previous instances of the
             Schema and/or its elements will not update.
-        @param paths: A list of paths to search for schemata, an alternative
+        :param paths: A list of paths to search for schemata, an alternative
             to `ebmlite.SCHEMA_PATH`
 
         Additional keyword arguments are sent verbatim to the `Schema`
@@ -1570,10 +1557,10 @@ def parseSchema(src, name=None, reload=False, **kwargs):
         is `True`. Calls to `loadSchema()` using a name previously used with
         `parseSchema()` will also return the previously instantiated Schema.
 
-        @param src: The XML string, or a stream containing XML.
-        @param name: The name of the schema. If none is supplied,
+        :param src: The XML string, or a stream containing XML.
+        :param name: The name of the schema. If none is supplied,
             the name defined within the schema will be used.
-        @param reload: If `True`, the resulting Schema is guaranteed to be
+        :param reload: If `True`, the resulting Schema is guaranteed to be
             new. Note: existing references to previous instances of the
             Schema and/or its elements will not update.
 
