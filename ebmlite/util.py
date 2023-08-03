@@ -15,7 +15,7 @@ __copyright__ = "Copyright 2021, Mide Technology Corporation"
 __credits__ = "David Randall Stokes, Connor Flanigan, Becker Awqatty, Derek Witt"
 
 __all__ = ['createID', 'validateID', 'toXml', 'xml2ebml', 'loadXml', 'pprint',
-           'printSchemata']
+           'printSchemata', 'flatiter']
 
 import ast
 from base64 import b64encode, b64decode
@@ -194,9 +194,9 @@ def toXml(el, parent=None, offsets=True, sizes=True, types=True, ids=True,
     return xmlEl
 
 
-#===============================================================================
+# ==============================================================================
 #
-#===============================================================================
+# ==============================================================================
 
 def xmlElement2ebml(xmlEl, ebmlFile, schema, sizeLength=None, unknown=True):
     """ Convert an XML element to EBML, recursing if necessary. For converting
@@ -473,3 +473,30 @@ def printSchemata(paths=None, out=sys.stdout, absolute=True):
     finally:
         if newfile:
             out.close()
+
+
+#===============================================================================
+#
+#===============================================================================
+
+
+def flatiter(element, depth=None):
+    """ Recursively crawl an EBML document or element, depth-first,
+        yielding all elements (or elements down to a given depth).
+
+        :param element: The EBML `Document` or `Element` to iterate.
+        :param depth: The maximum recursion depth. `None` or a value less
+            than zero will fully recurse without limit.
+    """
+    depth = -1 if depth is None else depth
+
+    def _flatiter(el, d, first):
+        if not first:
+            yield el
+        if abs(d) > 0 and isinstance(el, core.MasterElement):
+            for ch in el:
+                for grandchild in _flatiter(ch, d-1, False):
+                    yield grandchild
+
+    for child in _flatiter(element, depth, True):
+        yield child
