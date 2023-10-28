@@ -6,6 +6,7 @@ Note: the class docstrings will be shown in the `ebml2xml` help text.
 
 import base64
 from io import BytesIO, StringIO
+from typing import BinaryIO, Optional, Union
 
 
 # ==============================================================================
@@ -30,7 +31,12 @@ class BinaryCodec:
         """
         pass
 
-    def encode(self, data, stream=None, indent='', offset=0, **kwargs):
+    def encode(self,
+               data: bytes,
+               stream: Optional[BinaryIO] = None,
+               indent: Union[str, bytes] = '',
+               offset: int = 0,
+               **kwargs):
         """ Convert binary data to text. Typical arguments:
 
             :param data: The binary data from an EBML `BinaryElement`.
@@ -69,7 +75,7 @@ class Base64Codec(BinaryCodec):
     """
     NAME = "base64"
 
-    def __init__(self, cols=76, **kwargs):
+    def __init__(self, cols=76, **_kwargs):
         """ Constructor.
 
             :param cols: The length of each line of base64 data, excluding
@@ -80,10 +86,15 @@ class Base64Codec(BinaryCodec):
             Additional keyword arguments will be accepted (to maintain
             compatibility with other codecs) but ignored.
          """
+        super().__init__()
         self.cols = cols
 
 
-    def encode(self, data, stream=None, indent='', **kwargs):
+    def encode(self,
+               data: bytes,
+               stream: Optional[BinaryIO] = None,
+               indent: Union[str, bytes] = '',
+               **kwargs) -> Union[str, int]:
         """ Convert binary data to base64 text.
 
             :param data: The binary data from an EBML `BinaryElement`.
@@ -176,7 +187,11 @@ class HexCodec(BinaryCodec):
     # The name shown in the encoded XML element's `encoding` attribute
     NAME = "hex"
 
-    def __init__(self, width=2, cols=32, offsets=True, **kwargs):
+    def __init__(self,
+                 width: int = 2,
+                 cols: int = 32,
+                 offsets: bool = True,
+                 **_kwargs):
         """ Constructor.
 
             :param width: The number of bytes displayed per column when
@@ -187,12 +202,18 @@ class HexCodec(BinaryCodec):
             :param offsets: If `True`, each line will start with its offset
                 (in decimal). Applicable if `cols` is a non-zero number.
         """
+        super().__init__()
         self.width = width
         self.cols = cols
         self.offsets = bool(offsets and cols)
 
 
-    def encode(self, data, stream=None, offset=0, indent='', **kwargs):
+    def encode(self,
+               data: bytes,
+               stream: Optional[BinaryIO] = None,
+               offset: int = 0,
+               indent='',
+               **kwargs) -> Union[str, int]:
         """ Convert binary data to hexadecimal text.
 
             :param data: The binary data from an EBML `BinaryElement`.
@@ -233,7 +254,9 @@ class HexCodec(BinaryCodec):
 
 
     @classmethod
-    def decode(cls, data, stream=None):
+    def decode(cls,
+               data: bytes,
+               stream: Optional[BinaryIO] = None) -> Union[bytes, int]:
         """ Decode binary data in hexadecimal (e.g., from an XML file). Note:
             this is a `classmethod`, and works regardles of how the encoded
             data was formatted (e.g., number of columns, with or without
@@ -281,13 +304,17 @@ class IgnoreCodec(BinaryCodec):
     NAME = "ignore"
 
     @staticmethod
-    def encode(data, stream=None, **kwargs):
+    def encode(data: bytes,
+               stream: Optional[BinaryIO] = None,
+               **kwargs) -> Union[str, int]:
         if stream:
             return 0
         return ''
 
     @staticmethod
-    def decode(data, stream=None, **kwargs):
+    def decode(data: bytes,
+               stream: Optional[BinaryIO] = None,
+               **kwargs) -> Union[bytes, int]:
         if stream:
             return 0
         return b''

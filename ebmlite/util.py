@@ -4,10 +4,10 @@ This module may be imported or used as a command-line utility.
 
 Created on Aug 11, 2017
 
-@todo: Clean up and standardize usage of the term 'size' versus 'length.'
-@todo: Modify (or create an alternate version of) `toXml()` that writes
+:todo: Clean up and standardize usage of the term 'size' versus 'length.'
+:todo: Modify (or create an alternate version of) `toXml()` that writes
     directly to a file, allowing the conversion of huge EBML files.
-@todo: Add other options to command-line utility for the other arguments of
+:todo: Add other options to command-line utility for the other arguments of
     `toXml()` and `xml2ebml()`.
 """
 __author__ = "David Randall Stokes, Connor Flanigan"
@@ -18,12 +18,12 @@ __all__ = ['createID', 'validateID', 'toXml', 'xml2ebml', 'loadXml', 'pprint',
            'printSchemata']
 
 import ast
-from base64 import b64encode, b64decode
-from io import StringIO
+from io import BytesIO
 import pathlib
 import struct
 import sys
 import tempfile
+from typing import BinaryIO, Callable, IO, List, Literal, Optional, Tuple, Union
 from xml.etree import ElementTree as ET
 
 from . import core, encoding, decoding
@@ -34,22 +34,27 @@ from . import xml_codecs
 # ==============================================================================
 
 
-def createID(schema, idClass, exclude=(), minId=0x81, maxId=0x1FFFFFFE, count=1):
+def createID(schema: core.Schema,
+             idClass: Literal['a', 'b', 'c', 'd', 'A', 'B', 'C', 'D'],
+             exclude: Tuple[int] = (),
+             minId: int = 0x81,
+             maxId: int = 0x1FFFFFFE,
+             count: int = 1) -> List[int]:
     """ Generate unique EBML IDs. Primarily intended for use 'offline' by
         humans creating EBML schemata.
 
-        @param schema: The `Schema` in which the new IDs must coexist.
-        @param idClass: The EBML class of ID, one of (case-insensitive):
+        :param schema: The `Schema` in which the new IDs must coexist.
+        :param idClass: The EBML class of ID, one of (case-insensitive):
             * `'a'`: Class A (1 octet, base 0x8X)
             * `'b'`: Class B (2 octets, base 0x4000)
             * `'c'`: Class C (3 octets, base 0x200000)
             * `'d'`: Class D (4 octets, base 0x10000000)
-        @param exclude: A list of additional IDs to avoid.
-        @param minId: The minimum ID value, within the ID class' range.
-        @param maxId: The maximum ID value, within the ID class' range.
-        @param count: The maximum number of IDs to generate. The result may be
+        :param exclude: A list of additional IDs to avoid.
+        :param minId: The minimum ID value, within the ID class' range.
+        :param maxId: The maximum ID value, within the ID class' range.
+        :param count: The maximum number of IDs to generate. The result may be
             fewer than specified if too few meet the given criteria.
-        @return: A list of EBML IDs that match the given criteria.
+        :return: A list of EBML IDs that match the given criteria.
     """
     ranges = dict(A=(0x81, 0xFE),
                   B=(0x407F, 0x7FFE),
@@ -75,7 +80,7 @@ def createID(schema, idClass, exclude=(), minId=0x81, maxId=0x1FFFFFFE, count=1)
     return result
 
 
-def validateID(elementId):
+def validateID(elementId: int) -> bool:
     """ Verify that a number is a valid EBML element ID. A `ValueError`
         will be raised if the element ID is invalid.
 
@@ -85,8 +90,8 @@ def validateID(elementId):
           * C: 0x203FFF to 0x3FFFFE
           * D: 0x101FFFFF to 0x1FFFFFFE
 
-        @param elementId: The element ID to validate
-        @raises: `ValueError`, although certain edge cases may raise
+        :param elementId: The element ID to validate
+        :raises: `ValueError`, although certain edge cases may raise
             another type.
     """
     ranges = ((0x81, 0xFE), (0x407F, 0x7FFE), (0x203FFF, 0x3FFFFE), (0x101FFFFF, 0x1FFFFFFE))
@@ -123,30 +128,36 @@ def validateID(elementId):
 # ==============================================================================
 
 
-def toXml(el, parent=None, offsets=True, sizes=True, types=True, ids=True,
-          binary_codec='base64', void_codec='ignore'):
+def toXml(el: core.Element,
+          parent=None,
+          offsets: bool = True,
+          sizes: bool = True,
+          types: bool = True,
+          ids: bool = True,
+          binary_codec: Union[Callable, str] = 'base64',
+          void_codec: Union[Callable, str] = 'ignore'):
     """ Convert an EBML Document to XML. Binary elements will contain
         base64-encoded data in their body. Other non-master elements will
         contain their value in a ``value`` attribute.
 
-        @param el: An instance of an EBML Element or Document subclass.
-        @keyword parent: The resulting XML element's parent element, if any.
-        @keyword offsets: If `True`, create a ``offset`` attributes for each
+        :param el: An instance of an EBML Element or Document subclass.
+        :param parent: The resulting XML element's parent element, if any.
+        :param offsets: If `True`, create a ``offset`` attributes for each
             generated XML element, containing the corresponding EBML element's
             offset.
-        @keyword sizes: If `True`, create ``size`` attributes containing the
+        :param sizes: If `True`, create ``size`` attributes containing the
             corresponding EBML element's size.
-        @keyword types: If `True`, create ``type`` attributes containing the
+        :param types: If `True`, create ``type`` attributes containing the
             name of the corresponding EBML element type.
-        @keyword ids: If `True`, create ``id`` attributes containing the
+        :param ids: If `True`, create ``id`` attributes containing the
             corresponding EBML element's EBML ID.
-        @keyword binary_codec: The name of an XML codec class from
+        :param binary_codec: The name of an XML codec class from
             `ebmlite.xml_codecs`, or an instance of a codec, for rendering
             binary elements as text.
-        @keyword void_codec:  The name of an XML codec class from
+        :param void_codec:  The name of an XML codec class from
             `ebmlite.xml_codecs`, or an instance of a codec, for rendering
             the contents of Void elements as text.
-        @return The root XML element of the file.
+        :return The root XML element of the file.
     """
     if isinstance(binary_codec, str):
         binary_codec = xml_codecs.BINARY_CODECS[binary_codec]()
@@ -194,26 +205,30 @@ def toXml(el, parent=None, offsets=True, sizes=True, types=True, ids=True,
     return xmlEl
 
 
-#===============================================================================
+# ===========================================================================
 #
-#===============================================================================
+# ===========================================================================
 
-def xmlElement2ebml(xmlEl, ebmlFile, schema, sizeLength=None, unknown=True):
+def xmlElement2ebml(xmlEl,
+                    ebmlFile: BinaryIO,
+                    schema: core.Schema,
+                    sizeLength: Optional[int] = None,
+                    unknown: bool = True):
     """ Convert an XML element to EBML, recursing if necessary. For converting
         an entire XML document, use `xml2ebml()`.
 
-        @param xmlEl: The XML element. Its tag must match an element defined
+        :param xmlEl: The XML element. Its tag must match an element defined
             in the `schema`.
-        @param ebmlFile: An open file-like stream, to which the EBML data will
+        :param ebmlFile: An open file-like stream, to which the EBML data will
             be written.
-        @param schema: An `ebmlite.core.Schema` instance to use when
+        :param schema: An `ebmlite.core.Schema` instance to use when
             writing the EBML document.
-        @keyword sizeLength:
-        @param unknown: If `True`, unknown element names will be allowed,
+        :param sizeLength:
+        :param unknown: If `True`, unknown element names will be allowed,
             provided their XML elements include an ``id`` attribute with the
             EBML ID (in hexadecimal).
-        @return The length of the encoded element, including header and children.
-        @raise NameError: raised if an xml element is not present in the schema and unknown is False, OR if the xml
+        :return The length of the encoded element, including header and children.
+        :raise NameError: raised if an XML element is not present in the schema and unknown is False, OR if the xml
             element does not have an ID.
     """
     if not isinstance(xmlEl.tag, (str, bytes, bytearray)):
@@ -284,30 +299,34 @@ def xmlElement2ebml(xmlEl, ebmlFile, schema, sizeLength=None, unknown=True):
     return len(encoded)
 
 
-def xml2ebml(xmlFile, ebmlFile, schema, sizeLength=None, headers=True,
-             unknown=True):
+def xml2ebml(xmlFile,
+             ebmlFile: BinaryIO,
+             schema: Union[str, core.Schema],
+             sizeLength: Optional[int] = None,
+             headers: bool = True,
+             unknown: bool = True):
     """ Convert an XML file to EBML.
 
-        @todo: Convert XML on the fly, rather than parsing it first, allowing
+        :todo: Convert XML on the fly, rather than parsing it first, allowing
             for the conversion of arbitrarily huge files.
 
-        @param xmlFile: The XML source. Can be a filename, an open file-like
+        :param xmlFile: The XML source. Can be a filename, an open file-like
             stream, or a parsed XML document.
-        @param ebmlFile: The EBML file to write. Can be a filename or an open
+        :param ebmlFile: The EBML file to write. Can be a filename or an open
             file-like stream.
-        @param schema: The EBML schema to use. Can be a filename or an
+        :param schema: The EBML schema to use. Can be a filename or an
             instance of a `Schema`.
-        @keyword sizeLength: The default length of each element's size
+        :param sizeLength: The default length of each element's size
             descriptor. Must be large enough to store the largest 'master'
             element. If an XML element has a ``sizeLength`` attribute, it will
             override this.
-        @keyword headers: If `True`, generate the standard ``EBML`` EBML
+        :param headers: If `True`, generate the standard ``EBML`` EBML
             element if the XML document does not contain one.
-        @param unknown: If `True`, unknown element names will be allowed,
+        :param unknown: If `True`, unknown element names will be allowed,
             provided their XML elements include an ``id`` attribute with the
             EBML ID (in hexadecimal).
-        @return: the size of the ebml file in bytes.
-        @raise NameError: raises if an xml element is not present in the schema.
+        :return: the size of the ebml file in bytes.
+        :raise NameError: raises if an xml element is not present in the schema.
     """
     if isinstance(ebmlFile, (str, bytes, bytearray)):
         ebmlFile = open(ebmlFile, 'wb')
@@ -354,25 +373,27 @@ def xml2ebml(xmlFile, ebmlFile, schema, sizeLength=None, headers=True,
 
     return numBytes
 
-#===============================================================================
+# ===========================================================================
 #
-#===============================================================================
+# ===========================================================================
 
 
-def loadXml(xmlFile, schema, ebmlFile=None):
+def loadXml(xmlFile,
+            schema: core.Schema,
+            ebmlFile: Union[BinaryIO, str, None] = None):
     """ Helpful utility to load an EBML document from an XML file.
 
-        @param xmlFile: The XML source. Can be a filename, an open file-like
+        :param xmlFile: The XML source. Can be a filename, an open file-like
             stream, or a parsed XML document.
-        @param schema: The EBML schema to use. Can be a filename or an
+        :param schema: The EBML schema to use. Can be a filename or an
             instance of a `Schema`.
-        @keyword ebmlFile: The name of the temporary EBML file to write, or
+        :param ebmlFile: The name of the temporary EBML file to write, or
             ``:memory:`` to use RAM (like `sqlite3`). Defaults to an
             automatically-generated temporary file.
-        @return The root node of the specified EBML file.
+        :return The root node of the specified EBML file.
     """
     if ebmlFile == ":memory:":
-        ebmlFile = StringIO()
+        ebmlFile = BytesIO()
         xml2ebml(xmlFile, ebmlFile, schema)
         ebmlFile.seek(0)
     else:
@@ -382,23 +403,28 @@ def loadXml(xmlFile, schema, ebmlFile=None):
     return schema.load(ebmlFile)
 
 
-#===============================================================================
+# ===========================================================================
 #
-#===============================================================================
+# ===========================================================================
 
-def pprint(el, values=True, out=sys.stdout, indent="  ", binary_codec="ignore",
-           void_codec="ignore", _depth=0):
+def pprint(el: core.Element, 
+           values: bool = True, 
+           out: IO = sys.stdout,
+           indent: str = "  ",
+           binary_codec: Union[Callable, str] = "ignore",
+           void_codec: Union[Callable, str] = "ignore",
+           _depth: int = 0):
     """ Test function to recursively crawl an EBML document or element and
         print its structure, with child elements shown indented.
 
-        @param el: An instance of a `Document` or `Element` subclass.
-        @keyword values: If `True`, show elements' values.
-        @keyword out: A file-like stream to which to write.
-        @keyword indent: The string containing the character(s) used for each
+        :param el: An instance of a `Document` or `Element` subclass.
+        :param values: If `True`, show elements' values.
+        :param out: A file-like stream to which to write.
+        :param indent: The string containing the character(s) used for each
             indentation.
-        @keyword binary_codec: The name of a class from `ebmlite.xml_codecs`,
+        :param binary_codec: The name of a class from `ebmlite.xml_codecs`,
             or an instance of a codec, for rendering binary elements as text.
-        @keyword void_codec: The name of a class from `ebmlite.xml_codecs`,
+        :param void_codec: The name of a class from `ebmlite.xml_codecs`,
             or an instance of a codec, for rendering the contents of Void
             elements as text.
     """
@@ -438,21 +464,27 @@ def pprint(el, values=True, out=sys.stdout, indent="  ", binary_codec="ignore",
                         out.write(" <{}>".format(binary_codec.NAME))
                         binary_codec.encode(el.value, offset=el.offset, indent=indent, stream=out)
                 else:
-                    out.write(" %r" % (el.value))
+                    out.write(" {!r} ".format(el.value))
             out.write("\n")
 
     out.flush()
 
 
-#===============================================================================
+# ===========================================================================
 #
-#===============================================================================
+# ===========================================================================
 
-def printSchemata(paths=None, out=sys.stdout, absolute=True):
+def printSchemata(paths: Optional[List[str]] = None,
+                  out: Union[str, IO] = sys.stdout,
+                  absolute: bool = True):
     """ Display a list of schemata in `SCHEMA_PATH`. A thin wrapper for the
         core `listSchemata()` function.
 
-        @param out: A file-like stream to which to write.
+        :param paths: A list of paths to search for schemata, in addition to
+            those in `SCHEMA_PATH`.
+        :param out: A file-like stream or filename to which to write.
+        :param absolute: If `True`, use absolute paths in the schema
+            filenames.
     """
     out = out or sys.stdout
     newfile = isinstance(out, (str, pathlib.Path))
