@@ -23,7 +23,7 @@ import pathlib
 import struct
 import sys
 import tempfile
-from typing import BinaryIO, Callable, IO, List, Literal, Optional, Tuple, Union
+from typing import BinaryIO, Callable, IO, List, Optional, Tuple, Union
 from xml.etree import ElementTree as ET
 
 from . import core, encoding, decoding
@@ -35,7 +35,7 @@ from . import xml_codecs
 
 
 def createID(schema: core.Schema,
-             idClass: Literal['a', 'b', 'c', 'd', 'A', 'B', 'C', 'D'],
+             idClass: str,
              exclude: Tuple[int] = (),
              minId: int = 0x81,
              maxId: int = 0x1FFFFFFE,
