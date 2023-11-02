@@ -603,14 +603,8 @@ class MasterElement(Element):
         if not cls.children:
             return False
 
-        if cls._childIds:
-            return elId in cls._childIds
-        else:
-            # The set of valid child IDs hasn't been created yet.
-            cls._childIds = set(cls.children)
-            if cls.schema is not None:
-                cls._childIds.update(cls.schema.globals)
-            return elId in cls._childIds
+        return elId in cls.children or elId in cls.schema.globals
+
 
     @property
     def size(self) -> int:
@@ -1124,7 +1118,7 @@ class Schema(object):
         self.elementInfo = {}  # Raw element schema attributes, keyed by ID
 
         self.globals = {}   # Elements valid for any parent, by ID
-        self.children = {}  # Valid root elements, by ID
+        self.children = set()  # Valid root elements, by ID
 
         # Parse, using the correct method for the schema format.
         schema = ET.parse(source)
@@ -1215,7 +1209,7 @@ class Schema(object):
             for chEl in el:
                 self._parseSchema(chEl, cls)
 
-    def addElement(self, 
+    def addElement(self,
                    eid: int, 
                    ename: str, 
                    baseClass, 
@@ -1320,7 +1314,7 @@ class Schema(object):
                           {'id': eid, 'name': ename, 'schema': self,
                            'mandatory': mandatory, 'multiple': multiple,
                            'precache': precache, 'length': length,
-                           'children': dict(), '__doc__': docs,
+                           'children': set(), '__doc__': docs,
                            '__slots__': baseClass.__slots__})
 
             self.elements[eid] = eclass
@@ -1332,8 +1326,8 @@ class Schema(object):
 
         parent = parent or self
         if parent.children is None:
-            parent.children = {}
-        parent.children[eid] = eclass
+            parent.children = set()
+        parent.children.add(eid)
 
         return eclass
 
