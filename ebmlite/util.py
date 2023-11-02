@@ -464,7 +464,7 @@ def pprint(el: core.Element,
                         out.write(" <{}>".format(binary_codec.NAME))
                         binary_codec.encode(el.value, offset=el.offset, indent=indent, stream=out)
                 else:
-                    out.write(" {!r} ".format(el.value))
+                    out.write(" %r" % (el.value))
             out.write("\n")
 
     out.flush()
