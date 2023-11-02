@@ -111,7 +111,8 @@ class Element(object):
         :var mandatory: Must this element appear in all EBML files using
             this element's schema? Note: Not currently enforced.
         :var children: A list of valid child element types. Only applicable to
-            `Document` and `Master` subclasses. Note: Not currently enforced.
+            `Document` and `Master` subclasses. Note: Not currently enforced;
+            only used when decoding 'infinite' length elements.
         :var dtype: The element's native Python data type.
         :var precache: If `True`, the Element's value is read when the Element
             is parsed. if `False`, the value is lazy-loaded when needed.
@@ -156,7 +157,10 @@ class Element(object):
         # Document-wide caching could be implemented here.
         return bytearray(stream.read(size))
 
-    def __init__(self, stream: Optional[BinaryIO] = None, offset: int = 0, size: int = 0, payloadOffset: int = 0):
+    def __init__(self, stream: BinaryIO = None,
+                 offset: int = 0,
+                 size: int = 0,
+                 payloadOffset: int = 0):
         """ Constructor. Instantiate a new Element from a file. In most cases,
             elements should be created when a `Document` is loaded, rather
             than instantiated explicitly.
