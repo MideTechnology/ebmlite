@@ -1,4 +1,4 @@
-![example workflow](https://github.com/MideTechnology/ebmlite/actions/workflows/unit-tests.yml/badge.svg) [![codecov](https://codecov.io/gh/MideTechnology/ebmlite/branch/master/graph/badge.svg)](https://codecov.io/gh/MideTechnology/ebmlite) 
+[![PyPI Latest Release](https://img.shields.io/pypi/v/ebmlite.svg)](https://pypi.org/project/ebmlite/) ![example workflow](https://github.com/MideTechnology/ebmlite/actions/workflows/unit-tests.yml/badge.svg) [![codecov](https://codecov.io/gh/MideTechnology/ebmlite/branch/master/graph/badge.svg)](https://codecov.io/gh/MideTechnology/ebmlite) 
 
 
 
