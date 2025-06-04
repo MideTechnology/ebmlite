@@ -48,6 +48,7 @@ from ast import literal_eval
 from datetime import datetime
 import errno
 import importlib
+import importlib.resources as importlib_resources
 from io import BytesIO, StringIO, IOBase
 import os.path
 from pathlib import Path
@@ -62,19 +63,6 @@ from .decoding import readString, readUnicode
 from . import encoding
 from . import schemata
 
-# Dictionaries in Python 3.7+ are explicitly insert-ordered in all
-# implementations. If older, continue to use `collections.OrderedDict`.
-if sys.hexversion < 0x03070000:
-    from collections import OrderedDict as Dict
-else:
-    Dict = dict
-
-# Additionally, `importlib.resources.files` is new to 3.9 as well; this is
-# part of a work-around.
-if sys.hexversion < 0x03090000:
-    importlib_resources = None
-else:
-    import importlib.resources as importlib_resources
 
 # ==============================================================================
 #
@@ -745,7 +733,7 @@ class MasterElement(Element):
                 very specific, and it isn't totally necessary for the core
                 library.
         """
-        result = Dict()
+        result = {}
         for el in self:
             if el.multiple:
                 result.setdefault(el.name, []).append(el.dump())
@@ -948,7 +936,7 @@ class Document(MasterElement):
         if 'EBML' not in cls.schema:
             return {}
 
-        headers = Dict()
+        headers = {}
         for elName, elType in (('EBMLVersion', int),
                                ('EBMLReadVersion', int),
                                ('DocType', str),
@@ -959,7 +947,7 @@ class Document(MasterElement):
                 if v is not None:
                     headers[elName] = v
 
-        return Dict(EBML=headers)
+        return dict(EBML=headers)
 
     @classmethod
     def encode(cls, stream, data, headers=False, **kwargs):
