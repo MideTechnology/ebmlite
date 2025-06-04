@@ -4,6 +4,7 @@ Created on Aug 14, 2017
 @author: dstokes
 """
 
+from itertools import zip_longest
 import os.path
 import unittest
 from xml.dom.minidom import parseString
@@ -66,18 +67,11 @@ class Test(unittest.TestCase):
             xmlDoc2 = util.loadXml(xmlFile2, schema)
 
             # Compare each element from the XML
-            xmlEls1 = [xmlDoc1]
-            xmlEls2 = [xmlDoc2]
-            while len(xmlEls1) > 0:
-                self.assertEqual(xmlEls1[0], xmlEls2[0], 'Element '
-                                 + repr(xmlEls1[0])
-                                 + ' was not converted properly')
-                for x in list(xmlEls1.pop(0).children.values()):
-                    if issubclass(x, core.Element):
-                        xmlEls1.append(x)
-                for x in list(xmlEls2.pop(0).children.values()):
-                    if issubclass(x, core.Element):
-                        xmlEls2.append(x)
+            for el1, el2 in zip_longest(util.flatiter(xmlDoc1),
+                                        util.flatiter(xmlDoc2),
+                                        fillvalue=None):
+                self.assertEqual(el1, el2,
+                                 'Element {!r} was not converted properly'.format(el1))
 
 
     def testIde(self):
@@ -121,19 +115,11 @@ class Test(unittest.TestCase):
             xmlDoc2 = util.loadXml(xmlFile2, schema)
 
             # Compare each element from the XML
-            xmlEls1 = [xmlDoc1]
-            xmlEls2 = [xmlDoc2]
-            while len(xmlEls1) > 0:
-                self.assertEqual(xmlEls1[0], xmlEls2[0], 'Element '
-                                 + repr(xmlEls1[0])
-                                 + ' was not converted properly')
-                for x in list(xmlEls1.pop(0).children.values()):
-                    if issubclass(x, core.Element):
-                        xmlEls1.append(x)
-                for x in list(xmlEls2.pop(0).children.values()):
-                    if issubclass(x, core.Element):
-                        xmlEls2.append(x)
-
+            for el1, el2 in zip_longest(util.flatiter(xmlDoc1),
+                                        util.flatiter(xmlDoc2),
+                                        fillvalue=None):
+                self.assertEqual(el1, el2,
+                                 'Element {!r} was not converted properly'.format(el1))
 
 
     def testPPrint(self):
@@ -298,18 +284,11 @@ class TestThreadedFile(unittest.TestCase):
             xmlDoc2 = util.loadXml(xmlFile2, schema)
 
             # Compare each element from the XML
-            xmlEls1 = [xmlDoc1]
-            xmlEls2 = [xmlDoc2]
-            while len(xmlEls1) > 0:
-                self.assertEqual(xmlEls1[0], xmlEls2[0], 'Element '
-                                 + repr(xmlEls1[0])
-                                 + ' was not converted properly')
-                for x in list(xmlEls1.pop(0).children.values()):
-                    if issubclass(x, core.Element):
-                        xmlEls1.append(x)
-                for x in list(xmlEls2.pop(0).children.values()):
-                    if issubclass(x, core.Element):
-                        xmlEls2.append(x)
+            for el1, el2 in zip_longest(util.flatiter(xmlDoc1),
+                                        util.flatiter(xmlDoc2),
+                                        fillvalue=None):
+                self.assertEqual(el1, el2,
+                                 'Element {!r} was not converted properly'.format(el1))
 
 
 if __name__ == "__main__":
