@@ -13,9 +13,6 @@ jobs:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
         python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
-        exclude:
-          - os: ubuntu-latest
-            python-version: '3.6'
 
     env:
       OS: ${{ matrix.os }}
@@ -39,6 +36,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: multi-file-stuff
+          overwrite: true
           path: |
             ./tests/SSX46714-doesnot.IDE
             ./tests/SSX46714-new.IDE
