@@ -47,12 +47,11 @@ __all__ = ['BinaryElement', 'DateElement', 'Document', 'Element',
 from ast import literal_eval
 from datetime import datetime
 import errno
-import importlib
+import importlib.resources as importlib_resources
 from io import BytesIO, StringIO, IOBase
 import os.path
 from pathlib import Path
 import re
-import sys
 import types
 from typing import Any, BinaryIO, Dict, List, Optional, TextIO, Tuple, Union
 from xml.etree import ElementTree as ET
@@ -62,20 +61,6 @@ from .decoding import readFloat, readInt, readUInt, readDate
 from .decoding import readString, readUnicode
 from . import encoding
 from . import schemata
-
-# Dictionaries in Python 3.7+ are explicitly insert-ordered in all
-# implementations. If older, continue to use `collections.OrderedDict`.
-if sys.hexversion < 0x03070000:
-    from collections import OrderedDict as _Dict
-else:
-    _Dict = dict
-
-# Additionally, `importlib.resources.files` is new to 3.9 as well; this is
-# part of a work-around.
-if sys.hexversion < 0x03090000:
-    importlib_resources = None
-else:
-    import importlib.resources as importlib_resources
 
 # ==============================================================================
 #
@@ -784,7 +769,7 @@ class MasterElement(Element):
                 very specific, and it isn't totally necessary for the core
                 library.
         """
-        result = _Dict()
+        result = {}
         for el in self:
             if el.multiple:
                 result.setdefault(el.name, []).append(el.dump())
@@ -991,7 +976,7 @@ class Document(MasterElement):
         if 'EBML' not in cls.schema:
             return {}
 
-        headers = _Dict()
+        headers = {}
         for elName, elType in (('EBMLVersion', int),
                                ('EBMLReadVersion', int),
                                ('DocType', str),
@@ -1002,7 +987,7 @@ class Document(MasterElement):
                 if v is not None:
                     headers[elName] = v
 
-        return _Dict(EBML=headers)
+        return dict(EBML=headers)
 
     @classmethod
     def encode(cls,
@@ -1516,19 +1501,10 @@ def _expandSchemaPath(path: Union[str, Path, types.ModuleType],
             path, subdir = m.groups()
             strpath = path
 
-    if importlib_resources:
-        if isinstance(path, types.ModuleType):
-            return importlib_resources.files(path) / subdir / name
-        elif '{' in strpath:
-            return importlib_resources.files(strpath.strip('{} ')) / subdir / name
-    else:
-        # Pre-3.9: Use naive means of finding the module path. Won't work in
-        # some cases (module is a zip, etc.); it's just a fallback. To be
-        # deprecated.
-        if isinstance(path, types.ModuleType):
-            path = os.path.dirname(path.__file__)
-        elif '{' in strpath:
-            path = os.path.dirname(importlib.import_module(strpath.strip('{}')).__file__)
+    if isinstance(path, types.ModuleType):
+        return importlib_resources.files(path) / subdir / name
+    elif '{' in strpath:
+        return importlib_resources.files(strpath.strip('{} ')) / subdir / name
 
     return Path(path) / subdir / name
 
