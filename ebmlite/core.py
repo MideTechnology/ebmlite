@@ -47,13 +47,11 @@ __all__ = ['BinaryElement', 'DateElement', 'Document', 'Element',
 from ast import literal_eval
 from datetime import datetime
 import errno
-import importlib
 import importlib.resources as importlib_resources
 from io import BytesIO, StringIO, IOBase
 import os.path
 from pathlib import Path
 import re
-import sys
 import types
 from typing import Any, BinaryIO, Dict, List, Optional, TextIO, Tuple, Union
 from xml.etree import ElementTree as ET
@@ -1503,19 +1501,10 @@ def _expandSchemaPath(path: Union[str, Path, types.ModuleType],
             path, subdir = m.groups()
             strpath = path
 
-    if importlib_resources:
-        if isinstance(path, types.ModuleType):
-            return importlib_resources.files(path) / subdir / name
-        elif '{' in strpath:
-            return importlib_resources.files(strpath.strip('{} ')) / subdir / name
-    else:
-        # Pre-3.9: Use naive means of finding the module path. Won't work in
-        # some cases (module is a zip, etc.); it's just a fallback. To be
-        # deprecated.
-        if isinstance(path, types.ModuleType):
-            path = os.path.dirname(path.__file__)
-        elif '{' in strpath:
-            path = os.path.dirname(importlib.import_module(strpath.strip('{}')).__file__)
+    if isinstance(path, types.ModuleType):
+        return importlib_resources.files(path) / subdir / name
+    elif '{' in strpath:
+        return importlib_resources.files(strpath.strip('{} ')) / subdir / name
 
     return Path(path) / subdir / name
 
