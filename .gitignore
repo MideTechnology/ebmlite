@@ -23,3 +23,6 @@ venv?
 *.egg*
 
 .mypy_cache
+
+# Sphinx documentation
+docs/_build/

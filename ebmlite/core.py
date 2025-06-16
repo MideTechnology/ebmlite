@@ -1,40 +1,40 @@
-"""'''
+"""
 EBMLite: A lightweight EBML parsing library. It is designed to crawl through
 EBML files quickly and efficiently, and that's about it.
-
-:todo: Complete EBML encoding. Specifically, make 'master' elements write
-    directly to the stream, rather than build bytearrays, so huge 'master'
-    elements can be handled. It appears that the official spec may prohibit
-    (or at least counter-indicate) multiple root elements. Possible
-    compromise until proper fix: handle root 'master' elements differently
-    than deeper ones, more like the current `Document`.
-:todo: Validation. Enforce the hierarchy defined in each schema.
-:todo: Optimize 'infinite' master elements (i.e `size` is `None`). See notes
-    in `MasterElement` class' method definitions.
-:todo: Improved `MasterElement.__eq__()` method, possibly doing a recursive
-    crawl of both elements and comparing the actual contents, or iterating
-    over chunks of the raw binary data. Current implementation doesn't check
-    element contents, just ID and payload size (for speed).
-:todo: Document-wide caching, for future handling of streamed data. Affects
-    the longer-term streaming to-do (listed below) and optimization of
-    'infinite' elements (listed above).
-:todo: Clean up and standardize usage of the term 'size' versus 'length.'
-:todo: General documentation (more detailed than the README) and examples.
-:todo: Document the best way to load schemata in a PyInstaller executable.
-
-:todo: (longer term) Consider making schema loading automatic based on the EBML
-    DocType, DocTypeVersion, and DocTypeReadVersion. Would mean a refactoring
-    of how schemata are loaded.
-:todo: (longer term) Refactor to support streaming data. This will require
-    modifying the indexing and iterating methods of `Document`. Also affects
-    the document-wide caching to-do item, listed above.
-:todo: (longer term) Support the official Schema definition format. Start by
-    adopting some of the attributes, specifically ``minOccurs`` and
-    ``maxOccurs`` (they serve the function provided by the current
-    ``mandatory`` and ``multiple`` attributes). Add ``range`` later.
-    Eventually, recognize official schemata when loading, like the system
-    currently handles legacy ``python-ebml`` schemata.
 """
+# :todo: Complete EBML encoding. Specifically, make 'master' elements write
+#     directly to the stream, rather than build bytearrays, so huge 'master'
+#     elements can be handled. It appears that the official spec may prohibit
+#     (or at least counter-indicate) multiple root elements. Possible
+#     compromise until proper fix: handle root 'master' elements differently
+#     than deeper ones, more like the current `Document`.
+# :todo: Validation. Enforce the hierarchy defined in each schema.
+# :todo: Optimize 'infinite' master elements (i.e `size` is `None`). See notes
+#     in `MasterElement` class' method definitions.
+# :todo: Improved `MasterElement.__eq__()` method, possibly doing a recursive
+#     crawl of both elements and comparing the actual contents, or iterating
+#     over chunks of the raw binary data. Current implementation doesn't check
+#     element contents, just ID and payload size (for speed).
+# :todo: Document-wide caching, for future handling of streamed data. Affects
+#     the longer-term streaming to-do (listed below) and optimization of
+#     'infinite' elements (listed above).
+# :todo: Clean up and standardize usage of the term 'size' versus 'length.'
+# :todo: General documentation (more detailed than the README) and examples.
+# :todo: Document the best way to load schemata in a PyInstaller executable.
+#
+# :todo: (longer term) Consider making schema loading automatic based on the EBML
+#     DocType, DocTypeVersion, and DocTypeReadVersion. Would mean a refactoring
+#     of how schemata are loaded.
+# :todo: (longer term) Refactor to support streaming data. This will require
+#     modifying the indexing and iterating methods of `Document`. Also affects
+#     the document-wide caching to-do item, listed above.
+# :todo: (longer term) Support the official Schema definition format. Start by
+#     adopting some of the attributes, specifically ``minOccurs`` and
+#     ``maxOccurs`` (they serve the function provided by the current
+#     ``mandatory`` and ``multiple`` attributes). Add ``range`` later.
+#     Eventually, recognize official schemata when loading, like the system
+#     currently handles legacy ``python-ebml`` schemata.
+
 __author__ = "David Randall Stokes, Connor Flanigan"
 __copyright__ = "Copyright 2022, Mide Technology Corporation"
 __credits__ = "David Randall Stokes, Connor Flanigan, Becker Awqatty, Derek Witt"
@@ -1029,6 +1029,9 @@ class Schema(object):
     """ An EBML schema, mapping element IDs to names and data types. Unlike
         the document and element types, this is not a base class; all schemata
         are actual instances of this class.
+
+        Schema instances are typically created by loading and XML schema file
+        using :func:`loadSchema` or a byte string using :func:`parseSchema`.
 
         :ivar document: The schema's Document subclass.
         :ivar elements: A dictionary mapping element IDs to the schema's
