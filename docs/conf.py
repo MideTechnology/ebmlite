@@ -3,12 +3,38 @@
 # For the full list of built-in configuration values, see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
+import codecs
+import os.path
+import sys
+
+# go up a dir and include that guy =
+p = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, p)
+
+
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
+
+def get_version(rel_path):
+    """ Read the version number directly from the source. """
+    with codecs.open(rel_path, 'r') as fp:
+        for line in fp:
+            if line.startswith('__version__'):
+                delim = '"' if '"' in line else "'"
+                return line.split(delim)[1]
+        else:
+            raise RuntimeError("Unable to find version string.")
+
 
 project = 'ebmlite'
 copyright = '2025, Midé Technology Corp.'
 author = 'David R. Stokes'
+
+# The full version, including alpha/beta/rc tags
+release = get_version(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'ebmlite', '__init__.py')))
+# The short X.Y version
+version = '.'.join(release.split(".")[:2])
+
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -16,6 +42,8 @@ author = 'David R. Stokes'
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
+    'sphinx.ext.githubpages',
+    'sphinx_autodoc_typehints',
 ]
 
 templates_path = ['_templates']
