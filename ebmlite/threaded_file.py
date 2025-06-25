@@ -47,7 +47,7 @@ class ThreadAwareFile(io.FileIO):
         """
         # Ensure the file mode, if specified, is "read."
         mode = args[1] if len(args) > 1 else 'r'
-        if isinstance(mode, (str, bytes, bytearray, Path)):
+        if isinstance(mode, (str, Path)):
             if 'a' in mode or 'w' in mode or '+' in mode:
                 raise IOError("%s is read-only" % self.__class__.__name__)
 

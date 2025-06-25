@@ -809,7 +809,7 @@ class Document(MasterElement):
                 regardless, and stored in the Document's `info` attribute.
         """
         self._ownsStream = False
-        if isinstance(stream, (str, bytes, bytearray, Path)):
+        if isinstance(stream, (str, Path)):
             stream = open(stream, 'rb')
             self._ownsStream = True
 
@@ -1096,7 +1096,7 @@ class Schema(object):
         self.source = source
         self.filename = None
 
-        if isinstance(source, (str, bytes, bytearray, Path)):
+        if isinstance(source, (str, Path)):
             self.filename = os.path.realpath(source)
         elif hasattr(source, "name"):
             self.filename = os.path.realpath(source.name)
@@ -1575,8 +1575,7 @@ def loadSchema(filename: Union[str, Path],
 
     paths = paths or SCHEMA_PATH
     origName = str(filename)
-    if isinstance(filename, str):
-        filename = Path(filename)
+    filename = Path(filename)
 
     if origName in SCHEMATA and not reload:
         return SCHEMATA[origName]
