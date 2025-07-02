@@ -25,6 +25,7 @@ import sys
 import tempfile
 from typing import BinaryIO, Callable, IO, List, Optional, Tuple, Union
 from xml.etree import ElementTree as ET
+from pathlib import Path
 
 from . import core, encoding, decoding
 from . import xml_codecs
@@ -301,7 +302,7 @@ def xmlElement2ebml(xmlEl,
 
 def xml2ebml(xmlFile,
              ebmlFile: BinaryIO,
-             schema: Union[str, core.Schema],
+             schema: Union[str, Path, core.Schema],
              sizeLength: Optional[int] = None,
              headers: bool = True,
              unknown: bool = True):
@@ -328,7 +329,7 @@ def xml2ebml(xmlFile,
         :return: the size of the ebml file in bytes.
         :raise NameError: raises if an xml element is not present in the schema.
     """
-    if isinstance(ebmlFile, (str, bytes, bytearray)):
+    if isinstance(ebmlFile, (str, Path)):
         ebmlFile = open(ebmlFile, 'wb')
         openedEbml = True
     else:
@@ -474,8 +475,8 @@ def pprint(el: core.Element,
 #
 # ===========================================================================
 
-def printSchemata(paths: Optional[List[str]] = None,
-                  out: Union[str, IO] = sys.stdout,
+def printSchemata(paths: Optional[List[Union[str, Path]]] = None,
+                  out: Union[str, Path, IO] = sys.stdout,
                   absolute: bool = True):
     """ Display a list of schemata in `SCHEMA_PATH`. A thin wrapper for the
         core `listSchemata()` function.
@@ -487,7 +488,7 @@ def printSchemata(paths: Optional[List[str]] = None,
             filenames.
     """
     out = out or sys.stdout
-    newfile = isinstance(out, (str, pathlib.Path))
+    newfile = isinstance(out, (str, Path))
     if newfile:
         out = open(out, 'w')
 
