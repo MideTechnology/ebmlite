@@ -1,4 +1,2 @@
 coverage:
   range: 50..90
-ignore:
-  - "ebmlite/tools"
