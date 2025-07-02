@@ -476,7 +476,7 @@ def pprint(el: core.Element,
 # ===========================================================================
 
 def printSchemata(paths: Optional[List[Union[str, Path]]] = None,
-                  out: Union[str, Path, IO,] = sys.stdout,
+                  out: Union[str, Path, IO] = sys.stdout,
                   absolute: bool = True):
     """ Display a list of schemata in `SCHEMA_PATH`. A thin wrapper for the
         core `listSchemata()` function.
