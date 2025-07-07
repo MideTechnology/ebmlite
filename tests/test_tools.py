@@ -12,6 +12,13 @@ SCHEMA_PATH = os.path.join(".", "ebmlite", "schemata", "matroska.xml")
 
 @pytest.mark.script_launch_mode('subprocess')
 def test_ebml2xml(script_runner):
+
+    # This test can only run if the library has been installed,
+    # e.g., in a GitHub action. Bail if not.
+    # TODO: This is a hack and should be redone.
+    if os.getenv("GITHUB_ACTIONS") != "true":
+        return
+
     path_base = os.path.join(".", "tests", "video-4{ext}")
     path_in = path_base.format(ext=".ebml")
     path_out = path_base.format(ext=".ebml.xml")
@@ -56,6 +63,13 @@ def test_ebml2xml(script_runner):
 
 @pytest.mark.script_launch_mode('subprocess')
 def test_xml2ebml(script_runner):
+
+    # This test can only run if the library has been installed,
+    # e.g., in a GitHub action. Bail if not.
+    # TODO: This is a hack and should be redone.
+    if os.getenv("GITHUB_ACTIONS") != "true":
+        return
+
     path_base = os.path.join(".", "tests", "video-4{ext}")
     path_in = path_base.format(ext=".xml")
     path_out = path_base.format(ext=".xml.ebml")
@@ -84,6 +98,13 @@ def test_xml2ebml(script_runner):
 
 @pytest.mark.script_launch_mode('subprocess')
 def test_view(script_runner):
+
+    # This test can only run if the library has been installed,
+    # e.g., in a GitHub action. Bail if not.
+    # TODO: This is a hack and should be redone.
+    if os.getenv("GITHUB_ACTIONS") != "true":
+        return
+
     path_base = os.path.join(".", "tests", "video-4{ext}")
     path_in = path_base.format(ext=".ebml")
     path_out = path_base.format(ext=".xml.txt")
@@ -112,6 +133,13 @@ def test_view(script_runner):
 
 @pytest.mark.script_launch_mode('subprocess')
 def test_list_schemata(script_runner):
+
+    # This test can only run if the library has been installed,
+    # e.g., in a GitHub action. Bail if not.
+    # TODO: This is a hack and should be redone.
+    if os.getenv("GITHUB_ACTIONS") != "true":
+        return
+
     core.SCHEMA_PATH = [os.path.dirname(schemata.__file__)]
     path_out = os.path.join(".", "tests", "list-schemata.txt")
 

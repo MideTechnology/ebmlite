@@ -17,6 +17,7 @@ def load_files(args, binary_output=False):
         sys.stderr.write("Input file does not exist: %s\n" % args.input)
         exit(1)
 
+    schema = None
     try:
         schema_file = args.schema
         if os.path.splitext(schema_file.strip())[1] == '':
@@ -26,11 +27,11 @@ def load_files(args, binary_output=False):
         errPrint("Error loading schema: %s\n" % err)
 
     if not args.output:
-        yield (schema, sys.stdout)
+        yield schema, sys.stdout
         return
 
     output = os.path.realpath(os.path.expanduser(args.output))
     if os.path.exists(output) and not args.clobber:
         errPrint("Error: Output file already exists: %s" % args.output)
     with open(output, ('wb' if binary_output else 'w')) as out:
-        yield (schema, out)
+        yield schema, out

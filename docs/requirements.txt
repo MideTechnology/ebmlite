@@ -1,0 +1,4 @@
+# Documentation requirements
+Sphinx==8.2.3
+pydata-sphinx-theme==0.16.1
+sphinx-autodoc-typehints==1.18.1

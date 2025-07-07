@@ -15,6 +15,7 @@ __all__ = ['readElementID', 'readElementSize', 'readFloat', 'readInt',
 
 from datetime import datetime, timedelta
 import struct
+from typing import BinaryIO, Optional, Tuple
 import warnings
 
 # ==============================================================================
@@ -42,10 +43,10 @@ _struct_float64_unpack = _struct_float64.unpack
 # --- Reading and Decoding
 # ==============================================================================
 
-def decodeIntLength(byte):
+def decodeIntLength(byte: int) -> Tuple[int, int]:
     """ Extract the encoded size from an initial byte.
 
-        @return: The size, and the byte with the size removed (it is the first
+        :return: The size, and the byte with the size removed (it is the first
             byte of the value).
     """
     # An inelegant implementation, but it's fast.
@@ -67,11 +68,11 @@ def decodeIntLength(byte):
     return 8, 0
 
 
-def decodeIDLength(byte):
+def decodeIDLength(byte: int) -> Tuple[int, int]:
     """ Extract the encoded ID size from an initial byte.
 
-        @return: The size and the original byte (it is part of the ID).
-        @raise IOError: raise if the length of an ID is invalid.
+        :return: The size and the original byte (it is part of the ID).
+        :raise IOError: raise if the length of an ID is invalid.
     """
     if byte >= 128:
         return 1, byte
@@ -86,12 +87,12 @@ def decodeIDLength(byte):
     raise IOError('Invalid length for ID: %d' % length)
 
 
-def readElementID(stream):
+def readElementID(stream: BinaryIO) -> Tuple[int, int]:
     """ Read an element ID from a file (or file-like stream).
 
-        @param stream: The source file-like object.
-        @return: The decoded element ID and its length in bytes.
-        @raise IOError: raised if the length of the ID of an element is greater than 4 bytes.
+        :param stream: The source file-like object.
+        :return: The decoded element ID and its length in bytes.
+        :raise IOError: raised if the length of the ID of an element is greater than 4 bytes.
     """
     ch = stream.read(1)
     length, eid = decodeIDLength(ord(ch))
@@ -104,11 +105,11 @@ def readElementID(stream):
     return eid, length
 
 
-def readElementSize(stream):
+def readElementSize(stream: BinaryIO) -> Tuple[Optional[int], int]:
     """ Read an element size from a file (or file-like stream).
 
-        @param stream: The source file-like object.
-        @return: The decoded size (or `None`) and the length of the
+        :param stream: The source file-like object.
+        :return: The decoded size (or `None`) and the length of the
             descriptor in bytes.
     """
     ch = stream.read(1)
@@ -126,12 +127,12 @@ def readElementSize(stream):
     return size, length
 
 
-def readUInt(stream, size):
+def readUInt(stream: BinaryIO, size: int) -> int:
     """ Read an unsigned integer from a file (or file-like stream).
 
-        @param stream: The source file-like object.
-        @param size: The number of bytes to read from the stream.
-        @return: The decoded value.
+        :param stream: The source file-like object.
+        :param size: The number of bytes to read from the stream.
+        :return: The decoded value.
     """
 
     if size == 0:
@@ -141,12 +142,12 @@ def readUInt(stream, size):
     return _struct_uint64_unpack_from(data.rjust(8, b'\x00'))[0]
 
 
-def readInt(stream, size):
+def readInt(stream: BinaryIO, size: int) -> int:
     """ Read a signed integer from a file (or file-like stream).
 
-        @param stream: The source file-like object.
-        @param size: The number of bytes to read from the stream.
-        @return: The decoded value.
+        :param stream: The source file-like object.
+        :param size: The number of bytes to read from the stream.
+        :return: The decoded value.
     """
 
     if size == 0:
@@ -160,13 +161,13 @@ def readInt(stream, size):
     return _struct_int64_unpack_from(data.rjust(8, pad))[0]
 
 
-def readFloat(stream, size):
-    """ Read an floating point value from a file (or file-like stream).
+def readFloat(stream: BinaryIO, size: int) -> float:
+    """ Read a floating point value from a file (or file-like stream).
 
-        @param stream: The source file-like object.
-        @param size: The number of bytes to read from the stream.
-        @return: The decoded value.
-        @raise IOError: raised if the length of this floating point number is not
+        :param stream: The source file-like object.
+        :param size: The number of bytes to read from the stream.
+        :return: The decoded value.
+        :raise IOError: raised if the length of this floating point number is not
             valid (0, 4, 8 bytes)
     """
     if size == 4:
@@ -180,12 +181,12 @@ def readFloat(stream, size):
                   "only lengths of 0, 4, or 8 bytes supported." % size)
 
 
-def readString(stream, size):
+def readString(stream: BinaryIO, size: int) -> str:
     """ Read an ASCII string from a file (or file-like stream).
 
-        @param stream: The source file-like object.
-        @param size: The number of bytes to read from the stream.
-        @return: The decoded value.
+        :param stream: The source file-like object.
+        :param size: The number of bytes to read from the stream.
+        :return: The decoded value.
     """
     if size == 0:
         return u''
@@ -200,12 +201,12 @@ def readString(stream, size):
         return str(value, 'ascii', 'replace')
 
 
-def readUnicode(stream, size):
-    """ Read an UTF-8 encoded string from a file (or file-like stream).
+def readUnicode(stream: BinaryIO, size: int) -> str:
+    """ Read a UTF-8 encoded string from a file (or file-like stream).
 
-        @param stream: The source file-like object.
-        @param size: The number of bytes to read from the stream.
-        @return: The decoded value.
+        :param stream: The source file-like object.
+        :param size: The number of bytes to read from the stream.
+        :return: The decoded value.
     """
 
     if size == 0:
@@ -216,14 +217,14 @@ def readUnicode(stream, size):
     return str(data, 'utf_8')
 
 
-def readDate(stream, size=8):
+def readDate(stream: BinaryIO, size: int = 8) -> datetime:
     """ Read an EBML encoded date (nanoseconds since UTC 2001-01-01T00:00:00)
         from a file (or file-like stream).
 
-        @param stream: The source file-like object.
-        @param size: The number of bytes to read from the stream.
-        @return: The decoded value (as `datetime.datetime`).
-        @raise IOError: raised if the length of the date is not 8 bytes.
+        :param stream: The source file-like object.
+        :param size: The number of bytes to read from the stream.
+        :return: The decoded value (as `datetime.datetime`).
+        :raise IOError: raised if the length of the date is not 8 bytes.
     """
     if size != 8:
         raise IOError("Cannot read date value of length %d, only 8." % size)
