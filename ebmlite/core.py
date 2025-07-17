@@ -1639,7 +1639,7 @@ def parseSchema(src: str,
     else:
         stream = StringIO(src)
 
-    schema = Schema(stream, **kwargs)
+    schema = Schema(stream, name=name, **kwargs)
     name = name or schema.name
     SCHEMATA[name] = schema
     return schema
