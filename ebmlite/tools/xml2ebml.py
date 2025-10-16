@@ -26,10 +26,14 @@ def main():
         '-c', '--clobber', action="store_true",
         help="Clobber (overwrite) existing files.",
     )
+    argparser.add_argument(
+        '-n', '--no_header', action="store_false",
+        help="Do not write the standard EBML header segment.",
+    )
     args = argparser.parse_args()
 
     with utils.load_files(args, binary_output=True) as (schema, out):
-        ebmlite.util.xml2ebml(args.input, out, schema)  # , sizeLength=4, headers=True, unknown=True)
+        ebmlite.util.xml2ebml(args.input, out, schema, headers=args.no_header)  # , sizeLength=4, headers=True, unknown=True)
 
 
 if __name__ == "__main__":
